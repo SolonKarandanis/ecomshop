@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * @property int $id
@@ -34,5 +35,11 @@ class Brand extends Model
 
     public function products():HasMany{
         return $this->hasMany(Product::class);
+    }
+
+    public function getThumbnailImage():string
+    {
+        $isUrl=str_contains($this->image,'http');
+        return ($isUrl) ? $this->image : Storage::disk('public')->url($this->image);
     }
 }
