@@ -16,6 +16,7 @@ class CategoryInfolist
                 TextEntry::make('name'),
                 TextEntry::make('slug'),
                 ImageEntry::make('image')
+                    ->disk('public')
                     ->placeholder('-'),
                 IconEntry::make('is_active')
                     ->boolean(),
