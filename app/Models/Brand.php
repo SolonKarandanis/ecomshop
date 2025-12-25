@@ -25,6 +25,8 @@ use Illuminate\Support\Facades\Storage;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Brand whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Brand whereSlug($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Brand whereUpdatedAt($value)
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Product> $products
+ * @property-read int|null $products_count
  * @mixin \Eloquent
  */
 class Brand extends Model

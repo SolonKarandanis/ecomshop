@@ -34,7 +34,7 @@ class BrandForm
                     FileUpload::make('image')
                         ->image()
                         ->disk('public')
-                        ->directory('categories/images'),
+                        ->directory('brands/images'),
                     Toggle::make('is_active')
                         ->required()
                         ->default(true),

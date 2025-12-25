@@ -34,6 +34,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Address whereStreetAddress($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Address whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Address whereUserId($value)
+ * @property-read string $full_a_name
+ * @property-read \App\Models\Order $order
+ * @property-read \App\Models\User $user
  * @mixin \Eloquent
  */
 class Address extends Model

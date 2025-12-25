@@ -26,6 +26,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereTotalAmount($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereUnitAmount($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereUpdatedAt($value)
+ * @property-read \App\Models\Order $order
+ * @property-read \App\Models\Product $product
  * @mixin \Eloquent
  */
 class OrderItem extends Model
