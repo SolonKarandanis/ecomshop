@@ -8,6 +8,7 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
 class ProductsTable
@@ -23,7 +24,8 @@ class ProductsTable
                 TextColumn::make('name')
                     ->searchable(),
                 TextColumn::make('slug')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('price')
                     ->money()
                     ->sortable(),
@@ -31,7 +33,7 @@ class ProductsTable
                     ->boolean(),
                 IconColumn::make('is_featured')
                     ->boolean(),
-                IconColumn::make('is_stock')
+                IconColumn::make('in_stock')
                     ->boolean(),
                 IconColumn::make('on_sale')
                     ->boolean(),
@@ -45,7 +47,10 @@ class ProductsTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                SelectFilter::make('category')
+                    ->relationship('category', 'name'),
+                SelectFilter::make('brand')
+                    ->relationship('brand', 'name'),
             ])
             ->recordActions([
                 ViewAction::make(),

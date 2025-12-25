@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Products\Schemas;
 
 use Filament\Infolists\Components\IconEntry;
+use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Schema;
 
@@ -18,19 +19,19 @@ class ProductInfolist
                     ->label('Brand'),
                 TextEntry::make('name'),
                 TextEntry::make('slug'),
-                TextEntry::make('images')
-                    ->placeholder('-')
-                    ->columnSpanFull(),
+                ImageEntry::make('images')
+                    ->disk('public')
+                    ->placeholder('-'),
                 TextEntry::make('description')
                     ->placeholder('-')
                     ->columnSpanFull(),
                 TextEntry::make('price')
-                    ->money(),
+                    ->money('$'),
                 IconEntry::make('is_active')
                     ->boolean(),
                 IconEntry::make('is_featured')
                     ->boolean(),
-                IconEntry::make('is_stock')
+                IconEntry::make('in_stock')
                     ->boolean(),
                 IconEntry::make('on_sale')
                     ->boolean(),
