@@ -3,16 +3,19 @@
 namespace App\Filament\Resources\Orders\Schemas;
 
 use App\Models\Product;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\ToggleButtons;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
+use Illuminate\Support\Number;
 
 class OrderForm
 {
@@ -121,7 +124,22 @@ class OrderForm
                                     ->numeric()
                                     ->required()
                                     ->columnSpan(3)
-                            ])->columns(12)
+                            ])->columns(12),
+                        TextEntry::make('grand_total_placeholder')
+                            ->label('GranD Total')
+                            ->state(function(Get $get, Set $set){
+                                $total = 0;
+                                if (!$repeaters = $get('items')){
+                                    return $total;
+                                }
+                                foreach ($repeaters as $key => $repeater){
+                                    $total += $get("items.{$key}.total_amount");
+                                }
+                                $set('grand_total', $total);
+                                return Number::currency($total,'eur');
+                            }),
+                        Hidden::make('grand_total')
+                            ->default(0),
                     ]),
                 ])->columnSpanFull(),
             ]);

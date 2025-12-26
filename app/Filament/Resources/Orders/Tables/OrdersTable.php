@@ -6,6 +6,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Tables\Columns\SelectColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -16,23 +17,35 @@ class OrdersTable
         return $table
             ->columns([
                 TextColumn::make('user.name')
-                    ->searchable(),
+                    ->label('Customer')
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('grand_total')
                     ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->money('eur'),
                 TextColumn::make('payment_method')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('payment_status')
-                    ->searchable(),
-                TextColumn::make('order_status')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
+                SelectColumn::make('order_status')
+                    ->options([
+                        'new' => 'New',
+                        'processing' => 'Processing',
+                        'shipped' => 'Shipped',
+                        'delivered' => 'Delivered',
+                        'cancelled' => 'Cancelled',
+                    ])
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('currency')
-                    ->searchable(),
-                TextColumn::make('shipping_amount')
-                    ->numeric()
+                    ->searchable()
                     ->sortable(),
                 TextColumn::make('shipping_method')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
