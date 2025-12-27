@@ -3,6 +3,8 @@
 namespace App\Filament\Resources\Orders\Pages;
 
 use App\Filament\Resources\Orders\OrderResource;
+use App\Filament\Resources\Orders\Widgets\OrderBuyerStatsWidget;
+use App\Filament\Resources\Orders\Widgets\OrderStatsWidget;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 
@@ -14,6 +16,19 @@ class ListOrders extends ListRecords
     {
         return [
             CreateAction::make(),
+        ];
+    }
+
+    protected function getHeaderWidgets(): array{
+        return [
+            OrderStatsWidget::class,
+        ];
+    }
+
+    protected function getFooterWidgets(): array
+    {
+        return [
+          OrderBuyerStatsWidget::class,
         ];
     }
 }
