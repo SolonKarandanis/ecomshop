@@ -6,7 +6,6 @@ use App\Models\Order;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Number;
 
 class OrderStatsWidget extends StatsOverviewWidget
 {
