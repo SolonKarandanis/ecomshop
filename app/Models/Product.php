@@ -81,12 +81,24 @@ class Product extends Model
         return $this->hasMany(OrderItem::class);
     }
 
-    public function getThumbnailImage():string
+    public function getThumbnailImage(?string $imagePath=null):string
     {
         if (empty($this->images)) {
             return ''; // Or a default image path
         }
-        $isUrl=str_contains($this->images[0],'http');
-        return ($isUrl) ? $this->images[0] : Storage::disk('public')->url($this->images[0]);
+        if($imagePath){
+            foreach ($this->images as $image) {
+                if($image===$imagePath){
+                    return $this->isUrl($imagePath);
+                }
+            }
+        }
+        return $this->isUrl($this->images[0]);
+    }
+
+    private function isUrl(string $image):string{
+
+        $isUrl=str_contains($image,'http');
+        return ($isUrl) ? $image : Storage::disk('public')->url($image);
     }
 }
