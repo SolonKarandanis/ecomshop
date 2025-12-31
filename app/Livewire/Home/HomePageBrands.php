@@ -10,6 +10,6 @@ class HomePageBrands extends Component
     public function render()
     {
         $brands=Brand::query()->where('is_active',1)->get();
-        return view('livewire.home.home-page-brands',['brands'=>$brands]);
+        return view('livewire.home.home-page-brands',compact('brands'));
     }
 }
