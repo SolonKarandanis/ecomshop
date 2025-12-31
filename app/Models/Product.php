@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * @property int $id
@@ -78,5 +79,14 @@ class Product extends Model
 
     public function orderItems(): HasMany{
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function getThumbnailImage():string
+    {
+        if (empty($this->images)) {
+            return ''; // Or a default image path
+        }
+        $isUrl=str_contains($this->images[0],'http');
+        return ($isUrl) ? $this->images[0] : Storage::disk('public')->url($this->images[0]);
     }
 }
