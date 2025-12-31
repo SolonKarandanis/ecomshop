@@ -2,14 +2,20 @@
 
 namespace App\Livewire\Home;
 
-use App\Models\Category;
+use App\Repositories\CategoryRepository;
 use Livewire\Component;
 
 class HomePageCategories extends Component
 {
+
+    protected CategoryRepository $categoryRepository;
+
+    public function boot(CategoryRepository $categoryRepository){
+        $this->categoryRepository = $categoryRepository;
+    }
     public function render()
     {
-        $categories = Category::query()->where('is_active', 1)->get();
+        $categories = $this->categoryRepository->getActiveCategories();
         return view('livewire.home.home-page-categories', compact('categories'));
     }
 }
