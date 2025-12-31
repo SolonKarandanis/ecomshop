@@ -16,7 +16,6 @@ class ProductDetailPage extends Component
     public function render()
     {
         $product = Product::query()->where('slug', '=', $this->slug)->first();
-//        dd($product);
         return view('livewire.product-detail-page',compact('product'));
     }
 }

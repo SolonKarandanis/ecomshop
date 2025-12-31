@@ -1,4 +1,7 @@
-@php use Illuminate\Support\Number; @endphp
+@php
+    use Illuminate\Support\Number;
+    use Illuminate\Support\Str;
+@endphp
 <div class="w-full max-w-340 py-10 px-4 sm:px-6 lg:px-8 mx-auto">
     <section class="py-10 bg-gray-50 font-poppins dark:bg-gray-800 rounded-lg">
         <div class="px-4 py-4 mx-auto max-w-7xl lg:py-6 md:px-6">
@@ -86,7 +89,7 @@
                                     <div class="p-3 ">
                                         <div class="flex items-center justify-between gap-2 mb-2">
                                             <h3 class="text-xl font-medium dark:text-gray-400 line-clamp-3">
-                                                {{$product->name}}
+                                                {!!Str::markdown($product->description)!!}
                                             </h3>
                                         </div>
                                         <p class="text-lg ">
