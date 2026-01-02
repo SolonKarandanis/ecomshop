@@ -2,9 +2,10 @@
 
 namespace App\Livewire;
 
-use App\Models\Product;
+use App\Dtos\ProductSearchFilterDto;
 use App\Repositories\BrandRepository;
 use App\Repositories\CategoryRepository;
+use App\Repositories\ProductRepository;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -27,42 +28,41 @@ class ProductsPage extends Component
     #[Url('on_sale')]
     public $on_sale;
 
-    #[Url('price_range')]
-    public $price_range=3000;
+    #[Url('price_from')]
+    public $price_from=0;
+
+    #[Url('price_to')]
+    public $price_to=3000;
 
     protected CategoryRepository $categoryRepository;
     protected BrandRepository $brandRepository;
+    protected ProductRepository $productRepository;
 
     public function boot(
         CategoryRepository $categoryRepository,
         BrandRepository $brandRepository,
+        ProductRepository $productRepository
     ): void{
         $this->categoryRepository = $categoryRepository;
         $this->brandRepository = $brandRepository;
+        $this->productRepository = $productRepository;
     }
     public function render()
     {
         $categories = $this->categoryRepository->getActiveCategories();
         $brands=$this->brandRepository->getActiveBrands();
-        $productQuery = Product::query()
-            ->where('is_active', 1)
-            ->where('price','<=',$this->price_range);
-        if(!empty($this->selected_categories)){
-            $productQuery->whereIn('category_id', $this->selected_categories);
-        }
-        if(!empty($this->selected_brands)){
-            $productQuery->whereIn('brand_id', $this->selected_brands);
-        }
-        if($this->featured){
-            $productQuery->where('is_featured', true);
-        }
-        if($this->on_sale){
-            $productQuery->where('on_sale', true);
-        }
+        $productSearchFilterDto = new ProductSearchFilterDto();
+        $productSearchFilterDto->setSelectedCategories($this->selected_categories);
+        $productSearchFilterDto->setSelectedBrands($this->selected_brands);
+        $productSearchFilterDto->setFeatured($this->featured??false);
+        $productSearchFilterDto->setOnSale($this->on_sale??false);
+        $productSearchFilterDto->setPriceFrom($this->price_from);
+        $productSearchFilterDto->setPriceTo($this->price_to);
+        $searchResult = $this->productRepository->searchProducts($productSearchFilterDto);
         return view('livewire.products-page',[
             'categories' => $categories,
             'brands' => $brands,
-            'products'=>$productQuery->paginate(6),
+            'products'=>$searchResult,
         ]);
     }
 }

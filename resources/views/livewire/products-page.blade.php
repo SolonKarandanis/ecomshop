@@ -72,13 +72,13 @@
                         <h2 class="text-2xl font-bold text-gray-700 dark:text-white">Price</h2>
                         <div class="w-16 pb-2 mb-6 border-b border-rose-600 dark:border-gray-400"></div>
                         <div>
-                            <div class="text-gray-700 dark:text-white">{{Number::currency($price_range,'eur')}}</div>
+                            <div class="text-gray-700 dark:text-white">{{Number::currency($price_to,'eur')}}</div>
                             <input
                                 type="range"
-                                wire:model.live="price_range"
+                                wire:model.live="price_to"
                                 class="w-full h-1 mb-4 bg-blue-100 rounded appearance-none cursor-pointer"
                                 max="10000"
-                                value="{{$price_range}}"
+                                value="{{$price_to}}"
                                 step="500">
                             <div class="flex justify-between ">
                                 <span class="inline-block text-lg font-bold text-blue-400 ">
