@@ -8,13 +8,17 @@
             <div class="flex flex-wrap mb-24 -mx-3">
                 <div class="w-full pr-2 lg:w-1/4 lg:block">
                     <div class="p-4 mb-5 bg-white border border-gray-200 dark:border-gray-900 dark:bg-gray-900">
-                        <h2 class="text-2xl font-bold dark:text-gray-400"> Categories</h2>
+                        <h2 class="text-2xl font-bold text-gray-700 dark:text-white"> Categories</h2>
                         <div class="w-16 pb-2 mb-6 border-b border-rose-600 dark:border-gray-400"></div>
                         <ul>
                             @foreach($categories as $category)
                                 <li class="mb-4" wire:key="{{$category->id}}">
-                                    <label for="" class="flex items-center dark:text-gray-400 ">
-                                        <input type="checkbox" class="w-4 h-4 mr-2">
+                                    <label for="{{$category->slug}}" class="flex items-center text-gray-700 dark:text-white">
+                                        <input type="checkbox"
+                                               wire:model.live="selected_categories"
+                                               id="{{$category->slug}}"
+                                               value="{{$category->id}}"
+                                               class="w-4 h-4 mr-2">
                                         <span class="text-lg">{{$category->name}}</span>
                                     </label>
                                 </li>
@@ -22,46 +26,67 @@
                         </ul>
                     </div>
                     <div class="p-4 mb-5 bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-900">
-                        <h2 class="text-2xl font-bold dark:text-gray-400">Brand</h2>
+                        <h2 class="text-2xl font-bold text-gray-700 dark:text-white">Brand</h2>
                         <div class="w-16 pb-2 mb-6 border-b border-rose-600 dark:border-gray-400"></div>
                         <ul>
                             @foreach($brands as $brand)
                                 <li class="mb-4" wire:key="{{$brand->id}}">
-                                    <label for="" class="flex items-center dark:text-gray-300">
-                                        <input type="checkbox" class="w-4 h-4 mr-2">
-                                        <span class="text-lg dark:text-gray-400">{{$brand->name}}</span>
+                                    <label for="{{$brand->slug}}" class="flex items-center text-gray-700 dark:text-white">
+                                        <input type="checkbox"
+                                               wire:model.live="selected_brands"
+                                               id="{{$brand->slug}}"
+                                               value="{{$brand->id}}"
+                                               class="w-4 h-4 mr-2">
+                                        <span class="text-lg text-gray-700 dark:text-white">{{$brand->name}}</span>
                                     </label>
                                 </li>
                             @endforeach
                         </ul>
                     </div>
                     <div class="p-4 mb-5 bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-900">
-                        <h2 class="text-2xl font-bold dark:text-gray-400">Product Status</h2>
+                        <h2 class="text-2xl font-bold text-gray-700 dark:text-white">Product Status</h2>
                         <div class="w-16 pb-2 mb-6 border-b border-rose-600 dark:border-gray-400"></div>
                         <ul>
                             <li class="mb-4">
-                                <label for="" class="flex items-center dark:text-gray-300">
-                                    <input type="checkbox" class="w-4 h-4 mr-2">
-                                    <span class="text-lg dark:text-gray-400">In Stock</span>
+                                <label for="featured" class="flex items-center text-gray-700 dark:text-white">
+                                    <input id="featured"
+                                           value="true"
+                                           wire:model.live="featured"
+                                           type="checkbox"
+                                           class="w-4 h-4 mr-2">
+                                    <span class="text-lg text-gray-700 dark:text-white">Is Featured</span>
                                 </label>
-                            </li>
-                            <li class="mb-4">
-                                <label for="" class="flex items-center dark:text-gray-300">
-                                    <input type="checkbox" class="w-4 h-4 mr-2">
-                                    <span class="text-lg dark:text-gray-400">On Sale</span>
+                                <label for="on_sale" class="flex items-center dark:text-gray-300">
+                                    <input id="on_sale"
+                                           value="true"
+                                           wire:model.live="on_sale"
+                                           type="checkbox"
+                                           class="w-4 h-4 mr-2">
+                                    <span class="text-lg text-gray-700 dark:text-white">On Sale</span>
                                 </label>
                             </li>
                         </ul>
                     </div>
 
                     <div class="p-4 mb-5 bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-900">
-                        <h2 class="text-2xl font-bold dark:text-gray-400">Price</h2>
+                        <h2 class="text-2xl font-bold text-gray-700 dark:text-white">Price</h2>
                         <div class="w-16 pb-2 mb-6 border-b border-rose-600 dark:border-gray-400"></div>
                         <div>
-                            <input type="range" class="w-full h-1 mb-4 bg-blue-100 rounded appearance-none cursor-pointer" max="500000" value="100000" step="100000">
+                            <div class="text-gray-700 dark:text-white">{{Number::currency($price_range,'eur')}}</div>
+                            <input
+                                type="range"
+                                wire:model.live="price_range"
+                                class="w-full h-1 mb-4 bg-blue-100 rounded appearance-none cursor-pointer"
+                                max="10000"
+                                value="{{$price_range}}"
+                                step="500">
                             <div class="flex justify-between ">
-                                <span class="inline-block text-lg font-bold text-blue-400 ">&#8377; 1000</span>
-                                <span class="inline-block text-lg font-bold text-blue-400 ">&#8377; 500000</span>
+                                <span class="inline-block text-lg font-bold text-blue-400 ">
+                                    {{Number::currency(100,'eur')}}
+                                </span>
+                                <span class="inline-block text-lg font-bold text-blue-400 ">
+                                    {{Number::currency(10000,'eur')}}
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -70,7 +95,7 @@
                     <div class="px-3 mb-4">
                         <div class="items-center justify-between hidden px-3 py-2 bg-gray-100 md:flex dark:bg-gray-900 ">
                             <div class="flex items-center justify-between">
-                                <select name="" id="" class="block w-40 text-base bg-gray-100 cursor-pointer dark:text-gray-400 dark:bg-gray-900">
+                                <select name="" id="" class="block w-40 text-base bg-gray-100 cursor-pointer text-gray-700 dark:text-white dark:bg-gray-900">
                                     <option value="">Sort by latest</option>
                                     <option value="">Sort by Price</option>
                                 </select>
