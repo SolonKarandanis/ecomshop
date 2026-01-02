@@ -28,7 +28,7 @@ class ProductsPage extends Component
     public $on_sale;
 
     #[Url('price_range')]
-    public $price_range=1500;
+    public $price_range=3000;
 
     protected CategoryRepository $categoryRepository;
     protected BrandRepository $brandRepository;
