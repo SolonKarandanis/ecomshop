@@ -18,6 +18,8 @@ class Attribute extends Model
 {
     use HasFactory;
 
+    public $timestamps = false;
+
     protected $table = 'attributes';
 
     protected $fillable = ['name', 'type'];

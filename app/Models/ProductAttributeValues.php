@@ -25,6 +25,7 @@ class ProductAttributeValues extends Pivot
      * @var bool
      */
     public $incrementing = true;
+    public $timestamps = false;
 
     protected $table = 'product_attribute_values';
 

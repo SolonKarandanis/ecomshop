@@ -17,6 +17,8 @@ class AttributeOptions extends Model
 {
     use HasFactory;
 
+    public $timestamps = false;
+
     protected $table = 'attribute_options';
 
     protected $fillable = [
