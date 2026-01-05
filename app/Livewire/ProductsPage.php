@@ -34,6 +34,9 @@ class ProductsPage extends Component
     #[Url('price_to')]
     public $price_to=3000;
 
+    #[Url('sort')]
+    public $sort='latest';
+
     protected CategoryRepository $categoryRepository;
     protected BrandRepository $brandRepository;
     protected ProductRepository $productRepository;
@@ -58,6 +61,7 @@ class ProductsPage extends Component
         $productSearchFilterDto->setOnSale($this->on_sale??false);
         $productSearchFilterDto->setPriceFrom($this->price_from);
         $productSearchFilterDto->setPriceTo($this->price_to);
+        $productSearchFilterDto->setSort($this->sort);
         $searchResult = $this->productRepository->searchProducts($productSearchFilterDto);
         return view('livewire.products-page',[
             'categories' => $categories,

@@ -14,6 +14,8 @@ class ProductSearchFilterDto
     private int|null $price_from;
     private int|null $price_to;
 
+    private string $sort;
+
     public function getSelectedCategories(): array
     {
         return $this->selected_categories;
@@ -72,6 +74,16 @@ class ProductSearchFilterDto
     public function setPriceTo(int $price_to): void
     {
         $this->price_to = $price_to;
+    }
+
+    public function getSort(): string
+    {
+        return $this->sort;
+    }
+
+    public function setSort(string $sort): void
+    {
+        $this->sort = $sort;
     }
 
 

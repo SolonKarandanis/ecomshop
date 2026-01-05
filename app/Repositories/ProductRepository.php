@@ -23,18 +23,31 @@ class ProductRepository
         $productQuery = $this->modelQuery()
             ->where('is_active', true)
             ->whereBetween('price', [$dto->getPriceFrom(), $dto->getPriceTo()]);
-        if(!empty($dto->getSelectedCategories())){
-            $productQuery->whereIn('category_id', $dto->getSelectedCategories());
-        }
-        if(!empty($dto->getSelectedBrands())){
-            $productQuery->whereIn('brand_id', $dto->getSelectedBrands());
-        }
-        if($dto->isFeatured()){
-            $productQuery->where('is_featured', true);
-        }
-        if($dto->isOnSale()){
-            $productQuery->where('on_sale', true);
-        }
+
+        $productQuery->when(!empty($dto->getSelectedCategories()),function($query) use ($dto){
+            $query->whereIn('category_id', $dto->getSelectedCategories());
+        });
+
+        $productQuery->when(!empty($dto->getSelectedBrands()),function($query) use ($dto){
+            $query->whereIn('brand_id', $dto->getSelectedBrands());
+        });
+
+        $productQuery->when($dto->isFeatured(),function($query) use ($dto){
+            $query->where('is_featured', true);
+        });
+
+        $productQuery->when($dto->isOnSale(),function($query) use ($dto){
+            $query->where('on_sale', true);
+        });
+
+        $productQuery->when($dto->getSort()==='latest',function($query) use ($dto){
+            $query->orderBy('created_at', 'desc');
+        });
+
+        $productQuery->when($dto->getSort()==='price',function($query) use ($dto){
+            $query->orderBy('price', 'desc');
+        });
+
         return $productQuery->paginate(6);
     }
 }
