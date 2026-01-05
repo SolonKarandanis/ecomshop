@@ -37,6 +37,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read string $full_a_name
  * @property-read \App\Models\Order $order
  * @property-read \App\Models\User $user
+ * @property-read string $full_name
  * @mixin \Eloquent
  */
 class Address extends Model

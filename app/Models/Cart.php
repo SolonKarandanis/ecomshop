@@ -7,6 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\CartItem> $cartItems
+ * @property-read int|null $cart_items_count
+ * @property-read \App\Models\User|null $user
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Cart newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Cart newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Cart query()
+ * @mixin \Eloquent
+ */
 class Cart extends Model
 {
     use HasFactory;

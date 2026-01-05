@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
 
@@ -44,6 +45,9 @@ use Illuminate\Support\Facades\Storage;
  * @property-read \App\Models\Category $category
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\OrderItem> $orderItems
  * @property-read int|null $order_items_count
+ * @property-read \App\Models\ProductAttributeValues|null $pivot
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Attribute> $attributes
+ * @property-read int|null $attributes_count
  * @mixin \Eloquent
  */
 class Product extends Model
@@ -79,6 +83,12 @@ class Product extends Model
 
     public function orderItems(): HasMany{
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function attributes(): BelongsToMany
+    {
+        return $this->belongsToMany(Attribute::class, 'product_attribute_values', 'product_id', 'attribute_id')
+            ->using(ProductAttributeValues::class);
     }
 
     public function getThumbnailImage(?string $imagePath=null):string
