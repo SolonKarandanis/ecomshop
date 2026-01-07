@@ -48,6 +48,8 @@ use Illuminate\Support\Facades\Storage;
  * @property-read \App\Models\ProductAttributeValues|null $pivot
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Attribute> $attributes
  * @property-read int|null $attributes_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ProductAttributeValues> $productAttributeValues
+ * @property-read int|null $product_attribute_values_count
  * @mixin \Eloquent
  */
 class Product extends Model
@@ -89,6 +91,11 @@ class Product extends Model
     {
         return $this->belongsToMany(Attribute::class, 'product_attribute_values', 'product_id', 'attribute_id')
             ->using(ProductAttributeValues::class);
+    }
+
+    public function productAttributeValues(): HasMany
+    {
+        return $this->hasMany(ProductAttributeValues::class);
     }
 
     public function getThumbnailImage(?string $imagePath=null):string

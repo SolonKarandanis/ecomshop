@@ -12,6 +12,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Attribute newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Attribute newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Attribute query()
+ * @property int $id
+ * @property string $name
+ * @property string $type
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Attribute whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Attribute whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Attribute whereType($value)
  * @mixin \Eloquent
  */
 class Attribute extends Model
