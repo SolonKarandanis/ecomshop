@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Products\Schemas;
 
+use App\Enums\AttributeValueMethodEnum;
 use App\Models\Attribute;
 use App\Models\AttributeOptions;
 use App\Models\Product;
@@ -68,8 +69,15 @@ class ProductForm
                                             }
                                             return AttributeOptions::all()->pluck('name', 'id');
                                         })
-                                        ->required()
-                                ])->columns(2)
+                                        ->required(),
+                                    Select::make('attribute_value_method')
+                                        ->label('Value Method')
+                                        ->options(AttributeValueMethodEnum::labels())
+                                        ->live(),
+                                    TextInput::make('attribute_value')
+                                        ->label('Value')
+                                        ->disabled(fn (Get $get) => in_array($get('attribute_value_method'), [null, '']))
+                                ])->columns(4)
                         ])
                 ])->columnSpan(2),
                 Group::make()->schema([
