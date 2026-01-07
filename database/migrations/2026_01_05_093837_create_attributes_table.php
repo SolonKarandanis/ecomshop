@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('attributes', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->enum('type', ['single', 'multiple',])->default('single');
+            $table->enum('type', ['Select', 'Image', 'Radio',])->default('Select');
         });
     }
 
