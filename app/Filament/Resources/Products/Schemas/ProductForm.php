@@ -57,7 +57,7 @@ class ProductForm
                                 ->schema([
                                     Select::make('attribute_id')
                                         ->label('Attribute')
-                                        ->options(Attribute::all()->pluck('name', 'id')->toArray())
+                                        ->options(Attribute::query()->whereNotNull('name')->pluck('name', 'id')->toArray())
                                         ->reactive()
                                         ->required(),
                                     Select::make('attribute_option_id')
@@ -65,14 +65,16 @@ class ProductForm
                                         ->options(function (Get $get) {
                                             $attribute = Attribute::find($get('attribute_id'));
                                             if ($attribute) {
-                                                return $attribute->attributeOptions->pluck('name', 'id');
+                                                return $attribute->attributeOptions()->whereNotNull('option_name')->pluck('option_name', 'id');
                                             }
-                                            return AttributeOptions::all()->pluck('name', 'id');
+                                            return AttributeOptions::query()->whereNotNull('option_name')->pluck('option_name', 'id');
                                         })
+                                        ->disabled(fn (Get $get) => !$get('attribute_id'))
                                         ->required(),
                                     Select::make('attribute_value_method')
                                         ->label('Value Method')
                                         ->options(AttributeValueMethodEnum::labels())
+                                        ->placeholder('Select a method')
                                         ->live(),
                                     TextInput::make('attribute_value')
                                         ->label('Value')
