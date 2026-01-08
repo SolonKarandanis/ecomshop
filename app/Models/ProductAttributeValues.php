@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 /**
  * @property-read \App\Models\Attribute|null $attribute
@@ -50,6 +51,16 @@ class ProductAttributeValues extends Pivot implements HasMedia
         'attribute_value_method',
         'attribute_value'
     ];
+
+    public function registerMediaConversions(?Media $media = null): void
+    {
+        $this->addMediaConversion('thumb')
+            ->width(100);
+        $this->addMediaConversion('small')
+            ->width(480);
+        $this->addMediaConversion('large')
+            ->width(1200);
+    }
 
     public function product(): BelongsTo
     {

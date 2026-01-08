@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\Brands\Schemas;
 
 use App\Models\Brand;
-use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Grid;
@@ -31,10 +31,8 @@ class BrandForm
                             ->maxLength(255)
                             ->unique(Brand::class, 'slug',ignoreRecord: true),
                     ]),
-                    FileUpload::make('image')
-                        ->image()
-                        ->disk('public')
-                        ->directory('brands/images'),
+                    SpatieMediaLibraryFileUpload::make('image')
+                        ->collection('brand-images'),
                     Toggle::make('is_active')
                         ->required()
                         ->default(true),

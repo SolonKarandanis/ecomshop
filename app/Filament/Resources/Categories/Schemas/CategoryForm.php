@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\Categories\Schemas;
 
 use App\Models\Category;
-use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Grid;
@@ -31,10 +31,8 @@ class CategoryForm
                             ->maxLength(255)
                             ->unique(Category::class, 'slug',ignoreRecord: true),
                     ]),
-                    FileUpload::make('image')
-                        ->image()
-                        ->disk('public')
-                        ->directory('categories/images'),
+                    SpatieMediaLibraryFileUpload::make('image')
+                        ->collection('category-images'),
                     Toggle::make('is_active')
                         ->required()
                         ->default(true),

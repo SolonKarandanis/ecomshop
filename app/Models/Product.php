@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 /**
  * @property int $id
@@ -75,6 +76,16 @@ class Product extends Model implements HasMedia
     protected $casts=[
         'images'=>'array',
     ];
+
+    public function registerMediaConversions(?Media $media = null): void
+    {
+        $this->addMediaConversion('thumb')
+            ->width(100);
+        $this->addMediaConversion('small')
+            ->width(480);
+        $this->addMediaConversion('large')
+            ->width(1200);
+    }
 
     public function category(): BelongsTo
     {

@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 /**
  * @property int $id
@@ -29,11 +32,21 @@ use Illuminate\Support\Facades\Storage;
  * @property-read int|null $products_count
  * @mixin \Eloquent
  */
-class Brand extends Model
+class Brand extends Model implements HasMedia
 {
-    use HasFactory;
+    use HasFactory, InteractsWithMedia;
 
     protected $fillable=['name','slug','image','is_active'];
+
+    public function registerMediaConversions(?Media $media = null): void
+    {
+        $this->addMediaConversion('thumb')
+            ->width(100);
+        $this->addMediaConversion('small')
+            ->width(480);
+        $this->addMediaConversion('large')
+            ->width(1200);
+    }
 
     public function products():HasMany{
         return $this->hasMany(Product::class);
