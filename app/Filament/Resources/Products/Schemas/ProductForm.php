@@ -3,10 +3,11 @@
 namespace App\Filament\Resources\Products\Schemas;
 
 use App\Enums\AttributeValueMethodEnum;
+use App\Enums\ProductVariationTypesEnum;
 use App\Models\Attribute;
 use App\Models\AttributeOptions;
 use App\Models\Product;
-use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
@@ -42,12 +43,10 @@ class ProductForm
                             ->fileAttachmentsDirectory('products/attachments')
                     ])->columns(2),
                     Section::make('Product Images')->schema([
-                        FileUpload::make('images')
+                        SpatieMediaLibraryFileUpload::make('images')
+                            ->collection('product-images')
                             ->multiple()
-                            ->disk('public')
-                            ->directory('products/images')
                             ->maxFiles(5)
-                            ->image()
                             ->reorderable()
                     ]),
                     Section::make('Product Variations')
@@ -78,7 +77,16 @@ class ProductForm
                                         ->live(),
                                     TextInput::make('attribute_value')
                                         ->label('Value')
-                                        ->disabled(fn (Get $get) => in_array($get('attribute_value_method'), [null, '']))
+                                        ->disabled(fn (Get $get) => in_array($get('attribute_value_method'), [null, ''])),
+                                    SpatieMediaLibraryFileUpload::make('images')
+                                        ->collection('product-attribute-images')
+                                        ->multiple()
+                                        ->maxFiles(5)
+                                        ->reorderable()
+                                        ->visible(function (Get $get) {
+                                            $attribute = Attribute::find($get('attribute_id'));
+                                            return $attribute && $attribute->type === ProductVariationTypesEnum::Image->value;
+                                        })
                                 ])->columns(4)
                         ])
                 ])->columnSpan(2),

@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Attributes\Schemas;
 
+use App\Enums\ProductVariationTypesEnum;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 
@@ -14,6 +16,9 @@ class AttributeForm
                 TextInput::make('name')
                     ->required()
                     ->maxLength(255),
+                Select::make('type')
+                    ->options(ProductVariationTypesEnum::labels())
+                    ->required(),
             ]);
     }
 }
