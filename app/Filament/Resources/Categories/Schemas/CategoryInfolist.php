@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\Categories\Schemas;
 
 use Filament\Infolists\Components\IconEntry;
-use Filament\Infolists\Components\ImageEntry;
+use Filament\Infolists\Components\SpatieMediaLibraryImageEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Schema;
 
@@ -15,8 +15,8 @@ class CategoryInfolist
             ->components([
                 TextEntry::make('name'),
                 TextEntry::make('slug'),
-                ImageEntry::make('image')
-                    ->disk('public')
+                SpatieMediaLibraryImageEntry::make('image')
+                    ->collection('category-images')
                     ->placeholder('-'),
                 IconEntry::make('is_active')
                     ->boolean(),

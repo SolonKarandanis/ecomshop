@@ -148,16 +148,16 @@ return [
             '-mt', // multithreading for some speed improvements.
             '-q 90', // quality factor that brings the least noticeable changes.
         ],
-        Spatie\ImageOptimizer\Optimizers\Avifenc::class => [
-            '-a cq-level=23', // constant quality level, lower values mean better quality and greater file size (0-63).
-            '-j all', // number of jobs (worker threads, "all" uses all available cores).
-            '--min 0', // min quantizer for color (0-63).
-            '--max 63', // max quantizer for color (0-63).
-            '--minalpha 0', // min quantizer for alpha (0-63).
-            '--maxalpha 63', // max quantizer for alpha (0-63).
-            '-a end-usage=q', // rate control mode set to Constant Quality mode.
-            '-a tune=ssim', // SSIM as tune the encoder for distortion metric.
-        ],
+//        Spatie\ImageOptimizer\Optimizers\Avifenc::class => [
+//            '-a cq-level=23', // constant quality level, lower values mean better quality and greater file size (0-63).
+//            '-j all', // number of jobs (worker threads, "all" uses all available cores).
+//            '--min 0', // min quantizer for color (0-63).
+//            '--max 63', // max quantizer for color (0-63).
+//            '--minalpha 0', // min quantizer for alpha (0-63).
+//            '--maxalpha 63', // max quantizer for alpha (0-63).
+//            '-a end-usage=q', // rate control mode set to Constant Quality mode.
+//            '-a tune=ssim', // SSIM as tune the encoder for distortion metric.
+//        ],
     ],
 
     /*
