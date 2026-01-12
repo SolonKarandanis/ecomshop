@@ -15,6 +15,6 @@ class BrandRepository
 
     public function getActiveBrands(): Collection
     {
-        return $this->modelQuery()->where('is_active','=',true)->get();
+        return $this->modelQuery()->with('media')->where('is_active','=',true)->get();
     }
 }
