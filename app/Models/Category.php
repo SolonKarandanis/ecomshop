@@ -14,7 +14,6 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property int $id
  * @property string $name
  * @property string $slug
- * @property string|null $image
  * @property int $is_active
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -25,7 +24,6 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Category query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Category whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Category whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Category whereImage($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Category whereIsActive($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Category whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Category whereSlug($value)
@@ -36,7 +34,7 @@ class Category extends Model implements HasMedia
 {
     use HasFactory, InteractsWithMedia;
 
-    protected $fillable=['name','slug','image','is_active'];
+    protected $fillable=['name','slug','is_active'];
 
     public function registerMediaConversions(?Media $media = null): void
     {
@@ -54,7 +52,6 @@ class Category extends Model implements HasMedia
 
     public function getThumbnailImage():string
     {
-        $isUrl=str_contains($this->image,'http');
-        return ($isUrl) ? $this->image : Storage::disk('public')->url($this->image);
+        return $this->getFirstMediaUrl('category-images', 'thumb') ?: 'https://via.placeholder.com/100';
     }
 }

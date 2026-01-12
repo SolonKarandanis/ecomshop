@@ -54,7 +54,6 @@ class Brand extends Model implements HasMedia
 
     public function getThumbnailImage():string
     {
-        $isUrl=str_contains($this->image,'http');
-        return ($isUrl) ? $this->image : Storage::disk('public')->url($this->image);
+        return $this->getFirstMediaUrl('brand-images', 'thumb') ?: 'https://via.placeholder.com/100';
     }
 }
