@@ -21,7 +21,20 @@ class ProductInfolist
                 TextEntry::make('slug'),
                 ImageEntry::make('images')
                     ->disk('public')
-                    ->placeholder('-'),
+                    ->placeholder('-')
+                    ->getStateUsing(function ($record) {
+                        $productAttributeValue = $record->productAttributeValues()
+                            ->whereHas('attribute', function ($query) {
+                                $query->where('name', 'attribute.color');
+                            })
+                            ->first();
+
+                        if ($productAttributeValue && $productAttributeValue->hasMedia('product-attribute-images')) {
+
+                            return $productAttributeValue->getFirstMediaUrl('product-attribute-images','thumb');
+                        }
+                        return null;
+                    }),
                 TextEntry::make('description')
                     ->placeholder('-')
                     ->columnSpanFull(),

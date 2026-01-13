@@ -25,7 +25,7 @@
             @foreach($brands as $brand)
                 <div class="bg-white rounded-lg shadow-md dark:bg-gray-800" wire:key="{{$brand->id}}">
                     <a href="/products?brands[0]={{$brand->id}}" class="">
-                        <img src="{{$brand->getThumbnailImage()}}" alt="{{$brand->name}}" class="object-cover w-full h-64 rounded-t-lg">
+                        <img src="{{$brand->getSmallImage()}}" alt="{{$brand->name}}" class="object-cover w-full h-64 rounded-t-lg">
                     </a>
                     <div class="p-5 text-center">
                         <a href="#" class="text-2xl font-bold tracking-tight text-gray-900 dark:text-gray-300">

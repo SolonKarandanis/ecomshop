@@ -78,15 +78,17 @@ class ProductForm
                                     TextInput::make('attribute_value')
                                         ->label('Value')
                                         ->disabled(fn (Get $get) => in_array($get('attribute_value_method'), [null, ''])),
-                                    SpatieMediaLibraryFileUpload::make('images')
-                                        ->collection('product-attribute-images')
-                                        ->multiple()
-                                        ->maxFiles(5)
-                                        ->reorderable()
-                                        ->visible(function (Get $get) {
-                                            $attribute = Attribute::find($get('attribute_id'));
-                                            return $attribute && $attribute->type === ProductVariationTypesEnum::Image->value;
-                                        })
+                                    Group::make()->schema([
+                                        SpatieMediaLibraryFileUpload::make('images')
+                                            ->collection('product-attribute-images')
+                                            ->multiple()
+                                            ->maxFiles(5)
+                                            ->reorderable()
+                                            ->visible(function (Get $get) {
+                                                $attribute = Attribute::find($get('attribute_id'));
+                                                return $attribute && $attribute->type === ProductVariationTypesEnum::Image->value;
+                                            })
+                                    ])->columnSpan(4),
                                 ])->columns(4)
                         ])
                 ])->columnSpan(2),

@@ -108,7 +108,7 @@
                                 <div class="border border-gray-300 dark:border-gray-700">
                                     <div class="relative bg-gray-200">
                                         <a href="{{route('product.detail',$product->slug)}}">
-                                            <img src="{{$product->getThumbnailImage()}}" alt="{{$product->name}}" class="object-cover w-full h-56 mx-auto ">
+                                            <img src="{{$product->getSmallImage()}}" alt="{{$product->name}}" class="object-cover w-full h-56 mx-auto ">
                                         </a>
                                     </div>
                                     <div class="p-3 ">

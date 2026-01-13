@@ -111,19 +111,47 @@ class Product extends Model implements HasMedia
         return $this->hasMany(ProductAttributeValues::class);
     }
 
-    public function getThumbnailImage(?string $imagePath=null):string
+    protected function getColorProductAttributeValue():ProductAttributeValues|null{
+        return $this->productAttributeValues()
+            ->whereHas('attribute', function ($query) {
+                $query->where('name', 'attribute.color');
+            })
+            ->first();
+    }
+
+    protected function checkIfProductAttributeValueExists(ProductAttributeValues|null $productAttributeValue):bool{
+        return $productAttributeValue && $productAttributeValue->hasMedia('product-attribute-images');
+    }
+
+    public function getThumbnailImage():string
     {
-        if (empty($this->images)) {
-            return ''; // Or a default image path
+        $productAttributeValue = $this->getColorProductAttributeValue();
+        if ($this->checkIfProductAttributeValueExists($productAttributeValue)) {
+            return $productAttributeValue->getFirstMediaUrl('product-attribute-images', 'thumb');
         }
-        if($imagePath){
-            foreach ($this->images as $image) {
-                if($image===$imagePath){
-                    return $this->isUrl($imagePath);
-                }
-            }
+
+        return '';
+    }
+
+    public function getSmallImage():string
+    {
+        $productAttributeValue = $this->getColorProductAttributeValue();
+        if ($this->checkIfProductAttributeValueExists($productAttributeValue)) {
+            return $productAttributeValue->getFirstMediaUrl('product-attribute-images', 'small');
         }
-        return $this->isUrl($this->images[0]);
+
+        return '';
+    }
+
+    private function getImageByAttributeColor(): string
+    {
+        $productAttributeValue = $this->getColorProductAttributeValue();
+
+        if ($productAttributeValue && $productAttributeValue->hasMedia()) {
+            return $productAttributeValue->getFirstMediaUrl('default', 'small');
+        }
+
+        return '';
     }
 
     private function isUrl(string $image):string{

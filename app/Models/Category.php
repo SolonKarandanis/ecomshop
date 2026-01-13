@@ -54,4 +54,9 @@ class Category extends Model implements HasMedia
     {
         return $this->getFirstMediaUrl('category-images', 'thumb') ?: 'https://via.placeholder.com/100';
     }
+
+    public function getSmallImage():string
+    {
+        return $this->getFirstMediaUrl('category-images', 'small') ?: 'https://via.placeholder.com/100';
+    }
 }
