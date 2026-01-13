@@ -15,12 +15,21 @@ class ProductRepository
     }
 
     public function getProductBySlug($slug){
-        return $this->modelQuery()->where('slug', '=', $slug)->first();
+        return $this->modelQuery()
+            ->with('media')
+            ->where('slug', '=', $slug)->first();
     }
 
     public function searchProducts(ProductSearchFilterDto $dto): LengthAwarePaginator|array
     {
         $productQuery = $this->modelQuery()
+            ->with([
+                'productAttributeValues' => function ($query) {
+                    $query->whereHas('attribute', function ($query) {
+                        $query->where('name', 'attribute.color');
+                    })->with(['media', 'attribute']);
+                }
+            ])
             ->where('is_active', true)
             ->whereBetween('price', [$dto->getPriceFrom(), $dto->getPriceTo()]);
 

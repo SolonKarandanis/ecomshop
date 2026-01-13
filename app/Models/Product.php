@@ -111,11 +111,10 @@ class Product extends Model implements HasMedia
         return $this->hasMany(ProductAttributeValues::class);
     }
 
-    protected function getColorProductAttributeValue():ProductAttributeValues|null{
-        return $this->productAttributeValues()
-            ->whereHas('attribute', function ($query) {
-                $query->where('name', 'attribute.color');
-            })
+    protected function getColorProductAttributeValue(): ?ProductAttributeValues
+    {
+        return $this->productAttributeValues
+            ->where('attribute.name', 'attribute.color')
             ->first();
     }
 
