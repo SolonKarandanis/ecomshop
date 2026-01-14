@@ -64,7 +64,6 @@ class Product extends Model implements HasMedia
         'brand_id',
         'name',
         'slug',
-        'images',
         'description',
         'price',
         'is_active',
@@ -73,9 +72,7 @@ class Product extends Model implements HasMedia
         'on_sale',
     ];
 
-    protected $casts=[
-        'images'=>'array',
-    ];
+    protected $casts=[];
 
     public function registerMediaConversions(?Media $media = null): void
     {
@@ -118,6 +115,15 @@ class Product extends Model implements HasMedia
             ->first();
     }
 
+    public function getColorAttributeValues()
+    {
+        return $this->productAttributeValues
+            ->where('attribute.name', 'attribute.color')
+            ->filter(function ($productAttributeValue) {
+                return $this->checkIfProductAttributeValueExists($productAttributeValue);
+            });
+    }
+
     protected function checkIfProductAttributeValueExists(ProductAttributeValues|null $productAttributeValue):bool{
         return $productAttributeValue && $productAttributeValue->hasMedia('product-attribute-images');
     }
@@ -142,20 +148,13 @@ class Product extends Model implements HasMedia
         return '';
     }
 
-    private function getImageByAttributeColor(): string
+    public function getLargeImage():string
     {
         $productAttributeValue = $this->getColorProductAttributeValue();
-
-        if ($productAttributeValue && $productAttributeValue->hasMedia()) {
-            return $productAttributeValue->getFirstMediaUrl('default', 'small');
+        if ($this->checkIfProductAttributeValueExists($productAttributeValue)) {
+            return $productAttributeValue->getFirstMediaUrl('product-attribute-images', 'large');
         }
 
         return '';
-    }
-
-    private function isUrl(string $image):string{
-
-        $isUrl=str_contains($image,'http');
-        return ($isUrl) ? $image : Storage::disk('public')->url($image);
     }
 }

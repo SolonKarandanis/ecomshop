@@ -82,7 +82,7 @@ class ProductForm
                                         SpatieMediaLibraryFileUpload::make('images')
                                             ->collection('product-attribute-images')
                                             ->multiple()
-                                            ->maxFiles(5)
+                                            ->maxFiles(10)
                                             ->reorderable()
                                             ->visible(function (Get $get) {
                                                 $attribute = Attribute::find($get('attribute_id'));
