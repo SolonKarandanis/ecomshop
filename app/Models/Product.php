@@ -115,13 +115,10 @@ class Product extends Model implements HasMedia
             ->first();
     }
 
-    public function getColorAttributeValues()
+    public function getAttributeValues(string $attribute)
     {
         return $this->productAttributeValues
-            ->where('attribute.name', 'attribute.color')
-            ->filter(function ($productAttributeValue) {
-                return $this->checkIfProductAttributeValueExists($productAttributeValue);
-            });
+            ->where('attribute.name', $attribute);
     }
 
     protected function checkIfProductAttributeValueExists(ProductAttributeValues|null $productAttributeValue):bool{

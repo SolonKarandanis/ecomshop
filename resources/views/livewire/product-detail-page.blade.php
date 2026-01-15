@@ -1,6 +1,6 @@
 @php
     use Illuminate\Support\Number;
-    $colorAttributeValues = $product->getColorAttributeValues();
+    $colorAttributeValues = $product->getAttributeValues('attribute.color');
     $firstImage = $colorAttributeValues->isNotEmpty() ? $colorAttributeValues->first()->getFirstMediaUrl('product-attribute-images', 'large') : '';
     $colorOptions = $colorAttributeValues->map(function ($item) {
         return [
@@ -14,57 +14,65 @@
     <section class="overflow-hidden bg-white py-11 font-poppins dark:bg-gray-800">
         <div class="max-w-6xl px-4 py-4 mx-auto lg:py-8 md:px-6">
             <div class="flex flex-wrap -mx-4">
-                <div class="w-full mb-8 md:w-1/2 md:mb-0" x-data="{
-                    mainImage: '{{ $firstImage }}',
-                    selectedColor: {{ $firstColorId ?? 'null' }},
-                    colorAttributeValues: {{ json_encode($colorAttributeValues) }},
-                    init() {
-                        this.$watch('selectedColor', (newColor) => {
-                            if (newColor === null) {
-                                this.mainImage = '{{ $firstImage }}';
-                                return;
-                            }
-
-                            const foundAttribute = this.colorAttributeValues.find(attr => attr.attribute_option_id == newColor);
-                            if (foundAttribute && foundAttribute.media.length > 0) {
-                                this.mainImage = foundAttribute.media[0].original_url;
-                            }
-                        });
-                    }
-                }">
+                <div class="w-full mb-8 md:w-1/2 md:mb-0" >
                     <div class="sticky top-0 z-50 overflow-hidden ">
-                        <div class="relative mb-6 lg:mb-10 lg:h-2/4 ">
-                            <img x-bind:src="mainImage" alt="{{$product->name}}" class="object-cover w-full lg:h-full ">
-                        </div>
-                        <div class="flex-wrap hidden md:flex ">
-                            <template x-for="attributeValue in {{ json_encode($colorAttributeValues) }}">
-                                <template x-for="media in attributeValue.media">
-                                    <div x-show="selectedColor === null || selectedColor == attributeValue.attribute_option_id" class="w-1/2 p-2 sm:w-1/4" x-on:click="mainImage = media.original_url">
-                                        <img :src="media.original_url" alt="{{$product->name}}" class="object-cover w-full lg:h-20 cursor-pointer hover:border hover:border-blue-500">
-                                    </div>
-                                </template>
-                            </template>
-                        </div>
-                        <div class="flex gap-4 items-center">
-                            <template x-for="color in {{ json_encode($colorOptions) }}">
-                                <div>
-                                    <input type="radio" :id="'color_' + color.id" :value="color.id" x-model="selectedColor">
-                                    <label :for="'color_' + color.id" x-text="color.name"></label>
+                        @if($hasColorAttribute)
+                            <section class="mt-3 border-b-white border-b-2" x-data="{
+                                mainImage: '{{ $firstImage }}',
+                                selectedColor: {{ $firstColorId ?? 'null' }},
+                                colorAttributeValues: {{ json_encode($colorAttributeValues) }},
+                                init() {
+                                    this.$watch('selectedColor', (newColor) => {
+                                        if (newColor === null) {
+                                            this.mainImage = '{{ $firstImage }}';
+                                            return;
+                                        }
+
+                                        const foundAttribute = this.colorAttributeValues.find(attr => attr.attribute_option_id == newColor);
+                                        if (foundAttribute && foundAttribute.media.length > 0) {
+                                            this.mainImage = foundAttribute.media[0].original_url;
+                                        }
+                                    });
+                                }
+                            }">
+                                <div class="relative mb-6 lg:mb-10 lg:h-2/4 ">
+                                    <img :src="mainImage" alt="{{$product->name}}" class="object-cover w-full lg:h-full ">
                                 </div>
-                            </template>
-                             <button @click="selectedColor = null" class="text-sm text-blue-500">Reset</button>
-                        </div>
-                        <div class="px-6 pb-6 mt-6 border-t border-gray-300 dark:border-gray-400 ">
-                            <div class="flex flex-wrap items-center mt-6">
-                                <span class="mr-2">
-                                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="w-4 h-4 text-gray-700 dark:text-gray-400 bi bi-truck" viewBox="0 0 16 16">
-                                    <path d="M0 3.5A1.5 1.5 0 0 1 1.5 2h9A1.5 1.5 0 0 1 12 3.5V5h1.02a1.5 1.5 0 0 1 1.17.563l1.481 1.85a1.5 1.5 0 0 1 .329.938V10.5a1.5 1.5 0 0 1-1.5 1.5H14a2 2 0 1 1-4 0H5a2 2_0 1 1-3.998-.085A1.5 1.5 0 0 1 0 10.5v-7zm1.294 7.456A1.999 1.999 0 0 1 4.732 11h5.536a2.01 2.01 0 0 1 .732-.732V3.5a.5.5 0 0 0-.5-.5h-9a.5.5 0 0 0-.5.5v7a.5.5 0 0 0 .294.456zM12 10a2 2 0 0 1 1.732 1h.768a.5.5 0 0 0 .5-.5V8.35a.5.5 0 0 0-.11-.312l-1.48-1.85A.5.5 0 0 0 13.02 6H12v4zm-9 1a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm9 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2z">
-                                    </path>
-                                  </svg>
-                                </span>
-                                <h2 class="text-lg font-bold text-gray-700 dark:text-gray-400">Free Shipping</h2>
-                            </div>
-                        </div>
+                                <h3 class="text-gray-700 dark:text-gray-400 text-lg">Color:</h3>
+                                <div class="flex-wrap hidden md:flex ">
+                                    <template x-for="attributeValue in {{ json_encode($colorAttributeValues) }}">
+                                        <template x-for="media in attributeValue.media">
+                                            <div x-show="selectedColor === null || selectedColor == attributeValue.attribute_option_id" class="w-1/2 p-2 sm:w-1/4" x-on:click="mainImage = media.original_url">
+                                                <img :src="media.original_url" alt="{{$product->name}}" class="object-cover w-full lg:h-20 cursor-pointer hover:border hover:border-blue-500">
+                                            </div>
+                                        </template>
+                                    </template>
+                                </div>
+                                <div class="flex gap-x-6 items-center">
+                                    <template x-for="color in {{ json_encode($colorOptions) }}">
+                                        <div class="flex">
+                                            <input
+                                                type="radio"
+                                                :id="'color_' + color.id"
+                                                :value="color.id"
+                                                x-model="selectedColor"
+                                                class="shrink-0 mt-0.5 border-gray-200 rounded-full text-blue-600 focus:ring-blue-500 checked:border-blue-500 disabled:opacity-50
+                                        disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800">
+                                            <label
+                                                :for="'color_' + color.id"
+                                                x-text="color.name"
+                                                class="text-sm text-gray-500 ms-2 dark:text-neutral-400"></label>
+                                        </div>
+                                    </template>
+                                    <button @click="selectedColor = null" class="text-sm text-blue-500">Reset</button>
+                                </div>
+                            </section>
+                        @endif
+                        @if($hasPanelTypeAttribute)
+                            <section class="mt-3 border-b-white border-b-2">
+                                <h3 class="text-gray-700 dark:text-gray-400 text-lg">Panel Type:</h3>
+                            </section>
+                        @endif
                     </div>
                 </div>
                 <div class="w-full px-4 md:w-1/2 ">

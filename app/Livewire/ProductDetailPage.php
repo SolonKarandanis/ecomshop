@@ -9,6 +9,10 @@ class ProductDetailPage extends Component
 {
     public $slug;
 
+    public bool $hasColorAttribute;
+
+    public bool $hasPanelTypeAttribute;
+
     protected ProductRepository $productRepository;
 
     public function boot():void{
@@ -22,6 +26,8 @@ class ProductDetailPage extends Component
     public function render()
     {
         $product = $this->productRepository->getProductBySlug($this->slug);
+        $this->hasColorAttribute = $product->getAttributeValues('attribute.color')->count() > 0;
+        $this->hasPanelTypeAttribute = $product->getAttributeValues('attribute.panel.type')->count() > 0;
         return view('livewire.product-detail-page',compact('product'));
     }
 }
