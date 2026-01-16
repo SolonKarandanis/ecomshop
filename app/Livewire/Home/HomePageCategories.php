@@ -10,6 +10,10 @@ class HomePageCategories extends Component
 
     protected CategoryRepository $categoryRepository;
 
+    public function placeholder(){
+        return view('livewire.home.home-page-categories-placeholder');
+    }
+
     public function boot(CategoryRepository $categoryRepository){
         $this->categoryRepository = $categoryRepository;
     }

@@ -10,6 +10,10 @@ class HomePageBrands extends Component
 
     protected BrandRepository $brandRepository;
 
+    public function placeholder(){
+        return view('livewire.home.home-page-brands-placeholder');
+    }
+
     public function boot(BrandRepository $brandRepository): void
     {
         $this->brandRepository = $brandRepository;
