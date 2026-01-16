@@ -15,20 +15,7 @@
                     <div class="p-4 mb-5 bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-900">
                         <h2 class="text-2xl font-bold text-gray-700 dark:text-white">Brand</h2>
                         <div class="w-16 pb-2 mb-6 border-b border-rose-600 dark:border-gray-400"></div>
-                        <ul>
-                            @foreach($brands as $brand)
-                                <li class="mb-4" wire:key="{{$brand->id}}">
-                                    <label for="{{$brand->slug}}" class="flex items-center text-gray-700 dark:text-white">
-                                        <input type="checkbox"
-                                               wire:model.live="selected_brands"
-                                               id="{{$brand->slug}}"
-                                               value="{{$brand->id}}"
-                                               class="w-4 h-4 mr-2">
-                                        <span class="text-lg text-gray-700 dark:text-white">{{$brand->name}}</span>
-                                    </label>
-                                </li>
-                            @endforeach
-                        </ul>
+                        @livewire('products.product-brands',['lazy'=>true])
                     </div>
                     <div class="p-4 mb-5 bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-900">
                         <h2 class="text-2xl font-bold text-gray-700 dark:text-white">Product Status</h2>
