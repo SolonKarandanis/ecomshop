@@ -4,10 +4,10 @@ namespace App\Livewire;
 
 use App\Dtos\ProductSearchFilterDto;
 use App\Repositories\BrandRepository;
-use App\Repositories\CategoryRepository;
 use App\Repositories\ProductRepository;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
+use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -37,22 +37,24 @@ class ProductsPage extends Component
     #[Url('sort')]
     public $sort='latest';
 
-    protected CategoryRepository $categoryRepository;
     protected BrandRepository $brandRepository;
     protected ProductRepository $productRepository;
 
+    #[On('categoriesUpdated')]
+    public function updateCategories($categories)
+    {
+        $this->selected_categories = $categories;
+    }
+
     public function boot(
-        CategoryRepository $categoryRepository,
         BrandRepository $brandRepository,
         ProductRepository $productRepository
     ): void{
-        $this->categoryRepository = $categoryRepository;
         $this->brandRepository = $brandRepository;
         $this->productRepository = $productRepository;
     }
     public function render()
     {
-        $categories = $this->categoryRepository->getActiveCategories();
         $brands=$this->brandRepository->getActiveBrands();
         $productSearchFilterDto = new ProductSearchFilterDto();
         $productSearchFilterDto->setSelectedCategories($this->selected_categories);
@@ -64,7 +66,6 @@ class ProductsPage extends Component
         $productSearchFilterDto->setSort($this->sort);
         $searchResult = $this->productRepository->searchProducts($productSearchFilterDto);
         return view('livewire.products-page',[
-            'categories' => $categories,
             'brands' => $brands,
             'products'=>$searchResult,
         ]);
