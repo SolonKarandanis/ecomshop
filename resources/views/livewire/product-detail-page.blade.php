@@ -9,6 +9,14 @@
         ];
     })->unique('id')->values();
     $firstColorId = $colorOptions->isNotEmpty() ? $colorOptions->first()['id'] : null;
+
+     $panelTypeAttributeValues = $product->getAttributeValues('attribute.panel.type');
+     $panelOptions = $panelTypeAttributeValues->map(function($item){
+         return [
+             'id' => $item->attributeOption->id,
+            'name' => $item->attributeOption->option_name
+         ];
+     })
 @endphp
 <div class="w-full max-w-340 py-10 px-4 sm:px-6 lg:px-8 mx-auto">
     <section class="overflow-hidden bg-white py-11 font-poppins dark:bg-gray-800">
