@@ -16,7 +16,8 @@
              'id' => $item->attributeOption->id,
             'name' => $item->attributeOption->option_name
          ];
-     })
+     });
+    $firstPanelId = $panelOptions->isNotEmpty() ? $panelOptions->first()['id'] : null;
 @endphp
 <div class="w-full max-w-340 py-10 px-4 sm:px-6 lg:px-8 mx-auto">
     <section class="overflow-hidden bg-white py-11 font-poppins dark:bg-gray-800">
@@ -32,6 +33,7 @@
                     currency: 'EUR'
                 }).format(value);
             },
+            selectedPanel:{{$firstPanelId ?? 'null'}},
             init() {
                 this.$watch('selectedColor', (newColor) => {
                     if (newColor === null) {
@@ -96,6 +98,11 @@
                         @if($hasPanelTypeAttribute)
                             <section class="mt-3 border-b-white border-b-2">
                                 <h3 class="text-gray-700 dark:text-gray-400 text-lg">Panel Type:</h3>
+                                <select class="py-3 px-4 pe-9 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600">
+                                    <template x-for="pType in {{ json_encode($panelOptions) }}">
+                                        <option  x-text="pType.name" :value="pType.id" />
+                                    </template>
+                                </select>
                             </section>
                         @endif
                     </div>
