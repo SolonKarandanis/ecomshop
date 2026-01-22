@@ -1,6 +1,6 @@
 @php
     use Illuminate\Support\Number;
-    $colorAttributeValues = $product->getAttributeValues('attribute.color');
+    $colorAttributeValues = $product->getAttributeValues('attribute.color')->values();
     $firstImage = $colorAttributeValues->isNotEmpty() ? $colorAttributeValues->first()->getFirstMediaUrl('product-attribute-images', 'large') : '';
     $colorOptions = $colorAttributeValues->map(function ($item) {
         return [
@@ -10,13 +10,13 @@
     })->unique('id')->values();
     $firstColorId = $colorOptions->isNotEmpty() ? $colorOptions->first()['id'] : null;
 
-     $panelTypeAttributeValues = $product->getAttributeValues('attribute.panel.type');
-     $panelOptions = $panelTypeAttributeValues->map(function($item){
+     $panelTypeAttributeValues = $product->getAttributeValues('attribute.panel.type')->values();
+     $panelOptions = collect($panelTypeAttributeValues)->map(function($item){
          return [
              'id' => $item->attributeOption->id,
             'name' => $item->attributeOption->option_name
          ];
-     });
+     })->unique('id')->values();
     $firstPanelId = $panelOptions->isNotEmpty() ? $panelOptions->first()['id'] : null;
 @endphp
 <div class="w-full max-w-340 py-10 px-4 sm:px-6 lg:px-8 mx-auto">
@@ -25,6 +25,7 @@
             mainImage: '{{ $firstImage }}',
             selectedColor: {{ $firstColorId ?? 'null' }},
             colorAttributeValues: {{ json_encode($colorAttributeValues) }},
+            panelTypeAttributeValues: {{ json_encode($panelTypeAttributeValues) }},
             basePrice: {{ $product->price }},
             currentPrice: {{ $product->price }},
             formatCurrency(value) {
@@ -35,26 +36,52 @@
             },
             selectedPanel:{{$firstPanelId ?? 'null'}},
             init() {
+                this.calculatePrice();
                 this.$watch('selectedColor', (newColor) => {
+                    this.calculatePrice();
                     if (newColor === null) {
                         this.mainImage = '{{ $firstImage }}';
-                        this.currentPrice = this.basePrice;
                         return;
                     }
 
-                    const foundAttribute = this.colorAttributeValues.find(attr => attr.attribute_option_id == newColor);
+                    const foundAttribute = this.colorAttributeValues.find(attr => String(attr.attribute_option_id) == String(newColor));
                     if (foundAttribute) {
                         if (foundAttribute.media.length > 0) {
                            this.mainImage = foundAttribute.media[0].original_url;
                         }
-
-                        if (foundAttribute.attribute_value_method === '{{ \App\Enums\AttributeValueMethodEnum::FIXED->value }}') {
-                            this.currentPrice = this.basePrice + parseFloat(foundAttribute.attribute_value);
-                        } else if (foundAttribute.attribute_value_method === '{{ \App\Enums\AttributeValueMethodEnum::PERCENT->value }}') {
-                            this.currentPrice = this.basePrice * (1 + parseFloat(foundAttribute.attribute_value) / 100);
-                        }
                     }
                 });
+
+                this.$watch('selectedPanel', (newPanel) => {
+                    this.calculatePrice();
+                });
+            },
+            calculatePrice() {
+                let newPrice = this.basePrice;
+
+                if (this.selectedColor !== null) {
+                    const foundAttribute = this.colorAttributeValues.find(attr => String(attr.attribute_option_id) == String(this.selectedColor));
+                    if (foundAttribute) {
+                        if (foundAttribute.attribute_value_method === '{{ \App\Enums\AttributeValueMethodEnum::FIXED->value }}') {
+                            newPrice += parseFloat(foundAttribute.attribute_value);
+                        } else if (foundAttribute.attribute_value_method === '{{ \App\Enums\AttributeValueMethodEnum::PERCENT->value }}') {
+                            newPrice *= (1 + parseFloat(foundAttribute.attribute_value) / 100);
+                        }
+                    }
+                }
+
+                if (this.selectedPanel !== null) {
+                    const foundAttribute = this.panelTypeAttributeValues.find(attr => String(attr.attribute_option_id) == String(this.selectedPanel));
+                    if (foundAttribute) {
+                        if (foundAttribute.attribute_value_method === '{{ \App\Enums\AttributeValueMethodEnum::FIXED->value }}') {
+                            newPrice += parseFloat(foundAttribute.attribute_value);
+                        } else if (foundAttribute.attribute_value_method === '{{ \App\Enums\AttributeValueMethodEnum::PERCENT->value }}') {
+                            newPrice *= (1 + parseFloat(foundAttribute.attribute_value) / 100);
+                        }
+                    }
+                }
+
+                this.currentPrice = newPrice;
             }
         }">
             <div class="flex flex-wrap -mx-4">
@@ -91,18 +118,19 @@
                                                 class="text-sm text-gray-500 ms-2 dark:text-neutral-400"></label>
                                         </div>
                                     </template>
-                                    <button @click="selectedColor = null" class="text-sm text-blue-500">Reset</button>
                                 </div>
                             </section>
                         @endif
                         @if($hasPanelTypeAttribute)
                             <section class="mt-3 border-b-white border-b-2">
                                 <h3 class="text-gray-700 dark:text-gray-400 text-lg">Panel Type:</h3>
-                                <select class="py-3 px-4 pe-9 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600">
-                                    <template x-for="pType in {{ json_encode($panelOptions) }}">
-                                        <option  x-text="pType.name" :value="pType.id" />
-                                    </template>
-                                </select>
+                                <div class="flex gap-x-6 items-center">
+                                    <select x-model="selectedPanel" class="py-3 px-4 pe-9 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600">
+                                        <template x-for="pType in {{ json_encode($panelOptions) }}">
+                                            <option  x-text="pType.name" :value="pType.id" />
+                                        </template>
+                                    </select>
+                                </div>
                             </section>
                         @endif
                     </div>

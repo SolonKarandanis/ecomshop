@@ -18,7 +18,7 @@ class ProductRepository
         return $this->modelQuery()
             ->with([
                 'productAttributeValues' => function ($query) {
-                    $query->with(['attribute', 'media']);
+                    $query->with(['attribute','attributeOption', 'media']);
                 }
             ])
             ->where('slug', '=', $slug)->first();
