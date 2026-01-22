@@ -22,6 +22,15 @@ document.addEventListener('alpine:init', () => {
             }).format(value);
         },
 
+        setNewPrice(foundAttribute,newPrice){
+            if (foundAttribute.attribute_value_method === 'attribute.value.method.fixed') {
+                newPrice += parseFloat(foundAttribute.attribute_value);
+            } else if (foundAttribute.attribute_value_method === 'attribute.value.method.percent') {
+                newPrice *= (1 + parseFloat(foundAttribute.attribute_value) / 100);
+            }
+            return newPrice
+        },
+
         init() {
             this.calculatePrice();
             this.$watch('selectedColor', (newColor) => {
@@ -42,29 +51,18 @@ document.addEventListener('alpine:init', () => {
 
         calculatePrice() {
             let newPrice = this.basePrice;
-
             if (this.selectedColor !== null) {
                 const foundAttribute = this.colorAttributeValues.find(attr => String(attr.attribute_option_id) === String(this.selectedColor));
                 if (foundAttribute) {
-                    if (foundAttribute.attribute_value_method === 'attribute.value.method.fixed') {
-                        newPrice += parseFloat(foundAttribute.attribute_value);
-                    } else if (foundAttribute.attribute_value_method === 'attribute.value.method.percent') {
-                        newPrice *= (1 + parseFloat(foundAttribute.attribute_value) / 100);
-                    }
+                    newPrice = this.setNewPrice(foundAttribute,newPrice);
                 }
             }
-
             if (this.selectedPanel !== null) {
                 const foundAttribute = this.panelTypeAttributeValues.find(attr => String(attr.attribute_option_id) === String(this.selectedPanel));
                 if (foundAttribute) {
-                    if (foundAttribute.attribute_value_method === 'attribute.value.method.fixed') {
-                        newPrice += parseFloat(foundAttribute.attribute_value);
-                    } else if (foundAttribute.attribute_value_method === 'attribute.value.method.percent') {
-                        newPrice *= (1 + parseFloat(foundAttribute.attribute_value) / 100);
-                    }
+                    newPrice = this.setNewPrice(foundAttribute,newPrice);
                 }
             }
-
             this.currentPrice = newPrice;
         }
     }));
