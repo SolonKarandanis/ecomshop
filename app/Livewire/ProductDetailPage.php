@@ -26,8 +26,8 @@ class ProductDetailPage extends Component
     public function render()
     {
         $product = $this->productRepository->getProductBySlug($this->slug);
-        $this->hasColorAttribute = $product->getAttributeValues('attribute.color')->count() > 0;
-        $this->hasPanelTypeAttribute = $product->getAttributeValues('attribute.panel.type')->count() > 0;
+        $this->hasColorAttribute = $product->colorAttributeValues->count() > 0;
+        $this->hasPanelTypeAttribute = $product->panelTypeAttributeValues->count() > 0;
         return view('livewire.product-detail-page',compact('product'));
     }
 }

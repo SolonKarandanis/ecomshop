@@ -17,11 +17,14 @@ class ProductRepository
     public function getProductBySlug($slug){
         return $this->modelQuery()
             ->with([
-                'productAttributeValues' => function ($query) {
-                    $query->with(['attribute','attributeOption', 'media']);
+                'colorAttributeValues' => function ($query) {
+                    $query->with('attribute', 'attributeOption', 'media');
+                },
+                'panelTypeAttributeValues' => function ($query) {
+                    $query->with('attribute', 'attributeOption');
                 }
             ])
-            ->where('slug', '=', $slug)->first();
+            ->where('slug', '=', $slug)->firstOrFail();
     }
 
     public function searchProducts(ProductSearchFilterDto $dto): LengthAwarePaginator|array

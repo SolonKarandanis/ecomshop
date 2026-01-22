@@ -1,6 +1,6 @@
 @php
     use Illuminate\Support\Number;
-    $colorAttributeValues = $product->getAttributeValues('attribute.color')->values();
+    $colorAttributeValues = $product->colorAttributeValues;
     $firstImage = $colorAttributeValues->isNotEmpty() ? $colorAttributeValues->first()->getFirstMediaUrl('product-attribute-images', 'large') : '';
     $colorOptions = $colorAttributeValues->map(function ($item) {
         return [
@@ -10,8 +10,8 @@
     })->unique('id')->values();
     $firstColorId = $colorOptions->isNotEmpty() ? $colorOptions->first()['id'] : null;
 
-     $panelTypeAttributeValues = $product->getAttributeValues('attribute.panel.type')->values();
-     $panelOptions = collect($panelTypeAttributeValues)->map(function($item){
+     $panelTypeAttributeValues = $product->panelTypeAttributeValues;
+     $panelOptions = $panelTypeAttributeValues->map(function($item){
          return [
              'id' => $item->attributeOption->id,
             'name' => $item->attributeOption->option_name

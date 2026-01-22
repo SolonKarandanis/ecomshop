@@ -103,22 +103,29 @@ class Product extends Model implements HasMedia
             ->using(ProductAttributeValues::class);
     }
 
-    public function productAttributeValues(): HasMany
+    public function colorAttributeValues(): HasMany
     {
-        return $this->hasMany(ProductAttributeValues::class);
+        return $this->hasMany(ProductAttributeValues::class)
+            ->whereHas('attribute', function ($query) {
+                $query->where('name', 'attribute.color');
+            });
+    }
+
+    public function panelTypeAttributeValues(): HasMany
+    {
+        return $this->hasMany(ProductAttributeValues::class)
+            ->whereHas('attribute', function ($query) {
+                $query->where('name', 'attribute.panel.type');
+            });
     }
 
     protected function getColorProductAttributeValue(): ?ProductAttributeValues
     {
-        return $this->productAttributeValues
-            ->where('attribute.name', 'attribute.color')
-            ->first();
-    }
-
-    public function getAttributeValues(string $attribute)
-    {
-        return $this->productAttributeValues
-            ->where('attribute.name', $attribute);
+        if ($this->relationLoaded('colorAttributeValues')) {
+            return $this->colorAttributeValues->first();
+        }
+        // This fallback will still work, but it will be less efficient if the relation isn't preloaded.
+        return $this->colorAttributeValues()->first();
     }
 
     protected function checkIfProductAttributeValueExists(ProductAttributeValues|null $productAttributeValue):bool{
