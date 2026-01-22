@@ -21,69 +21,14 @@
 @endphp
 <div class="w-full max-w-340 py-10 px-4 sm:px-6 lg:px-8 mx-auto">
     <section class="overflow-hidden bg-white py-11 font-poppins dark:bg-gray-800">
-        <div class="max-w-6xl px-4 py-4 mx-auto lg:py-8 md:px-6" x-data="{
-            mainImage: '{{ $firstImage }}',
-            selectedColor: {{ $firstColorId ?? 'null' }},
-            colorAttributeValues: {{ json_encode($colorAttributeValues) }},
-            panelTypeAttributeValues: {{ json_encode($panelTypeAttributeValues) }},
-            basePrice: {{ $product->price }},
-            currentPrice: {{ $product->price }},
-            formatCurrency(value) {
-                return new Intl.NumberFormat('en-US', {
-                    style: 'currency',
-                    currency: 'EUR'
-                }).format(value);
-            },
-            selectedPanel:{{$firstPanelId ?? 'null'}},
-            init() {
-                this.calculatePrice();
-                this.$watch('selectedColor', (newColor) => {
-                    this.calculatePrice();
-                    if (newColor === null) {
-                        this.mainImage = '{{ $firstImage }}';
-                        return;
-                    }
-
-                    const foundAttribute = this.colorAttributeValues.find(attr => String(attr.attribute_option_id) == String(newColor));
-                    if (foundAttribute) {
-                        if (foundAttribute.media.length > 0) {
-                           this.mainImage = foundAttribute.media[0].original_url;
-                        }
-                    }
-                });
-
-                this.$watch('selectedPanel', (newPanel) => {
-                    this.calculatePrice();
-                });
-            },
-            calculatePrice() {
-                let newPrice = this.basePrice;
-
-                if (this.selectedColor !== null) {
-                    const foundAttribute = this.colorAttributeValues.find(attr => String(attr.attribute_option_id) == String(this.selectedColor));
-                    if (foundAttribute) {
-                        if (foundAttribute.attribute_value_method === '{{ \App\Enums\AttributeValueMethodEnum::FIXED->value }}') {
-                            newPrice += parseFloat(foundAttribute.attribute_value);
-                        } else if (foundAttribute.attribute_value_method === '{{ \App\Enums\AttributeValueMethodEnum::PERCENT->value }}') {
-                            newPrice *= (1 + parseFloat(foundAttribute.attribute_value) / 100);
-                        }
-                    }
-                }
-
-                if (this.selectedPanel !== null) {
-                    const foundAttribute = this.panelTypeAttributeValues.find(attr => String(attr.attribute_option_id) == String(this.selectedPanel));
-                    if (foundAttribute) {
-                        if (foundAttribute.attribute_value_method === '{{ \App\Enums\AttributeValueMethodEnum::FIXED->value }}') {
-                            newPrice += parseFloat(foundAttribute.attribute_value);
-                        } else if (foundAttribute.attribute_value_method === '{{ \App\Enums\AttributeValueMethodEnum::PERCENT->value }}') {
-                            newPrice *= (1 + parseFloat(foundAttribute.attribute_value) / 100);
-                        }
-                    }
-                }
-
-                this.currentPrice = newPrice;
-            }
-        }">
+        <div class="max-w-6xl px-4 py-4 mx-auto lg:py-8 md:px-6" x-data="productDetailPage(
+            '{{ $firstImage }}',
+            {{ $firstColorId ?? 'null' }},
+            {{ json_encode($colorAttributeValues) }},
+            {{ json_encode($panelTypeAttributeValues) }},
+            {{ $product->price }},
+            {{ $firstPanelId ?? 'null' }}
+        )">
             <div class="flex flex-wrap -mx-4">
                 <div class="w-full mb-8 md:w-1/2 md:mb-0" >
                     <div class="sticky top-0 z-50 overflow-hidden ">
