@@ -18,6 +18,42 @@
          ];
      })->unique('id')->values();
     $firstPanelId = $panelOptions->isNotEmpty() ? $panelOptions->first()['id'] : null;
+
+    $hardDriveAttributeValues = $product->hardDriveAttributeValues;
+    $hardDriveOptions = $hardDriveAttributeValues->map(function($item){
+         return [
+             'id' => $item->attributeOption->id,
+            'name' => $item->attributeOption->option_name
+         ];
+     })->unique('id')->values();
+    $firstHardDriveId = $hardDriveOptions->isNotEmpty() ? $hardDriveOptions->first()['id'] : null;
+
+    $keyboardAttributeValues = $product->keyboardAttributeValues;
+    $keyboardOptions = $keyboardAttributeValues->map(function($item){
+         return [
+             'id' => $item->attributeOption->id,
+            'name' => $item->attributeOption->option_name
+         ];
+     })->unique('id')->values();
+    $firstKeyboardId = $keyboardOptions->isNotEmpty() ? $keyboardOptions->first()['id'] : null;
+
+    $ramAttributeValues = $product->ramAttributeValues;
+    $ramOptions = $ramAttributeValues->map(function($item){
+         return [
+             'id' => $item->attributeOption->id,
+            'name' => $item->attributeOption->option_name
+         ];
+     })->unique('id')->values();
+    $firstRamId = $ramOptions->isNotEmpty() ? $ramOptions->first()['id'] : null;
+
+    $gpuAttributeValues = $product->gpuAttributeValues;
+    $gpuOptions = $gpuAttributeValues->map(function($item){
+         return [
+             'id' => $item->attributeOption->id,
+            'name' => $item->attributeOption->option_name
+         ];
+     })->unique('id')->values();
+    $firstGpuId = $gpuOptions->isNotEmpty() ? $gpuOptions->first()['id'] : null;
 @endphp
 <div class="w-full max-w-340 py-10 px-4 sm:px-6 lg:px-8 mx-auto">
     <section class="overflow-hidden bg-white py-11 font-poppins dark:bg-gray-800">

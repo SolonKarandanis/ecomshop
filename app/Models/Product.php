@@ -108,20 +108,34 @@ class Product extends Model implements HasMedia
         return $this->hasMany(ProductAttributeValues::class);
     }
 
-    public function colorAttributeValues(): HasMany
+    public function getColorAttributeValuesAttribute()
     {
-        return $this->hasMany(ProductAttributeValues::class)
-            ->whereHas('attribute', function ($query) {
-                $query->where('name', 'attribute.color');
-            });
+        return $this->productAttributeValues->where('attribute.name', 'attribute.color');
     }
 
-    public function panelTypeAttributeValues(): HasMany
+    public function getPanelTypeAttributeValuesAttribute()
     {
-        return $this->hasMany(ProductAttributeValues::class)
-            ->whereHas('attribute', function ($query) {
-                $query->where('name', 'attribute.panel.type');
-            });
+        return $this->productAttributeValues->where('attribute.name', 'attribute.panel.type');
+    }
+
+    public function getHardDriveAttributeValuesAttribute()
+    {
+        return $this->productAttributeValues->where('attribute.name', 'attribute.hard.drive');
+    }
+
+    public function getKeyboardAttributeValuesAttribute()
+    {
+        return $this->productAttributeValues->where('attribute.name', 'attribute.keyboard');
+    }
+
+    public function getRamAttributeValuesAttribute()
+    {
+        return $this->productAttributeValues->where('attribute.name', 'attribute.ram');
+    }
+
+    public function getGpuAttributeValuesAttribute()
+    {
+        return $this->productAttributeValues->where('attribute.name', 'attribute.gpu');
     }
 
     protected function getColorProductAttributeValue(): ?ProductAttributeValues

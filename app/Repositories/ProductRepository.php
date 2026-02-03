@@ -17,12 +17,9 @@ class ProductRepository
     public function getProductBySlug($slug){
         return $this->modelQuery()
             ->with([
-                'colorAttributeValues' => function ($query) {
-                    $query->with('attribute', 'attributeOption', 'media');
-                },
-                'panelTypeAttributeValues' => function ($query) {
-                    $query->with('attribute', 'attributeOption');
-                }
+                'productAttributeValues.attribute',
+                'productAttributeValues.attributeOption',
+                'productAttributeValues.media',
             ])
             ->where('slug', '=', $slug)->firstOrFail();
     }
