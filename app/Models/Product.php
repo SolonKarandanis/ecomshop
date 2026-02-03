@@ -103,6 +103,11 @@ class Product extends Model implements HasMedia
             ->using(ProductAttributeValues::class);
     }
 
+    public function productAttributeValues(): HasMany
+    {
+        return $this->hasMany(ProductAttributeValues::class);
+    }
+
     public function colorAttributeValues(): HasMany
     {
         return $this->hasMany(ProductAttributeValues::class)
