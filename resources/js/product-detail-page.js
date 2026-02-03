@@ -1,19 +1,16 @@
 document.addEventListener('alpine:init', () => {
     Alpine.data('productDetailPage', (
         firstImage,
-        firstColorId,
-        colorAttributeValues,
-        panelTypeAttributeValues,
         basePrice,
-        firstPanelId
+        attributes,
+        colorAttributeValuesForGallery
     ) => ({
         mainImage: firstImage,
-        selectedColor: firstColorId,
-        colorAttributeValues: colorAttributeValues,
-        panelTypeAttributeValues: panelTypeAttributeValues,
         basePrice: basePrice,
         currentPrice: basePrice,
-        selectedPanel: firstPanelId,
+        attributes: attributes,
+        colorAttributeValuesForGallery: colorAttributeValuesForGallery,
+        selectedAttributes: {},
 
         formatCurrency(value) {
             return new Intl.NumberFormat('en-US', {
@@ -22,47 +19,53 @@ document.addEventListener('alpine:init', () => {
             }).format(value);
         },
 
-        setNewPrice(foundAttribute,newPrice){
+        setNewPrice(foundAttribute, newPrice) {
             if (foundAttribute.attribute_value_method === 'attribute.value.method.fixed') {
                 newPrice += parseFloat(foundAttribute.attribute_value);
             } else if (foundAttribute.attribute_value_method === 'attribute.value.method.percent') {
                 newPrice *= (1 + parseFloat(foundAttribute.attribute_value) / 100);
             }
-            return newPrice
+            return newPrice;
         },
 
         init() {
+            // Initialize selectedAttributes from the 'initial' value of each attribute
+            this.attributes.forEach(attr => {
+                this.selectedAttributes[attr.name] = attr.initial;
+            });
+
             this.calculatePrice();
-            this.$watch('selectedColor', (newColor) => {
+
+            // Watch the whole object for changes
+            this.$watch('selectedAttributes', () => {
                 this.calculatePrice();
-                if (newColor === null) {
+
+                // Specific logic for color changing the main image
+                const selectedColorId = this.selectedAttributes['color'];
+                if (selectedColorId === undefined) return;
+
+                if (selectedColorId === null) {
                     this.mainImage = firstImage;
                     return;
                 }
-                const foundAttribute = this.colorAttributeValues.find(attr => String(attr.attribute_option_id) === String(newColor));
+                const foundAttribute = this.colorAttributeValuesForGallery.find(attr => String(attr.attribute_option_id) === String(selectedColorId));
                 if (foundAttribute && foundAttribute.media.length > 0) {
                     this.mainImage = foundAttribute.media[0].original_url;
                 }
-            });
-            this.$watch('selectedPanel', () => {
-                this.calculatePrice();
-            });
+            }, { deep: true });
         },
 
         calculatePrice() {
-            let newPrice = this.basePrice;
-            if (this.selectedColor !== null) {
-                const foundAttribute = this.colorAttributeValues.find(attr => String(attr.attribute_option_id) === String(this.selectedColor));
-                if (foundAttribute) {
-                    newPrice = this.setNewPrice(foundAttribute,newPrice);
+            let newPrice = parseFloat(this.basePrice);
+            this.attributes.forEach(attribute => {
+                const selectedOptionId = this.selectedAttributes[attribute.name];
+                if (selectedOptionId !== null) {
+                    const foundValue = attribute.values.find(val => String(val.attribute_option_id) === String(selectedOptionId));
+                    if (foundValue) {
+                        newPrice = this.setNewPrice(foundValue, newPrice);
+                    }
                 }
-            }
-            if (this.selectedPanel !== null) {
-                const foundAttribute = this.panelTypeAttributeValues.find(attr => String(attr.attribute_option_id) === String(this.selectedPanel));
-                if (foundAttribute) {
-                    newPrice = this.setNewPrice(foundAttribute,newPrice);
-                }
-            }
+            });
             this.currentPrice = newPrice;
         }
     }));
