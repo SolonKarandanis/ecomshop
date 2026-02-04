@@ -47,6 +47,10 @@ class CartItem extends Model
         'attributes',
     ];
 
+    protected $casts = [
+        'attributes' => 'string',
+    ];
+
     public function cart():BelongsTo{
         return $this->belongsTo(Cart::class);
     }
