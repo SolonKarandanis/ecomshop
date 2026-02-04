@@ -138,14 +138,6 @@ class Product extends Model implements HasMedia
         return $this->productAttributeValues->where('attribute.name', 'attribute.gpu');
     }
 
-    protected function getColorProductAttributeValue(): ?ProductAttributeValues
-    {
-        if ($this->relationLoaded('colorAttributeValues')) {
-            return $this->colorAttributeValues->first();
-        }
-        // This fallback will still work, but it will be less efficient if the relation isn't preloaded.
-        return $this->colorAttributeValues()->first();
-    }
 
     protected function checkIfProductAttributeValueExists(ProductAttributeValues|null $productAttributeValue):bool{
         return $productAttributeValue && $productAttributeValue->hasMedia('product-attribute-images');
@@ -153,7 +145,7 @@ class Product extends Model implements HasMedia
 
     public function getThumbnailImage():string
     {
-        $productAttributeValue = $this->getColorProductAttributeValue();
+        $productAttributeValue = $this->getColorAttributeValuesAttribute()->first();
         if ($this->checkIfProductAttributeValueExists($productAttributeValue)) {
             return $productAttributeValue->getFirstMediaUrl('product-attribute-images', 'thumb');
         }
@@ -163,7 +155,7 @@ class Product extends Model implements HasMedia
 
     public function getSmallImage():string
     {
-        $productAttributeValue = $this->getColorProductAttributeValue();
+        $productAttributeValue = $this->getColorAttributeValuesAttribute()->first();
         if ($this->checkIfProductAttributeValueExists($productAttributeValue)) {
             return $productAttributeValue->getFirstMediaUrl('product-attribute-images', 'small');
         }
@@ -173,7 +165,7 @@ class Product extends Model implements HasMedia
 
     public function getLargeImage():string
     {
-        $productAttributeValue = $this->getColorProductAttributeValue();
+        $productAttributeValue = $this->getColorAttributeValuesAttribute()->first();
         if ($this->checkIfProductAttributeValueExists($productAttributeValue)) {
             return $productAttributeValue->getFirstMediaUrl('product-attribute-images', 'large');
         }
