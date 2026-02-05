@@ -27,6 +27,15 @@ class Cart extends Model
         'total_price'
     ];
 
+    public function recalculateCartTotalPrice(): void
+    {
+        $total = 0;
+        foreach ($this->cartItems as $item) {
+            $total += $item->total_price;
+        }
+        $this->total_price = $total;
+    }
+
     public function user():BelongsTo{
         return $this->belongsTo(User::class);
     }
