@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Cart;
+use App\Models\CartItem;
 use App\Repositories\CartRepository;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
@@ -51,8 +52,20 @@ class CartService
         return json_decode(Cookie::get(self::COOKIE_CART_ITEMS_NAME,'[]'),true);
     }
 
-    protected function getCartFromCookies(){
-        return json_decode(Cookie::get(self::COOKIE_CART_NAME,null));
+    protected function getCartFromCookies(): Cart
+    {
+        $cartData = json_decode(Cookie::get(self::COOKIE_CART_NAME), true) ?? [];
+        $cart = new Cart($cartData);
+
+        $cartItemsData = $this->getCartItemsFromCookies();
+        $cartItems = [];
+        foreach ($cartItemsData as $itemData) {
+            $cartItems[] = new CartItem($itemData);
+        }
+
+        $cart->setRelation('cartItems', collect($cartItems));
+
+        return $cart;
     }
 
     protected function getCartFromDatabase():Cart{
