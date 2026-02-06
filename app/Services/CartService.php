@@ -108,10 +108,18 @@ class CartService
         $cart = $this->getCartFromDatabase();
         $attributes = $addToCartRequest->getAttributes();
         ksort($attributes);
+        $addToCartRequest->setAttributes($attributes);
         $cartItem = $this->cartRepository->findItemByProductIdAndAttributes($cart->id,$addToCartRequest->getProductId(), $attributes);
         if($cartItem){
             $this->cartRepository->updateItemQuantity($cartItem->id, $addToCartRequest->getQuantity());
         }
+        else{
+            $this->cartRepository->createCartItem($addToCartRequest);
+        }
 
+        $cart = $this->getCartFromDatabase();
+        $cart->recalculateCartTotalPrice();
+        $this->cartRepository->saveCart($cart);
+        $this->cachedCart = $cart;
     }
 }

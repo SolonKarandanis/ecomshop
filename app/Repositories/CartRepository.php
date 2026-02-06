@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Dtos\AddToCartDto;
 use App\Models\Cart;
 use App\Models\CartItem;
 use Illuminate\Database\Eloquent\Builder;
@@ -24,6 +25,11 @@ class CartRepository
             ->firstOrFail();
     }
 
+    public function saveCart(Cart $cart): void
+    {
+        $cart->update($cart->getFillable());
+    }
+
     public function findItemByProductIdAndAttributes(int $cartId,int $productId, array $attributes): CartItem| null{
         return $this->itemModelQuery()
             ->where('cart_id',$cartId)
@@ -35,6 +41,17 @@ class CartRepository
     public function updateItemQuantity(int $cartItemId, int $quantity): void{
         $this->itemModelQuery()->where('id',$cartItemId)->update([
             'quantity' => DB::raw('quantity+'.$quantity),
+        ]);
+    }
+
+    public function createCartItem(AddToCartDto $addToCartDto):void{
+        $total_price = $addToCartDto->getQuantity() * $addToCartDto->getPrice();
+        $this->itemModelQuery()->create([
+            'product_id' => $addToCartDto->getProductId(),
+            'quantity' => $addToCartDto->getQuantity(),
+            'unit_price' => $addToCartDto->getPrice(),
+            'total_price' => $total_price,
+            'attributes' => json_encode($addToCartDto->getAttributes()),
         ]);
     }
 
