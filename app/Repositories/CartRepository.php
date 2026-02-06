@@ -24,8 +24,9 @@ class CartRepository
             ->firstOrFail();
     }
 
-    public function findItemByProductIdAndAttributes(int $productId, array $attributes): CartItem| null{
+    public function findItemByProductIdAndAttributes(int $cartId,int $productId, array $attributes): CartItem| null{
         return $this->itemModelQuery()
+            ->where('cart_id',$cartId)
             ->where('product_id',$productId)
             ->where('attributes',json_encode($attributes))
             ->first();
@@ -38,7 +39,7 @@ class CartRepository
     }
 
     public function deleteCartItem(int $cartItemId):void{
-        $this->modelQuery()
+        $this->itemModelQuery()
             ->where('id', $cartItemId)
             ->delete();
     }

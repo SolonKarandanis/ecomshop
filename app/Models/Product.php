@@ -53,6 +53,14 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property-read int|null $attributes_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ProductAttributeValues> $productAttributeValues
  * @property-read int|null $product_attribute_values_count
+ * @property-read mixed $color_attribute_values
+ * @property-read mixed $gpu_attribute_values
+ * @property-read mixed $hard_drive_attribute_values
+ * @property-read mixed $keyboard_attribute_values
+ * @property-read mixed $panel_type_attribute_values
+ * @property-read mixed $ram_attribute_values
+ * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, Media> $media
+ * @property-read int|null $media_count
  * @mixin \Eloquent
  */
 class Product extends Model implements HasMedia
