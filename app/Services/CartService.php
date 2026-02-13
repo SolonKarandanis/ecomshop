@@ -43,12 +43,20 @@ class CartService
         }
     }
 
+    public function updateItemsQuantity():void{
+
+    }
+
     public function removeItemsFromCart(array $cartItemIds):void{
         if(Auth::check()){
-
+            $this->deleteItemsFromDatabase($cartItemIds);
         }else{
-
+            $this->deleteItemsFromCookies($cartItemIds);
         }
+    }
+
+    public function clearCart():void{
+
     }
 
     protected function getCartFromCookies(): Cart
@@ -85,6 +93,22 @@ class CartService
         return $this->cartRepository->getCart($userId);
     }
 
+    protected function getCartItemsForCookies($item):array{
+        $attributeIds = json_decode($item->attributes, true) ?? [];
+        ksort($attributeIds);
+        $key = $item->product_id . '_' . json_encode($attributeIds);
+
+        $itemData = [
+            'id' => $item->id_from_cookie ?? (string) Str::uuid(),
+            'product_id' => $item->product_id,
+            'quantity' => $item->quantity,
+            'price' => $item->unit_price,
+            'attribute_ids' => $attributeIds,
+        ];
+        $cartItemsForCookie[$key] = $itemData;
+        return $cartItemsForCookie;
+    }
+
     /**
      * @param AddToCartDto[] $addToCartRequests
      */
@@ -93,18 +117,7 @@ class CartService
         $cart = $this->getCartFromCookies();
         $cartItemsForCookie = [];
         foreach ($cart->cartItems as $item) {
-            $attributeIds = json_decode($item->attributes, true) ?? [];
-            ksort($attributeIds);
-            $key = $item->product_id . '_' . json_encode($attributeIds);
-
-            $itemData = [
-                'id' => $item->id_from_cookie ?? (string) Str::uuid(),
-                'product_id' => $item->product_id,
-                'quantity' => $item->quantity,
-                'price' => $item->unit_price,
-                'attribute_ids' => $attributeIds,
-            ];
-            $cartItemsForCookie[$key] = $itemData;
+            $cartItemsForCookie= $this->getCartItemsForCookies($item);
         }
 
         foreach ($addToCartRequests as $request) {
@@ -157,5 +170,24 @@ class CartService
     protected function deleteItemsFromDatabase(array $cartItemIds):void{
         $cartId=$this->cartRepository->getCartId(Auth::id());
         $this->cartRepository->deleteCartItems($cartId,$cartItemIds);
+    }
+
+    protected function deleteItemsFromCookies(array $cartItemIds):void{
+        $cart = $this->getCartFromCookies();
+        $cartItemsForCookie = [];
+        foreach ($cart->cartItems as $item) {
+            if(in_array($item->id_from_cookie, $cartItemIds)){
+                continue;
+            }
+            $cartItemsForCookie=$this->getCartItemsForCookies($item);
+        }
+
+        Cookie::queue(self::COOKIE_CART_ITEMS_NAME, json_encode($cartItemsForCookie), self::COOKIE_LIFETIME);
+
+        $cart->recalculateCartTotalPrice();
+        $cartAttributes = collect($cart->toArray())->only($cart->getFillable())->toArray();
+        Cookie::queue(self::COOKIE_CART_NAME, json_encode($cartAttributes), self::COOKIE_LIFETIME);
+
+        $this->cachedCart = $cart;
     }
 }
