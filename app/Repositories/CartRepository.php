@@ -22,7 +22,14 @@ class CartRepository
         return $this->modelQuery()
             ->with(['cartItems'])
             ->where('user_id',$userId)
-            ->firstOrFail();
+            ->firstOrCreate(['user_id'=>$userId,'total_price'=>0]);
+    }
+
+    public function getCartId(int $userId): int{
+        $cart= $this->modelQuery()
+            ->where('user_id',$userId)
+            ->firstOrCreate(['user_id'=>$userId,'total_price'=>0]);
+        return $cart->id;
     }
 
     public function saveCart(Cart $cart): void
@@ -44,9 +51,10 @@ class CartRepository
         ]);
     }
 
-    public function createCartItem(AddToCartDto $addToCartDto):void{
+    public function createCartItem(int $cartId,AddToCartDto $addToCartDto):void{
         $total_price = $addToCartDto->getQuantity() * $addToCartDto->getPrice();
         $this->itemModelQuery()->create([
+            'cart_id'=>$cartId,
             'product_id' => $addToCartDto->getProductId(),
             'quantity' => $addToCartDto->getQuantity(),
             'unit_price' => $addToCartDto->getPrice(),
@@ -55,9 +63,57 @@ class CartRepository
         ]);
     }
 
-    public function deleteCartItem(int $cartItemId):void{
+    public function deleteCartItem(int $cartId,int $cartItemId):void{
         $this->itemModelQuery()
+            ->where('id', $cartId)
             ->where('id', $cartItemId)
             ->delete();
+    }
+
+    public function deleteCartItems(int $cartId,array $cartItemIds):void{
+        $this->itemModelQuery()
+            ->where('id', $cartId)
+            ->whereIn('id', $cartItemIds)
+            ->delete();
+    }
+
+    public function clearCart(int $cartId):void{
+        $this->itemModelQuery()
+            ->where('cart_id',$cartId)
+            ->delete();
+    }
+
+    /**
+     * Creates multiple cart items from an array of AddToCartDto objects.
+     * @param int $cartId
+     * @param AddToCartDto[] $cartItems
+     */
+    public function createCartItems(int $cartId, array $cartItems): void
+    {
+        $itemsToInsert = collect($cartItems)->map(fn(AddToCartDto $dto) => [
+            'cart_id' => $cartId,
+            'product_id' => $dto->getProductId(),
+            'quantity' => $dto->getQuantity(),
+            'unit_price' => $dto->getPrice(),
+            'total_price' => $dto->getQuantity() * $dto->getPrice(),
+            'attributes' => json_encode($dto->getAttributes()),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ])->toArray();
+
+        if (!empty($itemsToInsert)) {
+            $this->itemModelQuery()->insert($itemsToInsert);
+        }
+    }
+
+    /**
+     * Updates quantities for multiple cart items.
+     * @param array $cartItems Array of items with 'id' and 'quantity' to add.
+     */
+    public function updateCartItemsQuantity(array $cartItems): void
+    {
+        foreach ($cartItems as $item) {
+            $this->itemModelQuery()->where('id', $item['id'])->increment('quantity', $item['quantity']);
+        }
     }
 }
