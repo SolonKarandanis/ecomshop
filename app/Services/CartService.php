@@ -56,7 +56,11 @@ class CartService
     }
 
     public function clearCart():void{
-
+        if(Auth::check()){
+            $this->clearCartFromDatabase();
+        }else{
+            $this->clearCartFromCookies();
+        }
     }
 
     protected function getCartFromCookies(): Cart
@@ -160,16 +164,13 @@ class CartService
         }
 
         $this->cartRepository->createCartItems($cartId, $addToCartRequests);
-
-        $cart = $this->getCartFromDatabase();
-        $cart->recalculateCartTotalPrice();
-        $this->cartRepository->saveCart($cart);
-        $this->cachedCart = $cart;
+        $this->recalculateCartTotalPrice();
     }
 
     protected function deleteItemsFromDatabase(array $cartItemIds):void{
         $cartId=$this->cartRepository->getCartId(Auth::id());
         $this->cartRepository->deleteCartItems($cartId,$cartItemIds);
+        $this->recalculateCartTotalPrice();
     }
 
     protected function deleteItemsFromCookies(array $cartItemIds):void{
@@ -188,6 +189,25 @@ class CartService
         $cartAttributes = collect($cart->toArray())->only($cart->getFillable())->toArray();
         Cookie::queue(self::COOKIE_CART_NAME, json_encode($cartAttributes), self::COOKIE_LIFETIME);
 
+        $this->cachedCart = $cart;
+    }
+
+    protected function clearCartFromDatabase():void{
+        $cartId=$this->cartRepository->getCartId(Auth::id());
+        $this->cartRepository->clearCart($cartId);
+        $this->recalculateCartTotalPrice();
+    }
+
+    protected function clearCartFromCookies():void{
+        Cookie::queue(Cookie::forget(self::COOKIE_CART_NAME));
+        Cookie::queue(Cookie::forget(self::COOKIE_CART_ITEMS_NAME));
+        $this->cachedCart = new Cart();
+    }
+
+    protected function recalculateCartTotalPrice():void{
+        $cart = $this->getCartFromDatabase();
+        $cart->recalculateCartTotalPrice();
+        $this->cartRepository->saveCart($cart);
         $this->cachedCart = $cart;
     }
 }
