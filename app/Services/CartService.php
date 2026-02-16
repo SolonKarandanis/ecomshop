@@ -3,12 +3,14 @@
 namespace App\Services;
 
 use App\Dtos\AddToCartDto;
+use App\Dtos\UpdateCartItemsDTO;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Repositories\CartRepository;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Str;
+use Illuminate\Support\Collection;
 
 class CartService
 {
@@ -209,5 +211,105 @@ class CartService
         $cart->recalculateCartTotalPrice();
         $this->cartRepository->saveCart($cart);
         $this->cachedCart = $cart;
+    }
+
+    /**
+     * @param UpdateCartItemsDTO[] $updateCartItemRequests
+     */
+    protected function updateCartItemsInDatabase(array $updateCartItemRequests): void
+    {
+        $cart = $this->getCartFromDatabase();
+        $cartItems = $cart->cartItems;
+
+        $updates = [];
+        $idsToUpdate = [];
+
+        foreach ($updateCartItemRequests as $request) {
+            $cartItemId = $request->getCartItemId();
+            $quantity = $request->getQuantity();
+            $attributes = $request->getAttributes();
+            ksort($attributes);
+
+            $existingCartItem = $this->findExistingCartItemForUpdate($cartItems, $cartItemId);
+
+            if ($existingCartItem !== null) {
+                $totalPrice = $quantity * $existingCartItem->unit_price;
+                $updates[] = [
+                    'id' => $existingCartItem->id,
+                    'quantity' => $quantity,
+                    'total_price' => $totalPrice,
+                    'attributes' => json_encode($attributes),
+                ];
+                $idsToUpdate[] = $existingCartItem->id;
+            }
+        }
+
+        if (empty($updates)) {
+            return;
+        }
+
+        $this->cartRepository->batchUpdateCartItems($updates, $idsToUpdate);
+
+        $this->recalculateCartTotalPrice();
+    }
+
+    /**
+     * @param Collection<int, CartItem> $cartItems
+     * @param string $cartItemId
+     * @return CartItem|null
+     */
+    protected function findExistingCartItemForUpdate(Collection $cartItems, string $cartItemId): CartItem|null
+    {
+        if ($cartItems->isEmpty()) {
+            return null;
+        }
+
+        return $cartItems->first(function (CartItem $cartItem) use ($cartItemId) {
+            return (isset($cartItem->id_from_cookie) && $cartItem->id_from_cookie === $cartItemId) ||
+                   (isset($cartItem->id) && (string)$cartItem->id === $cartItemId);
+        });
+    }
+
+    /**
+     * @param UpdateCartItemsDTO[] $updateCartItemRequests
+     */
+    protected function updateCartItemsInCookies(array $updateCartItemRequests):void{
+        $cart = $this->getCartFromCookies();
+        $cartItems = $cart->cartItems;
+
+        $cartItemsForCookie = [];
+        foreach ($cartItems as $item) {
+            $attributeIds = json_decode($item->attributes, true) ?? [];
+            ksort($attributeIds);
+            $key = $item->product_id . '_' . json_encode($attributeIds);
+            $cartItemsForCookie[$key] = [
+                'id' => $item->id_from_cookie,
+                'product_id' => $item->product_id,
+                'quantity' => $item->quantity,
+                'price' => $item->unit_price,
+                'attribute_ids' => $attributeIds,
+            ];
+        }
+
+        foreach ($updateCartItemRequests as $request) {
+            $cartItemId = $request->getCartItemId();
+            $quantity = $request->getQuantity();
+            $attributes = $request->getAttributes();
+            ksort($attributes);
+            $key = $request->getProductId() . '_' . json_encode($attributes);
+
+            if (isset($cartItemsForCookie[$key]) && $cartItemsForCookie[$key]['id'] === $cartItemId) {
+                $cartItemsForCookie[$key]['quantity'] = $quantity;
+            }
+        }
+
+        Cookie::queue(self::COOKIE_CART_ITEMS_NAME, json_encode($cartItemsForCookie), self::COOKIE_LIFETIME);
+
+        $newCart = $this->getCartFromCookies();
+        $cart->recalculateCartTotalPrice();
+        $this->cachedCart = $newCart;
+
+        $cartAttributes = collect($newCart->toArray())->only($newCart->getFillable())->toArray();
+        Cookie::queue(self::COOKIE_CART_NAME, json_encode($cartAttributes), self::COOKIE_LIFETIME);
     }
 }

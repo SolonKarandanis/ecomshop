@@ -116,4 +116,47 @@ class CartRepository
             $this->itemModelQuery()->where('id', $item['id'])->increment('quantity', $item['quantity']);
         }
     }
+
+    public function updateCartItem(CartItem $cartItem): void{
+        $cartItem->save();
+    }
+
+    public function batchUpdateCartItems(array $updates, array $idsToUpdate): void
+    {
+        if (empty($updates)) {
+            return;
+        }
+
+        $table = (new CartItem())->getTable();
+        $cases = [];
+        $params = [];
+
+        $quantityCase = "quantity = CASE id ";
+        $totalPriceCase = "total_price = CASE id ";
+        $attributesCase = "attributes = CASE id ";
+
+        foreach ($updates as $update) {
+            $quantityCase .= "WHEN ? THEN ? ";
+            $totalPriceCase .= "WHEN ? THEN ? ";
+            $attributesCase .= "WHEN ? THEN ? ";
+            $params[] = $update['id'];
+            $params[] = $update['quantity'];
+            $params[] = $update['id'];
+            $params[] = $update['total_price'];
+            $params[] = $update['id'];
+            $params[] = $update['attributes'];
+        }
+
+        $quantityCase .= "END";
+        $totalPriceCase .= "END";
+        $attributesCase .= "END";
+
+        $ids = implode(',', array_fill(0, count($idsToUpdate), '?'));
+
+        $sql = "UPDATE {$table} SET {$quantityCase}, {$totalPriceCase}, {$attributesCase} WHERE id IN ({$ids})";
+
+        $bindings = array_merge($params, $idsToUpdate);
+
+        DB::update($sql, $bindings);
+    }
 }
