@@ -45,8 +45,16 @@ class CartService
         }
     }
 
-    public function updateItemsQuantity():void{
-
+    /**
+     * @param UpdateCartItemsDTO[] $updateCartItemRequests
+     */
+    public function updateItemsQuantity(array $updateCartItemRequests):void{
+        if(Auth::check()){
+            $this->updateCartItemsInDatabase($updateCartItemRequests);
+        }
+        else{
+            $this->updateCartItemsInCookies($updateCartItemRequests);
+        }
     }
 
     public function removeItemsFromCart(array $cartItemIds):void{
@@ -63,6 +71,61 @@ class CartService
         }else{
             $this->clearCartFromCookies();
         }
+    }
+
+    public function moveCartItemsToDatabase():void{
+        $cookieCart = $this->getCartFromCookies();
+        if($cookieCart->cartItems->isEmpty()){
+            return;
+        }
+
+        $dbCart = $this->getCartFromDatabase();
+        $dbCartItems = $dbCart->cartItems;
+
+        $itemsToCreate = [];
+        $itemsToUpdate = [];
+        $idsToUpdate = [];
+
+        foreach ($cookieCart->cartItems as $cookieItem) {
+            $attributes = json_decode($cookieItem->attributes, true) ?? [];
+            ksort($attributes);
+
+            $existingItem = $dbCartItems->first(function (CartItem $dbItem) use ($cookieItem, $attributes) {
+                return $dbItem->product_id === $cookieItem->product_id &&
+                       json_decode($dbItem->attributes, true) === $attributes;
+            });
+
+            if ($existingItem) {
+                $newQuantity = $existingItem->quantity + $cookieItem->quantity;
+                $totalPrice = $newQuantity * $existingItem->unit_price;
+                $itemsToUpdate[] = [
+                    'id' => $existingItem->id,
+                    'quantity' => $newQuantity,
+                    'total_price' => $totalPrice,
+                    'attributes' => json_encode($attributes),
+                ];
+                $idsToUpdate[] = $existingItem->id;
+            } else {
+                $itemsToCreate[] = new AddToCartDto(
+                    $cookieItem->product_id,
+                    $cookieItem->quantity,
+                    $cookieItem->unit_price,
+                    $attributes
+                );
+            }
+        }
+
+        if (!empty($itemsToCreate)) {
+            $this->cartRepository->createCartItems($dbCart->id, $itemsToCreate);
+        }
+
+        if (!empty($itemsToUpdate)) {
+            $this->cartRepository->batchUpdateCartItems($itemsToUpdate, $idsToUpdate);
+        }
+
+        $this->clearCartFromCookies();
+        $this->recalculateCartTotalPrice();
+        $this->cachedCart = $this->getCartFromDatabase();
     }
 
     protected function getCartFromCookies(): Cart
@@ -312,4 +375,5 @@ class CartService
         $cartAttributes = collect($newCart->toArray())->only($newCart->getFillable())->toArray();
         Cookie::queue(self::COOKIE_CART_NAME, json_encode($cartAttributes), self::COOKIE_LIFETIME);
     }
+
 }
