@@ -6,6 +6,7 @@ use App\Dtos\ProductSearchFilterDto;
 use App\Models\Product;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 
 class ProductRepository
 {
@@ -62,5 +63,19 @@ class ProductRepository
         });
 
         return $productQuery->paginate(6);
+    }
+
+    /**
+     * @param int[] $productIds
+     */
+    public function findProductsByIds(array $productIds): Collection{
+        return $this->modelQuery()
+            ->with([
+                'attributes.attributeOptions' => function ($query) {
+                    $query->orderBy('id')->limit(1);
+                }
+            ])
+            ->whereIn('id', $productIds)
+            ->get();
     }
 }

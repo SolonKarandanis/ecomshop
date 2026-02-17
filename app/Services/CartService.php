@@ -6,7 +6,9 @@ use App\Dtos\AddToCartDto;
 use App\Dtos\UpdateCartItemsDTO;
 use App\Models\Cart;
 use App\Models\CartItem;
+use App\Models\Product;
 use App\Repositories\CartRepository;
+use App\Repositories\ProductRepository;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Str;
@@ -19,7 +21,10 @@ class CartService
     protected const COOKIE_CART_ITEMS_NAME = 'cartItems';
     protected const COOKIE_LIFETIME = 60*24*365; // 1 year
 
-    public function __construct(private readonly CartRepository $cartRepository){}
+    public function __construct(
+        private readonly CartRepository $cartRepository,
+        private readonly ProductRepository $productRepository
+    ){}
 
     public function getCart(): Cart{
         if ($this->cachedCart !== null) {
@@ -181,6 +186,34 @@ class CartService
     /**
      * @param AddToCartDto[] $addToCartRequests
      */
+    protected function fetchProductsToBeAdded(array $addToCartRequests):Collection{
+        $productIds= array_map(fn($request):int => $request->getProductId(),$addToCartRequests);
+        return $this->productRepository->findProductsByIds($productIds);
+    }
+
+    /**
+     * @param AddToCartDto $request
+     * @param Collection<int, Product> $productsToBeAdded
+     */
+    protected function setAttributesIfEmptyToRequest(AddToCartDto $request,Collection $productsToBeAdded): void
+    {
+        if (empty($request->getAttributes())) {
+            $product = $productsToBeAdded->find($request->getProductId());
+            if ($product && $product->attributes->isNotEmpty()) {
+                $defaultAttributes = [];
+                foreach ($product->attributes as $attribute) {
+                    if ($attribute->attributeOptions->isNotEmpty()) {
+                        $defaultAttributes[$attribute->id] = $attribute->attributeOptions->first()->id;
+                    }
+                }
+                $request->setAttributes($defaultAttributes);
+            }
+        }
+    }
+
+    /**
+     * @param AddToCartDto[] $addToCartRequests
+     */
     public function saveCartToCookies(array $addToCartRequests): void
     {
         $cart = $this->getCartFromCookies();
@@ -189,7 +222,10 @@ class CartService
             $cartItemsForCookie= $this->getCartItemsForCookies($item);
         }
 
+        $productsToBeAdded = $this->fetchProductsToBeAdded($addToCartRequests);
+
         foreach ($addToCartRequests as $request) {
+            $this->setAttributesIfEmptyToRequest($request,$productsToBeAdded);
             $attributes = $request->getAttributes();
             ksort($attributes);
             $key = $request->getProductId() . '_' . json_encode($attributes);
@@ -221,8 +257,9 @@ class CartService
      */
     public function saveCartToDatabase(array $addToCartRequests): void{
         $cartId = $this->cartRepository->getCartId(Auth::id());
-
+        $productsToBeAdded = $this->fetchProductsToBeAdded($addToCartRequests);
         foreach ($addToCartRequests as $request) {
+            $this->setAttributesIfEmptyToRequest($request,$productsToBeAdded);
             $attributes = $request->getAttributes();
             ksort($attributes);
             $request->setAttributes($attributes);

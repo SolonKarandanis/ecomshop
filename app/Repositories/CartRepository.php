@@ -118,7 +118,7 @@ class CartRepository
     }
 
     public function updateCartItem(CartItem $cartItem): void{
-        $cartItem->save();
+        $this->itemModelQuery()->update($cartItem->toArray());
     }
 
     public function batchUpdateCartItems(array $updates, array $idsToUpdate): void
