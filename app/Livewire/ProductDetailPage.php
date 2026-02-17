@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Repositories\ProductRepository;
+use App\Services\CartService;
 use Livewire\Component;
 
 class ProductDetailPage extends Component
@@ -17,9 +18,14 @@ class ProductDetailPage extends Component
     public bool $hasGpuAttribute;
 
     protected ProductRepository $productRepository;
+    protected CartService $cartService;
 
-    public function boot():void{
-        $this->productRepository = new ProductRepository();
+    public function boot(
+        ProductRepository $productRepository,
+        CartService $cartService
+    ): void{
+        $this->productRepository = $productRepository;
+        $this->cartService = $cartService;
     }
 
     public function mount($slug): void

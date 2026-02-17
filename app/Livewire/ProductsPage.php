@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Dtos\ProductSearchFilterDto;
 use App\Repositories\ProductRepository;
+use App\Services\CartService;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
 use Livewire\Attributes\On;
@@ -37,6 +38,7 @@ class ProductsPage extends Component
     public $sort='latest';
 
     protected ProductRepository $productRepository;
+    protected CartService $cartService;
 
     #[On('categoriesUpdated')]
     public function updateCategories($categories)
@@ -53,9 +55,11 @@ class ProductsPage extends Component
     }
 
     public function boot(
-        ProductRepository $productRepository
+        ProductRepository $productRepository,
+        CartService $cartService
     ): void{
         $this->productRepository = $productRepository;
+        $this->cartService = $cartService;
     }
     public function render()
     {
