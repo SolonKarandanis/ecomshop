@@ -41,6 +41,9 @@ class CartService
         return $cart;
     }
 
+    /**
+     * @param AddToCartDto[] $addToCartRequests
+     */
     public function addItemsToCart(array $addToCartRequests):void{
         if(Auth::check()){
             $this->saveCartToDatabase($addToCartRequests);
@@ -76,6 +79,15 @@ class CartService
         }else{
             $this->clearCartFromCookies();
         }
+    }
+
+    public function getCartItemsCount(): int
+    {
+        if (Auth::check()) {
+            return $this->cartRepository->getCartItemsCount(Auth::id());
+        }
+
+        return $this->getCartFromCookies()->cartItems->sum('quantity');
     }
 
     public function moveCartItemsToDatabase():void{

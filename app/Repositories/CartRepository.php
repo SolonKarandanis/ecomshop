@@ -32,6 +32,14 @@ class CartRepository
         return $cart->id;
     }
 
+    public function getCartItemsCount(int $userId): int
+    {
+        $cartId = $this->getCartId($userId);
+        return $this->itemModelQuery()
+            ->where('cart_id', $cartId)
+            ->sum('quantity');
+    }
+
     public function saveCart(Cart $cart): void
     {
         $cart->update($cart->getFillable());

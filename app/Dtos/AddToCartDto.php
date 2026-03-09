@@ -9,6 +9,13 @@ class AddToCartDto
     private int $price;
     private array $attributes;
 
+    public function __construct(int $productId, int $quantity, int $price){
+        $this->productId = $productId;
+        $this->quantity = $quantity;
+        $this->price = $price;
+        $this->attributes = [];
+    }
+
     public function getProductId(): int
     {
         return $this->productId;

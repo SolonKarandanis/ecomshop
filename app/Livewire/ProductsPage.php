@@ -3,6 +3,8 @@
 namespace App\Livewire;
 
 use App\Dtos\ProductSearchFilterDto;
+use App\Dtos\AddToCartDto;
+use App\Models\Product;
 use App\Repositories\ProductRepository;
 use App\Services\CartService;
 use Livewire\Attributes\Title;
@@ -52,6 +54,21 @@ class ProductsPage extends Component
     {
         $this->selected_brands = $brands;
         $this->resetPage();
+    }
+
+    public function addToCart(Product $product): void
+    {
+        $addToCartDto = new AddToCartDto(
+            $product->id,
+            1,
+            $product->price
+        );
+        $this->cartService->addItemsToCart([$addToCartDto]);
+        $this->dispatch('cartUpdated');
+        $this->dispatch('show-notification', [
+            'message' => 'Product added to cart successfully!',
+            'type' => 'success'
+        ]);
     }
 
     public function boot(
