@@ -3,6 +3,7 @@
 namespace App\Livewire\Partials;
 
 use App\Services\CartService;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 class Navbar extends Component
@@ -14,6 +15,11 @@ class Navbar extends Component
         $this->cartService = $cartService;
     }
     public function mount(){
+        $this->total_cart_items = $this->cartService->getCartItemsCount();
+    }
+
+    #[On('cartUpdated')]
+    public function cartUpdated(){
         $this->total_cart_items = $this->cartService->getCartItemsCount();
     }
     public function render()

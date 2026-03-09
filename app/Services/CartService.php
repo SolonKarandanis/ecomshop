@@ -231,13 +231,22 @@ class CartService
         $cart = $this->getCartFromCookies();
         $cartItemsForCookie = [];
         foreach ($cart->cartItems as $item) {
-            $cartItemsForCookie= $this->getCartItemsForCookies($item);
+            $attributeIds = json_decode($item->attributes, true) ?? [];
+            ksort($attributeIds);
+            $key = $item->product_id . '_' . json_encode($attributeIds);
+            $cartItemsForCookie[$key] = [
+                'id' => $item->id_from_cookie ?? (string) Str::uuid(),
+                'product_id' => $item->product_id,
+                'quantity' => $item->quantity,
+                'price' => $item->unit_price,
+                'attribute_ids' => $attributeIds,
+            ];
         }
 
         $productsToBeAdded = $this->fetchProductsToBeAdded($addToCartRequests);
 
         foreach ($addToCartRequests as $request) {
-            $this->setAttributesIfEmptyToRequest($request,$productsToBeAdded);
+            $this->setAttributesIfEmptyToRequest($request, $productsToBeAdded);
             $attributes = $request->getAttributes();
             ksort($attributes);
             $key = $request->getProductId() . '_' . json_encode($attributes);
@@ -255,7 +264,7 @@ class CartService
             }
         }
 
-        Cookie::queue(self::COOKIE_CART_ITEMS_NAME, json_encode($cartItemsForCookie), self::COOKIE_LIFETIME);
+        Cookie::queue(self::COOKIE_CART_ITEMS_NAME, json_encode(array_values($cartItemsForCookie)), self::COOKIE_LIFETIME);
 
         $cart->recalculateCartTotalPrice();
         $cartAttributes = collect($cart->toArray())->only($cart->getFillable())->toArray();
@@ -267,17 +276,35 @@ class CartService
     /**
      * @param AddToCartDto[] $addToCartRequests
      */
-    public function saveCartToDatabase(array $addToCartRequests): void{
+    public function saveCartToDatabase(array $addToCartRequests): void
+    {
         $cartId = $this->cartRepository->getCartId(Auth::id());
         $productsToBeAdded = $this->fetchProductsToBeAdded($addToCartRequests);
+        $newCartItems = [];
+
         foreach ($addToCartRequests as $request) {
-            $this->setAttributesIfEmptyToRequest($request,$productsToBeAdded);
+            $this->setAttributesIfEmptyToRequest($request, $productsToBeAdded);
             $attributes = $request->getAttributes();
             ksort($attributes);
             $request->setAttributes($attributes);
+
+            $existingItem = $this->cartRepository->findItemByProductIdAndAttributes(
+                $cartId,
+                $request->getProductId(),
+                $attributes
+            );
+
+            if ($existingItem) {
+                $this->cartRepository->updateItemQuantity($existingItem->id, $request->getQuantity());
+            } else {
+                $newCartItems[] = $request;
+            }
         }
 
-        $this->cartRepository->createCartItems($cartId, $addToCartRequests);
+        if (!empty($newCartItems)) {
+            $this->cartRepository->createCartItems($cartId, $newCartItems);
+        }
+
         $this->recalculateCartTotalPrice();
     }
 
