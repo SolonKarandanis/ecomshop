@@ -37,7 +37,7 @@ class CartRepository
         $cartId = $this->getCartId($userId);
         return $this->itemModelQuery()
             ->where('cart_id', $cartId)
-            ->sum('quantity');
+            ->count();
     }
 
     public function saveCart(Cart $cart): void
