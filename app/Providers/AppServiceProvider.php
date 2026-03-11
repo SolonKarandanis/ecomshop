@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Repositories\CartRepository;
+use App\Repositories\ProductRepository;
+use App\Services\CartService;
 use Filament\Support\Assets\Js;
 use Filament\Support\Facades\FilamentAsset;
 use Illuminate\Pagination\Paginator;
@@ -15,7 +18,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(CartService::class, function ($app) {
+            return new CartService($app->make(CartRepository::class), $app->make(ProductRepository::class));
+        });
     }
 
     /**

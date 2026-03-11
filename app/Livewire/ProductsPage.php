@@ -7,6 +7,7 @@ use App\Dtos\AddToCartDto;
 use App\Models\Product;
 use App\Repositories\ProductRepository;
 use App\Services\CartService;
+use Jantinnerezo\LivewireAlert\Facades\LivewireAlert;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
 use Livewire\Attributes\On;
@@ -65,10 +66,12 @@ class ProductsPage extends Component
         );
         $this->cartService->addItemsToCart([$addToCartDto]);
         $this->dispatch('cartUpdated');
-        $this->dispatch('show-notification', [
-            'message' => 'Product added to cart successfully!',
-            'type' => 'success'
-        ]);
+        LivewireAlert::title('Add To Cart')
+            ->text('Product added to cart successfully!')
+            ->success()
+            ->timer(2000)
+            ->show();
+
     }
 
     public function boot(
