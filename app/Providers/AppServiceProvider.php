@@ -31,7 +31,7 @@ class AppServiceProvider extends ServiceProvider
         Paginator::useTailwind();
         FilamentAsset::register([
             // Local asset build using Vite
-            Js::make('sweetalert2', Vite::asset('resources/js/sweetalert2.js')),
+            Js::make('sweetalert2', Vite::asset('resources/js/app.js')),
         ]);
     }
 }

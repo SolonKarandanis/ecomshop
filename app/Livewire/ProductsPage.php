@@ -7,6 +7,7 @@ use App\Dtos\AddToCartDto;
 use App\Models\Product;
 use App\Repositories\ProductRepository;
 use App\Services\CartService;
+use Jantinnerezo\LivewireAlert\Enums\Position;
 use Jantinnerezo\LivewireAlert\Facades\LivewireAlert;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
@@ -70,6 +71,8 @@ class ProductsPage extends Component
             ->text('Product added to cart successfully!')
             ->success()
             ->timer(2000)
+            ->toast()
+            ->position(Position::TopEnd)
             ->show();
 
     }
