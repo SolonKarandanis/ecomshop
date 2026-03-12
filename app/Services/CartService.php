@@ -243,13 +243,16 @@ class CartService
                 return $item->product_id === $request->getProductId() && $itemAttributes === $attributes;
             });
 
+            $product = $productsToBeAdded->find($request->getProductId());
+            $price = $this->calculatePriceWithAttributes($product, $attributes);
+
             if ($existingItem) {
                 $existingItem->quantity += $request->getQuantity();
             } else {
                 $newItemData = [
                     'product_id' => $request->getProductId(),
                     'quantity' => $request->getQuantity(),
-                    'unit_price' => $request->getPrice(),
+                    'unit_price' => $price,
                     'attributes' => json_encode($attributes),
                 ];
                 $newItem = new CartItem($newItemData);
@@ -279,6 +282,28 @@ class CartService
 
     }
 
+    private function calculatePriceWithAttributes(Product $product, array $attributes): float
+    {
+        $newPrice = $product->price;
+        $attributeValues = $product->productAttributeValues;
+
+        foreach ($attributes as $attributeId => $optionId) {
+            $value = $attributeValues->first(function ($item) use ($attributeId, $optionId) {
+                return $item->attribute->name === $attributeId && $item->attribute_option_id === $optionId;
+            });
+
+            if ($value) {
+                if ($value->attribute_value_method === 'attribute.value.method.fixed') {
+                    $newPrice += (float)$value->attribute_value;
+                } elseif ($value->attribute_value_method === 'attribute.value.method.percent') {
+                    $newPrice *= (1 + (float)$value->attribute_value / 100);
+                }
+            }
+        }
+
+        return $newPrice;
+    }
+
     /**
      * @param AddToCartDto[] $addToCartRequests
      */
@@ -299,6 +324,10 @@ class CartService
                 $request->getProductId(),
                 $attributes
             );
+
+            $product = $productsToBeAdded->find($request->getProductId());
+            $price = $this->calculatePriceWithAttributes($product, $attributes);
+            $request->setPrice($price);
 
             if ($existingItem) {
                 $this->cartRepository->updateItemQuantity($existingItem->id, $request->getQuantity());

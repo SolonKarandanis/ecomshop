@@ -78,12 +78,26 @@ class ProductRepository
     /**
      * @param int[] $productIds
      */
-    public function findProductsByIds(array $productIds): Collection{
+    public function findProductsByIdsWithDefaultAttributes(array $productIds): Collection{
         return $this->modelQuery()
             ->with([
                 'attributes.attributeOptions' => function ($query) {
                     $query->orderBy('id')->limit(1);
                 }
+            ])
+            ->whereIn('id', $productIds)
+            ->get();
+    }
+
+    /**
+     * @param int[] $productIds
+     */
+    public function findProductsByIds(array $productIds): Collection{
+        return $this->modelQuery()
+            ->with([
+                'attributes.attributeOptions',
+                'productAttributeValues.attribute',
+                'productAttributeValues.attributeOption',
             ])
             ->whereIn('id', $productIds)
             ->get();
