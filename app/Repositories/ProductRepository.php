@@ -15,7 +15,17 @@ class ProductRepository
         return Product::query();
     }
 
-    public function getProductBySlug($slug){
+    public function getProductById(int $id): Product{
+        return $this->modelQuery()
+            ->with([
+                'productAttributeValues.attribute',
+                'productAttributeValues.attributeOption',
+                'productAttributeValues.media',
+            ])
+            ->where('id', '=', $id)->firstOrFail();
+    }
+
+    public function getProductBySlug($slug): Product{
         return $this->modelQuery()
             ->with([
                 'productAttributeValues.attribute',

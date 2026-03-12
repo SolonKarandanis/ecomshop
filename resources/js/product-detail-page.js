@@ -11,6 +11,7 @@ document.addEventListener('alpine:init', () => {
         attributes: attributes,
         colorAttributeValuesForGallery: colorAttributeValuesForGallery,
         selectedAttributes: {},
+        quantity: 1,
 
         formatCurrency(value) {
             return new Intl.NumberFormat('en-US', {

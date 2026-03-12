@@ -2,8 +2,12 @@
 
 namespace App\Livewire;
 
+use App\Dtos\AddToCartDto;
+use App\Models\Product;
 use App\Repositories\ProductRepository;
 use App\Services\CartService;
+use Jantinnerezo\LivewireAlert\Enums\Position;
+use Jantinnerezo\LivewireAlert\Facades\LivewireAlert;
 use Livewire\Component;
 
 class ProductDetailPage extends Component
@@ -19,6 +23,26 @@ class ProductDetailPage extends Component
 
     protected ProductRepository $productRepository;
     protected CartService $cartService;
+
+    public function addToCart(int $productId, int $quantity, array $attributes): void{
+        $product = $this->productRepository->getProductById($productId);
+        $addToCartDto = AddToCartDto::withAttributes(
+            $product->id,
+            $quantity,
+            $product->price,
+            $attributes
+        );
+        dd($addToCartDto);
+        $this->cartService->addItemsToCart([$addToCartDto]);
+        $this->dispatch('cartUpdated');
+        LivewireAlert::title('Add To Cart')
+            ->text('Product added to cart successfully!')
+            ->success()
+            ->timer(2000)
+            ->toast()
+            ->position(Position::TopEnd)
+            ->show();
+    }
 
     public function boot(
         ProductRepository $productRepository,

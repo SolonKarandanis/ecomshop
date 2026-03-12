@@ -16,6 +16,13 @@ class AddToCartDto
         $this->attributes = [];
     }
 
+    public static function withAttributes(int $productId, int $quantity, int $price, array $attributes): self
+    {
+        $dto = new self($productId, $quantity, $price);
+        $dto->setAttributes($attributes);
+        return $dto;
+    }
+
     public function getProductId(): int
     {
         return $this->productId;

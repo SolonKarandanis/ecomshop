@@ -58,8 +58,9 @@ class ProductsPage extends Component
         $this->resetPage();
     }
 
-    public function addToCart(Product $product): void
+    public function addToCart(int $productId): void
     {
+        $product = $this->productRepository->getProductById($productId);
         $addToCartDto = new AddToCartDto(
             $product->id,
             1,
