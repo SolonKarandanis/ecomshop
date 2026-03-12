@@ -32,7 +32,6 @@ class ProductDetailPage extends Component
             $product->price,
             $attributes
         );
-        dd($addToCartDto);
         $this->cartService->addItemsToCart([$addToCartDto]);
         $this->dispatch('cartUpdated');
         LivewireAlert::title('Add To Cart')
