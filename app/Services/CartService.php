@@ -289,7 +289,7 @@ class CartService
 
         foreach ($attributes as $attributeId => $optionId) {
             $value = $attributeValues->first(function ($item) use ($attributeId, $optionId) {
-                return $item->attribute->name === $attributeId && $item->attribute_option_id === $optionId;
+                return $item->attribute_id == $attributeId && $item->attribute_option_id == $optionId;
             });
 
             if ($value) {

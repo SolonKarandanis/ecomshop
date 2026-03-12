@@ -32,7 +32,7 @@ document.addEventListener('alpine:init', () => {
         init() {
             // Initialize selectedAttributes from the 'initial' value of each attribute
             this.attributes.forEach(attr => {
-                this.selectedAttributes[attr.name] = attr.initial;
+                this.selectedAttributes[attr.id] = attr.initial;
             });
 
             this.calculatePrice();
@@ -42,7 +42,10 @@ document.addEventListener('alpine:init', () => {
                 this.calculatePrice();
 
                 // Specific logic for color changing the main image
-                const selectedColorId = this.selectedAttributes['color'];
+                const colorAttr = this.attributes.find(attr => attr.name === 'color');
+                if (!colorAttr) return;
+
+                const selectedColorId = this.selectedAttributes[colorAttr.id];
                 if (selectedColorId === undefined) return;
 
                 if (selectedColorId === null) {
@@ -59,7 +62,7 @@ document.addEventListener('alpine:init', () => {
         calculatePrice() {
             let newPrice = parseFloat(this.basePrice);
             this.attributes.forEach(attribute => {
-                const selectedOptionId = this.selectedAttributes[attribute.name];
+                const selectedOptionId = this.selectedAttributes[attribute.id];
                 if (selectedOptionId !== null) {
                     const foundValue = attribute.values.find(val => String(val.attribute_option_id) === String(selectedOptionId));
                     if (foundValue) {

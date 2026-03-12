@@ -5,10 +5,12 @@
 
     if ($hasColorAttribute) {
         $colorAttributeValues = $product->colorAttributeValues;
+        $colorAttributeId = $colorAttributeValues->first()->attribute->id;
         $colorOptions = $colorAttributeValues->map(function ($item) {
             return ['id' => $item->attributeOption->id, 'name' => $item->attributeOption->option_name];
         })->unique('id')->values();
         $attributes[] = [
+            'id' => $colorAttributeId,
             'name' => 'color',
             'label' => 'Color',
             'values' => $colorAttributeValues->values(),
@@ -19,10 +21,12 @@
 
     if ($hasPanelTypeAttribute) {
         $panelTypeAttributeValues = $product->panelTypeAttributeValues;
+        $panelTypeAttributeId = $panelTypeAttributeValues->first()->attribute->id;
         $panelOptions = $panelTypeAttributeValues->map(function ($item) {
             return ['id' => $item->attributeOption->id, 'name' => $item->attributeOption->option_name];
         })->unique('id')->values();
         $attributes[] = [
+            'id' => $panelTypeAttributeId,
             'name' => 'panel',
             'label' => 'Panel Type',
             'values' => $panelTypeAttributeValues->values(),
@@ -33,10 +37,12 @@
 
     if ($hasHardDriveAttribute) {
         $hardDriveAttributeValues = $product->hardDriveAttributeValues;
+        $hardDriveAttributeId = $hardDriveAttributeValues->first()->attribute->id;
         $hardDriveOptions = $hardDriveAttributeValues->map(function ($item) {
             return ['id' => $item->attributeOption->id, 'name' => $item->attributeOption->option_name];
         })->unique('id')->values();
         $attributes[] = [
+            'id' => $hardDriveAttributeId,
             'name' => 'hard_drive',
             'label' => 'Hard Drive',
             'values' => $hardDriveAttributeValues->values(),
@@ -47,10 +53,12 @@
 
     if ($hasKeyboardAttribute) {
         $keyboardAttributeValues = $product->keyboardAttributeValues;
+        $keyboardAttributeId = $keyboardAttributeValues->first()->attribute->id;
         $keyboardOptions = $keyboardAttributeValues->map(function ($item) {
             return ['id' => $item->attributeOption->id, 'name' => $item->attributeOption->option_name];
         })->unique('id')->values();
         $attributes[] = [
+            'id' => $keyboardAttributeId,
             'name' => 'keyboard',
             'label' => 'Keyboard',
             'values' => $keyboardAttributeValues->values(),
@@ -61,10 +69,12 @@
 
     if ($hasRamAttribute) {
         $ramAttributeValues = $product->ramAttributeValues;
+        $ramAttributeId = $ramAttributeValues->first()->attribute->id;
         $ramOptions = $ramAttributeValues->map(function ($item) {
             return ['id' => $item->attributeOption->id, 'name' => $item->attributeOption->option_name];
         })->unique('id')->values();
         $attributes[] = [
+            'id' => $ramAttributeId,
             'name' => 'ram',
             'label' => 'RAM',
             'values' => $ramAttributeValues->values(),
@@ -75,10 +85,12 @@
 
     if ($hasGpuAttribute) {
         $gpuAttributeValues = $product->gpuAttributeValues;
+        $gpuAttributeId = $gpuAttributeValues->first()->attribute->id;
         $gpuOptions = $gpuAttributeValues->map(function ($item) {
             return ['id' => $item->attributeOption->id, 'name' => $item->attributeOption->option_name];
         })->unique('id')->values();
         $attributes[] = [
+            'id' => $gpuAttributeId,
             'name' => 'gpu',
             'label' => 'GPU',
             'values' => $gpuAttributeValues->values(),
@@ -110,7 +122,7 @@
                                 <div class="flex-wrap hidden md:flex ">
                                     <template x-for="attributeValue in colorAttributeValuesForGallery">
                                         <template x-for="media in attributeValue.media">
-                                            <div x-show="selectedAttributes['color'] === null || selectedAttributes['color'] == attributeValue.attribute_option_id" class="w-1/2 p-2 sm:w-1/4" x-on:click="mainImage = media.original_url">
+                                            <div x-show="selectedAttributes[attributes.find(attr => attr.name === 'color').id] === null || selectedAttributes[attributes.find(attr => attr.name === 'color').id] == attributeValue.attribute_option_id" class="w-1/2 p-2 sm:w-1/4" x-on:click="mainImage = media.original_url">
                                                 <img :src="media.original_url" alt="{{$product->name}}" class="object-cover w-full lg:h-20 cursor-pointer hover:border hover:border-blue-500">
                                             </div>
                                         </template>
@@ -123,7 +135,7 @@
                                                 type="radio"
                                                 :id="'color_' + option.id"
                                                 :value="option.id"
-                                                x-model="selectedAttributes['color']"
+                                                x-model="selectedAttributes[attributes.find(attr => attr.name === 'color').id]"
                                                 class="shrink-0 mt-0.5 border-gray-200 rounded-full text-blue-600 focus:ring-blue-500 checked:border-blue-500 disabled:opacity-50
                                         disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800">
                                             <label
@@ -139,7 +151,7 @@
                             <section class="mt-3 border-b-white border-b-2">
                                 <h3 class="text-gray-700 dark:text-gray-400 text-lg" x-text="attribute.label + ':'"></h3>
                                 <div class="flex gap-x-6 items-center">
-                                    <select x-model="selectedAttributes[attribute.name]" class="py-3 px-4 pe-9 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600">
+                                    <select x-model="selectedAttributes[attribute.id]" class="py-3 px-4 pe-9 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600">
                                         <template x-for="option in attribute.options">
                                             <option :value="option.id" x-text="option.name"></option>
                                         </template>
