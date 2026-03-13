@@ -16,6 +16,8 @@ class CartPage extends Component
     }
     public function render()
     {
-        return view('livewire.cart-page');
+        $cart = $this->cartService->getCart();
+//        dd($cart);
+        return view('livewire.cart-page',['cart'=>$cart]);
     }
 }
