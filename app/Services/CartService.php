@@ -87,11 +87,7 @@ class CartService
 
     public function getCartItemsCount(): int
     {
-        if (Auth::check()) {
-            return $this->cartRepository->getCartItemsCount(Auth::id());
-        }
-
-        return $this->getCartFromCookies()->cartItems->count();
+        return $this->getCart()->cartItems->count();
     }
 
     public function moveCartItemsToDatabase():void{
@@ -163,10 +159,15 @@ class CartService
         }
 
         $cartItems = [];
-        $productIds=[];
+        $productOptions = [];
         foreach ($cartItemsData as $key => $itemData) {
-            $productId=$itemData['product_id'];
-            $productIds[]=$productId;
+            $productId = $itemData['product_id'];
+            if (!isset($productOptions[$productId])) {
+                $productOptions[$productId] = [];
+            }
+            $optionIds = array_values($itemData['attribute_ids']);
+            $productOptions[$productId] = array_unique(array_merge($productOptions[$productId], $optionIds));
+
             $modelData = [
                 'product_id' => $productId,
                 'quantity' => $itemData['quantity'],
@@ -179,9 +180,10 @@ class CartService
             $cartItem->id_from_cookie = $itemData['id'] ?? null;
             $cartItems[] = $cartItem;
         }
-        $products = $this->productRepository->findProductsByIds($productIds);
+
+        $products = $this->productRepository->findProductsForCart($productOptions);
         foreach ($cartItems as $cartItem) {
-            $product = $products->find($cartItem->product_id);
+            $product = $products->get($cartItem->product_id);
             if($product){
                 $cartItem->setRelation('product', $product);
             }
@@ -369,7 +371,7 @@ class CartService
     }
 
     protected function deleteItemsFromCookies(array $cartItemIds):void{
-        $cart = $this->getCartFromCookies();
+        $cart = $this->getCart();
 
         $itemsToKeep = $cart->cartItems->reject(function ($item) use ($cartItemIds) {
             return in_array($item->id_from_cookie, $cartItemIds);
@@ -401,7 +403,7 @@ class CartService
     }
 
     protected function recalculateCartTotalPrice():void{
-        $cart = $this->getCartFromDatabase();
+        $cart = $this->getCart();
         $cart->recalculateCartTotalPrice();
         $this->cartRepository->saveCart($cart);
     }
@@ -467,7 +469,7 @@ class CartService
      * @param UpdateCartItemsDTO[] $updateCartItemRequests
      */
     protected function updateCartItemsInCookies(array $updateCartItemRequests):void{
-        $cart = $this->getCartFromCookies();
+        $cart = $this->getCart();
         $cartItems = $cart->cartItems;
 
         $cartItemsForCookie = [];

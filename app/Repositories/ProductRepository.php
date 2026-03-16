@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Dtos\ProductSearchFilterDto;
 use App\Models\Product;
+use App\Models\ProductAttributeValues;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
@@ -102,5 +103,56 @@ class ProductRepository
             ->whereIn('id', $productIds)
             ->distinct()
             ->get();
+    }
+
+    public function findProductsForCart(array $productOptions): Collection
+    {
+        $productIds = array_keys($productOptions);
+        if (empty($productIds)) {
+            return collect();
+        }
+
+        $pavQuery = ProductAttributeValues::query()->with(['attribute', 'attributeOption']);
+
+        foreach ($productOptions as $productId => $optionIds) {
+            if (!empty($optionIds)) {
+                $pavQuery->orWhere(function ($query) use ($productId, $optionIds) {
+                    $query->where('product_id', $productId)
+                        ->whereIn('attribute_option_id', $optionIds);
+                });
+            }
+        }
+
+        $pvs = $pavQuery->get();
+        $pvsByProduct = $pvs->groupBy('product_id');
+
+        $products = $this->modelQuery()->whereIn('id', $productIds)->get()->keyBy('id');
+
+        foreach ($products as $product) {
+            $productPvs = $pvsByProduct->get($product->id, collect());
+            $product->setRelation('productAttributeValues', $productPvs);
+
+            $attributes = collect();
+            foreach ($productPvs as $pv) {
+                if (!$pv->relationLoaded('attribute') || !$pv->relationLoaded('attributeOption')) {
+                    continue;
+                }
+
+                $attribute = $pv->attribute;
+                if (!$attributes->has($attribute->id)) {
+                    $attribute->setRelation('attributeOptions', collect());
+                    $attributes->put($attribute->id, $attribute);
+                }
+                $attributes->get($attribute->id)->attributeOptions->push($pv->attributeOption);
+            }
+
+            foreach ($attributes as $attribute) {
+                $attribute->setRelation('attributeOptions', $attribute->attributeOptions->unique('id')->values());
+            }
+
+            $product->setRelation('attributes', $attributes->values());
+        }
+
+        return $products;
     }
 }
