@@ -20,6 +20,7 @@ class CartService
     protected const COOKIE_CART_NAME = 'cart';
     protected const COOKIE_CART_ITEMS_NAME = 'cartItems';
     protected const COOKIE_LIFETIME = 60*24*365; // 1 year
+    private ?Cart $cachedCart = null;
 
     public function __construct(
         private readonly CartRepository $cartRepository,
@@ -27,13 +28,17 @@ class CartService
     ){}
 
     public function getCart(): Cart{
+        if($this->cachedCart){
+            return $this->cachedCart;
+        }
         if(Auth::check()){
             $cart = $this->getCartFromDatabase();
         }
         else{
             $cart = $this->getCartFromCookies();
         }
-        return $cart;
+        $this->cachedCart = $cart;
+        return $this->cachedCart;
     }
 
     /**
@@ -46,6 +51,7 @@ class CartService
         else{
             $this->saveCartToCookies($addToCartRequests);
         }
+        $this->cachedCart = null;
     }
 
     /**
@@ -58,6 +64,7 @@ class CartService
         else{
             $this->updateCartItemsInCookies($updateCartItemRequests);
         }
+        $this->cachedCart = null;
     }
 
     public function removeItemsFromCart(array $cartItemIds):void{
@@ -66,6 +73,7 @@ class CartService
         }else{
             $this->deleteItemsFromCookies($cartItemIds);
         }
+        $this->cachedCart = null;
     }
 
     public function clearCart():void{
@@ -74,6 +82,7 @@ class CartService
         }else{
             $this->clearCartFromCookies();
         }
+        $this->cachedCart = null;
     }
 
     public function getCartItemsCount(): int
@@ -137,6 +146,7 @@ class CartService
 
         $this->clearCartFromCookies();
         $this->recalculateCartTotalPrice();
+        $this->cachedCart = null;
     }
 
     protected function getCartFromCookies(): Cart
@@ -153,9 +163,12 @@ class CartService
         }
 
         $cartItems = [];
+        $productIds=[];
         foreach ($cartItemsData as $key => $itemData) {
+            $productId=$itemData['product_id'];
+            $productIds[]=$productId;
             $modelData = [
-                'product_id' => $itemData['product_id'],
+                'product_id' => $productId,
                 'quantity' => $itemData['quantity'],
                 'unit_price' => $itemData['price'],
                 'total_price' => $itemData['price'] * $itemData['quantity'],
@@ -166,7 +179,13 @@ class CartService
             $cartItem->id_from_cookie = $itemData['id'] ?? null;
             $cartItems[] = $cartItem;
         }
-
+        $products = $this->productRepository->findProductsByIds($productIds);
+        foreach ($cartItems as $cartItem) {
+            $product = $products->find($cartItem->product_id);
+            if($product){
+                $cartItem->setRelation('product', $product);
+            }
+        }
         $cart->setRelation('cartItems', collect($cartItems));
         $cart->recalculateCartTotalPrice();
 
@@ -351,11 +370,15 @@ class CartService
 
     protected function deleteItemsFromCookies(array $cartItemIds):void{
         $cart = $this->getCartFromCookies();
+
+        $itemsToKeep = $cart->cartItems->reject(function ($item) use ($cartItemIds) {
+            return in_array($item->id_from_cookie, $cartItemIds);
+        });
+
+        $cart->setRelation('cartItems', $itemsToKeep);
+
         $cartItemsForCookie = [];
-        foreach ($cart->cartItems as $item) {
-            if(in_array($item->id_from_cookie, $cartItemIds)){
-                continue;
-            }
+        foreach ($itemsToKeep as $item) {
             $cartItemsForCookie = array_merge($cartItemsForCookie, $this->getCartItemsForCookies($item));
         }
 
@@ -475,10 +498,24 @@ class CartService
 
         Cookie::queue(self::COOKIE_CART_ITEMS_NAME, json_encode(array_values($cartItemsForCookie)), self::COOKIE_LIFETIME);
 
-        $newCart = $this->getCartFromCookies();
+        $updatedCartItems = [];
+        foreach ($cartItemsForCookie as $itemData) {
+            $modelData = [
+                'product_id' => $itemData['product_id'],
+                'quantity' => $itemData['quantity'],
+                'unit_price' => $itemData['price'],
+                'total_price' => $itemData['price'] * $itemData['quantity'],
+                'attributes' => json_encode($itemData['attribute_ids']),
+            ];
+            $cartItem = new CartItem($modelData);
+            $cartItem->id_from_cookie = $itemData['id'] ?? null;
+            $updatedCartItems[] = $cartItem;
+        }
+
+        $cart->setRelation('cartItems', collect($updatedCartItems));
         $cart->recalculateCartTotalPrice();
 
-        $cartAttributes = collect($newCart->toArray())->only($newCart->getFillable())->toArray();
+        $cartAttributes = collect($cart->toArray())->only($cart->getFillable())->toArray();
         Cookie::queue(self::COOKIE_CART_NAME, json_encode($cartAttributes), self::COOKIE_LIFETIME);
     }
 

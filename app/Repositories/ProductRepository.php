@@ -100,6 +100,7 @@ class ProductRepository
                 'productAttributeValues.attributeOption',
             ])
             ->whereIn('id', $productIds)
+            ->distinct()
             ->get();
     }
 }

@@ -20,14 +20,14 @@
                                 <td class="py-4">
                                     <div class="flex items-center">
                                         <img class="h-16 w-16 mr-4" src="https://via.placeholder.com/150" alt="Product image">
-                                        <span class="font-semibold">Product name</span>
+                                        <span class="font-semibold">{{$cartItem->product->name}}</span>
                                     </div>
                                 </td>
                                 <td class="py-4">{{Number::currency($cartItem->unit_price,'eur')}}</td>
                                 <td class="py-4">
                                     <div class="flex items-center">
                                         <button class="border rounded-md py-2 px-4 mr-2">-</button>
-                                        <span class="text-center w-8">1</span>
+                                        <span class="text-center w-8">{{$cartItem->quantity}}</span>
                                         <button class="border rounded-md py-2 px-4 ml-2">+</button>
                                     </div>
                                 </td>

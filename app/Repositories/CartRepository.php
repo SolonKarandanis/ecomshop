@@ -20,7 +20,10 @@ class CartRepository
 
     public function getCart(int $userId): Cart{
         return $this->modelQuery()
-            ->with(['cartItems'])
+            ->with([
+                'cartItems',
+                'cartItems.product'
+            ])
             ->where('user_id',$userId)
             ->firstOrCreate(['user_id'=>$userId,'total_price'=>0]);
     }
