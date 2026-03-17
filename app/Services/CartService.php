@@ -298,13 +298,8 @@ class CartService
                 'attribute_ids' => $itemAttributes,
             ];
         }
-
         Cookie::queue(self::COOKIE_CART_ITEMS_NAME, json_encode($cartItemsForCookie), self::COOKIE_LIFETIME);
-
-        $cart->recalculateCartTotalPrice();
-        $cartAttributes = collect($cart->toArray())->only($cart->getFillable())->toArray();
-        Cookie::queue(self::COOKIE_CART_NAME, json_encode($cartAttributes), self::COOKIE_LIFETIME);
-
+        $this->recalculateCartTotalPrice();
     }
 
     private function calculatePriceWithAttributes(Product $product, array $attributes): float
@@ -387,12 +382,8 @@ class CartService
         foreach ($itemsToKeep as $item) {
             $cartItemsForCookie = array_merge($cartItemsForCookie, $this->getCartItemsForCookies($item));
         }
-
         Cookie::queue(self::COOKIE_CART_ITEMS_NAME, json_encode(array_values($cartItemsForCookie)), self::COOKIE_LIFETIME);
-
-        $cart->recalculateCartTotalPrice();
-        $cartAttributes = collect($cart->toArray())->only($cart->getFillable())->toArray();
-        Cookie::queue(self::COOKIE_CART_NAME, json_encode($cartAttributes), self::COOKIE_LIFETIME);
+        $this->recalculateCartTotalPrice();
     }
 
     protected function clearCartFromDatabase():void{
@@ -407,9 +398,16 @@ class CartService
     }
 
     protected function recalculateCartTotalPrice():void{
+        $this->cachedCart = null;
         $cart = $this->getCart();
         $cart->recalculateCartTotalPrice();
-        $this->cartRepository->saveCart($cart);
+        if(Auth::check()){
+            $this->cartRepository->saveCart($cart);
+        }else{
+            $cartAttributes = collect($cart->toArray())->only($cart->getFillable())->toArray();
+            Cookie::queue(self::COOKIE_CART_NAME, json_encode($cartAttributes), self::COOKIE_LIFETIME);
+        }
+
     }
 
     /**
@@ -442,13 +440,10 @@ class CartService
                 $idsToUpdate[] = $existingCartItem->id;
             }
         }
-
         if (empty($updates)) {
             return;
         }
-
         $this->cartRepository->batchUpdateCartItems($updates, $idsToUpdate);
-
         $this->recalculateCartTotalPrice();
     }
 
@@ -519,10 +514,7 @@ class CartService
         }
 
         $cart->setRelation('cartItems', collect($updatedCartItems));
-        $cart->recalculateCartTotalPrice();
-
-        $cartAttributes = collect($cart->toArray())->only($cart->getFillable())->toArray();
-        Cookie::queue(self::COOKIE_CART_NAME, json_encode($cartAttributes), self::COOKIE_LIFETIME);
+        $this->recalculateCartTotalPrice();
     }
 
 }

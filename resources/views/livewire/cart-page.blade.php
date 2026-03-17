@@ -26,9 +26,9 @@
                                 <td class="py-4">{{Number::currency($cartItem->unit_price,'eur')}}</td>
                                 <td class="py-4">
                                     <div class="flex items-center">
-                                        <button class="border rounded-md py-2 px-4 mr-2">-</button>
+                                        <button wire:click="decreaseQuantity('{{$cartItem->id ?? $cartItem->id_from_cookie}}')" class="border rounded-md py-2 px-4 mr-2">-</button>
                                         <span class="text-center w-8">{{$cartItem->quantity}}</span>
-                                        <button class="border rounded-md py-2 px-4 ml-2">+</button>
+                                        <button wire:click="increaseQuantity('{{$cartItem->id ?? $cartItem->id_from_cookie}}')" class="border rounded-md py-2 px-4 ml-2">+</button>
                                     </div>
                                 </td>
                                 <td class="py-4">{{Number::currency($cartItem->total_price,'eur')}}</td>
@@ -75,3 +75,4 @@
         </div>
     </div>
 </div>
+

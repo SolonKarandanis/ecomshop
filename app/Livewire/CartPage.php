@@ -2,21 +2,73 @@
 
 namespace App\Livewire;
 
+use App\Dtos\UpdateCartItemsDTO;
+use App\Models\Cart;
+use App\Models\CartItem;
 use App\Services\CartService;
 use Livewire\Component;
 
 class CartPage extends Component
 {
     protected CartService $cartService;
+    public ?Cart $cart = null;
 
     public function boot(
         CartService $cartService
     ): void{
         $this->cartService = $cartService;
     }
+
+    public function mount(): void
+    {
+        $this->cart = $this->cartService->getCart();
+    }
+
+    public function increaseQuantity(string $cartItemId): void
+    {
+        $cartItem = $this->findCartItem($this->cart, $cartItemId);
+
+        if ($cartItem) {
+            $newQuantity = $cartItem->quantity + 1;
+            $this->updateQuantity($cartItem, $newQuantity);
+        }
+    }
+
+    public function decreaseQuantity(string $cartItemId): void
+    {
+        $cartItem = $this->findCartItem($this->cart, $cartItemId);
+
+        if ($cartItem && $cartItem->quantity > 1) {
+            $newQuantity = $cartItem->quantity - 1;
+            $this->updateQuantity($cartItem, $newQuantity);
+        }
+    }
+
+    private function findCartItem($cart, string $cartItemId): ?CartItem
+    {
+        return $cart->cartItems->first(function ($item) use ($cartItemId) {
+            $itemId = $item->id ?? $item->id_from_cookie;
+            return (string) $itemId === $cartItemId;
+        });
+    }
+
+    private function updateQuantity(CartItem $cartItem, int $newQuantity): void
+    {
+        $attributes = json_decode($cartItem->attributes, true) ?? [];
+        $cartItemId = $cartItem->id ?? $cartItem->id_from_cookie;
+
+        $updateDto = new UpdateCartItemsDTO(
+            (string) $cartItemId,
+            $cartItem->product_id,
+            $newQuantity,
+            $attributes
+        );
+        $this->cartService->updateItemsQuantity([$updateDto]);
+        $this->cart = $this->cartService->getCart();
+    }
+
     public function render()
     {
-        $cart = $this->cartService->getCart();
-        return view('livewire.cart-page',['cart'=>$cart]);
+        return view('livewire.cart-page');
     }
 }
