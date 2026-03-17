@@ -11,7 +11,7 @@
                             <th class="text-left font-semibold">Price</th>
                             <th class="text-left font-semibold">Quantity</th>
                             <th class="text-left font-semibold">Total</th>
-                            <th class="text-left font-semibold">Remove</th>
+                            <th class="text-left font-semibold">Actions</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -19,7 +19,7 @@
                             <tr wire:key="cart-item-{{ $cartItem->id ?? $cartItem->id_from_cookie }}">
                                 <td class="py-4">
                                     <div class="flex items-center">
-                                        <img class="h-16 w-16 mr-4" src="https://via.placeholder.com/150" alt="Product image">
+                                        <img class="h-16 w-16 mr-4" src="{{$cartItem->product->getThumbnailImage()}}" alt="{{$cartItem->product->name}}">
                                         <span class="font-semibold">{{$cartItem->product->name}}</span>
                                     </div>
                                 </td>
@@ -32,7 +32,11 @@
                                     </div>
                                 </td>
                                 <td class="py-4">{{Number::currency($cartItem->total_price,'eur')}}</td>
-                                <td><button class="bg-slate-300 border-2 border-slate-400 rounded-lg px-3 py-1 hover:bg-red-500 hover:text-white hover:border-red-700">Remove</button></td>
+                                <td>
+                                    <button class="bg-slate-300 border-2 border-slate-400 rounded-lg px-3 py-1 hover:bg-red-500 hover:text-white hover:border-red-700">
+                                        Remove
+                                    </button>
+                                </td>
                             </tr>
                             @empty
                             <tr>

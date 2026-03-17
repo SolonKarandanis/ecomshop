@@ -112,18 +112,30 @@ class ProductRepository
             return collect();
         }
 
-        $pavQuery = ProductAttributeValues::query()->with(['attribute', 'attributeOption']);
-
+        // Query for explicitly selected options
+        $selectedPavQuery = ProductAttributeValues::query()->with(['attribute', 'attributeOption', 'media']);
         foreach ($productOptions as $productId => $optionIds) {
             if (!empty($optionIds)) {
-                $pavQuery->orWhere(function ($query) use ($productId, $optionIds) {
+                $selectedPavQuery->orWhere(function ($query) use ($productId, $optionIds) {
                     $query->where('product_id', $productId)
                         ->whereIn('attribute_option_id', $optionIds);
                 });
             }
         }
+        $selectedPvs = $selectedPavQuery->get();
 
-        $pvs = $pavQuery->get();
+        // Query for color attributes for all products in the cart
+        $colorPvs = ProductAttributeValues::query()
+            ->with(['attribute', 'attributeOption', 'media'])
+            ->whereIn('product_id', $productIds)
+            ->whereHas('attribute', function ($query) {
+                $query->where('name', 'attribute.color');
+            })
+            ->get();
+
+        // Merge selected and color attributes
+        $pvs = $selectedPvs->merge($colorPvs)->unique('id');
+
         $pvsByProduct = $pvs->groupBy('product_id');
 
         $products = $this->modelQuery()->whereIn('id', $productIds)->get()->keyBy('id');

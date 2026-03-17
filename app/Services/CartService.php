@@ -145,12 +145,16 @@ class CartService
         $this->cachedCart = null;
     }
 
+    protected function getFromCookies(string $cookieName): array|string|null{
+            return request()->cookie($cookieName,'[]');
+    }
+
     protected function getCartFromCookies(): Cart
     {
-        $cartData = json_decode(request()->cookie(self::COOKIE_CART_NAME), true) ?? [];
+        $cartData = json_decode($this->getFromCookies(self::COOKIE_CART_NAME),true);
         $cart = new Cart($cartData);
 
-        $cookieValue = request()->cookie(self::COOKIE_CART_ITEMS_NAME, '[]');
+        $cookieValue =$this->getFromCookies(self::COOKIE_CART_ITEMS_NAME);
         Log::debug('Raw cartItems cookie value from request(): ', [$cookieValue]);
         $cartItemsData = json_decode($cookieValue, true);
         if (json_last_error() !== JSON_ERROR_NONE) {
