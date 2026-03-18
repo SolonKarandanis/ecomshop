@@ -52,7 +52,7 @@
                     <h2 class="text-lg font-semibold mb-4">Summary</h2>
                     <div class="flex justify-between mb-2">
                         <span>Subtotal</span>
-                        <span>{{Number::currency($cart->total_price,'eur')}}</span>
+                        <span>{{Number::currency($cart->total_price ?? 0,'eur')}}</span>
                     </div>
                     <div class="flex justify-between mb-2">
                         <span>Taxes</span>
@@ -65,7 +65,7 @@
                     <hr class="my-2">
                     <div class="flex justify-between mb-2">
                         <span class="font-semibold">Total</span>
-                        <span class="font-semibold">{{Number::currency($cart->total_price,'eur')}}</span>
+                        <span class="font-semibold">{{Number::currency($cart->total_price ?? 0,'eur')}}</span>
                     </div>
                     @if($cart->cartItems)
                         <button class="bg-blue-500 text-white py-2 px-4 rounded-lg mt-4 w-full">Checkout</button>

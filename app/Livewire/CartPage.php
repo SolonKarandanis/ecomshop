@@ -26,6 +26,7 @@ class CartPage extends Component
 
     public function increaseQuantity(string $cartItemId): void
     {
+        $this->cart = $this->cartService->getCart();
         $cartItem = $this->findCartItem($this->cart, $cartItemId);
 
         if ($cartItem) {
@@ -36,6 +37,7 @@ class CartPage extends Component
 
     public function decreaseQuantity(string $cartItemId): void
     {
+        $this->cart = $this->cartService->getCart();
         $cartItem = $this->findCartItem($this->cart, $cartItemId);
 
         if ($cartItem && $cartItem->quantity > 1) {
@@ -69,6 +71,7 @@ class CartPage extends Component
 
     public function render()
     {
+        $this->cart = $this->cartService->getCart();
         return view('livewire.cart-page');
     }
 }
