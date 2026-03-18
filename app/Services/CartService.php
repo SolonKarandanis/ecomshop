@@ -511,8 +511,30 @@ class CartService
             $updatedCartItems[] = $cartItem;
         }
 
+//        $products = $this->productRepository->findProductsForCart($productOptions);
+//        foreach ($cartItems as $cartItem) {
+//            $product = $products->get($cartItem->product_id);
+//            if($product){
+//                $cartItem->setRelation('product', $product);
+//            }
+//        }
+//        $cart->setRelation('cartItems', collect($cartItems));
+
+        // Eager load the product relationships for the updated cart items
+        $productIds = array_column($updatedCartItems, 'product_id');
+        if (!empty($productIds)) {
+            $products = $this->productRepository->findProductsByIds($productIds)->keyBy('id');
+            foreach ($updatedCartItems as $cartItem) {
+                if (isset($products[$cartItem->product_id])) {
+                    $cartItem->setRelation('product', $products[$cartItem->product_id]);
+                }
+            }
+        }
+
         $cart->setRelation('cartItems', collect($updatedCartItems));
         $this->recalculateCartTotalPrice($cart);
     }
+
+//    protected
 
 }

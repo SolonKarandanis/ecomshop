@@ -112,59 +112,13 @@ class ProductRepository
             return collect();
         }
 
-        // Query for explicitly selected options
-        $selectedPavQuery = ProductAttributeValues::query()->with(['attribute', 'attributeOption', 'media']);
-        foreach ($productOptions as $productId => $optionIds) {
-            if (!empty($optionIds)) {
-                $selectedPavQuery->orWhere(function ($query) use ($productId, $optionIds) {
-                    $query->where('product_id', $productId)
-                        ->whereIn('attribute_option_id', $optionIds);
-                });
-            }
-        }
-        $selectedPvs = $selectedPavQuery->get();
-
-        // Query for color attributes for all products in the cart
-        $colorPvs = ProductAttributeValues::query()
-            ->with(['attribute', 'attributeOption', 'media'])
-            ->whereIn('product_id', $productIds)
-            ->whereHas('attribute', function ($query) {
-                $query->where('name', 'attribute.color');
-            })
-            ->get();
-
-        // Merge selected and color attributes
-        $pvs = $selectedPvs->merge($colorPvs)->unique('id');
-
-        $pvsByProduct = $pvs->groupBy('product_id');
-
-        $products = $this->modelQuery()->whereIn('id', $productIds)->get()->keyBy('id');
-
-        foreach ($products as $product) {
-            $productPvs = $pvsByProduct->get($product->id, collect());
-            $product->setRelation('productAttributeValues', $productPvs);
-
-            $attributes = collect();
-            foreach ($productPvs as $pv) {
-                if (!$pv->relationLoaded('attribute') || !$pv->relationLoaded('attributeOption')) {
-                    continue;
-                }
-
-                $attribute = $pv->attribute;
-                if (!$attributes->has($attribute->id)) {
-                    $attribute->setRelation('attributeOptions', collect());
-                    $attributes->put($attribute->id, $attribute);
-                }
-                $attributes->get($attribute->id)->attributeOptions->push($pv->attributeOption);
-            }
-
-            foreach ($attributes as $attribute) {
-                $attribute->setRelation('attributeOptions', $attribute->attributeOptions->unique('id')->values());
-            }
-
-            $product->setRelation('attributes', $attributes->values());
-        }
-
-        return $products;
+        return $this->modelQuery()
+            ->with([
+                'productAttributeValues.attribute',
+                'productAttributeValues.media',
+            ])
+            ->whereIn('id', $productIds)
+            ->get()
+            ->keyBy('id');
     }
 }
