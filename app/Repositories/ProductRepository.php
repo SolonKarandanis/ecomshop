@@ -105,9 +105,8 @@ class ProductRepository
             ->get();
     }
 
-    public function findProductsForCart(array $productOptions): Collection
+    public function findProductsForCart(array $productIds): Collection
     {
-        $productIds = array_keys($productOptions);
         if (empty($productIds)) {
             return collect();
         }

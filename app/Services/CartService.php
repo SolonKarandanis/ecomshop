@@ -158,14 +158,10 @@ class CartService
         }
 
         $cartItems = [];
-        $productOptions = [];
+        $productIds = [];
         foreach ($cartItemsData as $key => $itemData) {
             $productId = $itemData['product_id'];
-            if (!isset($productOptions[$productId])) {
-                $productOptions[$productId] = [];
-            }
-            $optionIds = array_values($itemData['attribute_ids']);
-            $productOptions[$productId] = array_unique(array_merge($productOptions[$productId], $optionIds));
+            $productIds[] = $productId;
 
             $modelData = [
                 'product_id' => $productId,
@@ -179,8 +175,7 @@ class CartService
             $cartItem->id_from_cookie = $itemData['id'] ?? null;
             $cartItems[] = $cartItem;
         }
-
-        $products = $this->productRepository->findProductsForCart($productOptions);
+        $products = $this->productRepository->findProductsForCart($productIds);
         foreach ($cartItems as $cartItem) {
             $product = $products->get($cartItem->product_id);
             if($product){
