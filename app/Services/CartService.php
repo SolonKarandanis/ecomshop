@@ -293,7 +293,7 @@ class CartService
                 'attribute_ids' => $itemAttributes,
             ];
         }
-        Cookie::queue(self::COOKIE_CART_ITEMS_NAME, json_encode($cartItemsForCookie), self::COOKIE_LIFETIME);
+        $this->putItemsToCookies($cartItemsForCookie);
         $this->recalculateCartTotalPrice();
     }
 
@@ -377,7 +377,7 @@ class CartService
         foreach ($itemsToKeep as $item) {
             $cartItemsForCookie = array_merge($cartItemsForCookie, $this->getCartItemsForCookies($item));
         }
-        Cookie::queue(self::COOKIE_CART_ITEMS_NAME, json_encode(array_values($cartItemsForCookie)), self::COOKIE_LIFETIME);
+        $this->putItemsToCookies($cartItemsForCookie);
         $this->recalculateCartTotalPrice();
     }
 
@@ -402,7 +402,7 @@ class CartService
             $this->cartRepository->saveCart($cart);
         }else{
             $cartAttributes = collect($cart->toArray())->only($cart->getFillable())->toArray();
-            Cookie::queue(self::COOKIE_CART_NAME, json_encode($cartAttributes), self::COOKIE_LIFETIME);
+            $this->putCartInCookies($cartAttributes);
         }
         $this->cachedCart=$cart;
     }
@@ -494,9 +494,7 @@ class CartService
                 $cartItemsForCookie[$key]['quantity'] = $quantity;
             }
         }
-
-        Cookie::queue(self::COOKIE_CART_ITEMS_NAME, json_encode(array_values($cartItemsForCookie)), self::COOKIE_LIFETIME);
-
+        $this->putItemsToCookies($cartItemsForCookie);
         $updatedCartItems = [];
         foreach ($cartItemsForCookie as $itemData) {
             $modelData = [
@@ -535,6 +533,12 @@ class CartService
         $this->recalculateCartTotalPrice($cart);
     }
 
-//    protected
+    protected function putCartInCookies(array $cartAttributes):void{
+        Cookie::queue(self::COOKIE_CART_NAME, json_encode($cartAttributes), self::COOKIE_LIFETIME);
+    }
+
+    protected function putItemsToCookies(array $cartItemsForCookie):void{
+        Cookie::queue(self::COOKIE_CART_ITEMS_NAME, json_encode(array_values($cartItemsForCookie)), self::COOKIE_LIFETIME);
+    }
 
 }
