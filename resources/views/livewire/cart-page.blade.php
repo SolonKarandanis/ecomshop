@@ -26,15 +26,19 @@
                                 <td class="py-4">{{Number::currency($cartItem->unit_price,'eur')}}</td>
                                 <td class="py-4">
                                     <div class="flex items-center">
-                                        <button wire:click="decreaseQuantity('{{$cartItem->id ?? $cartItem->id_from_cookie}}')" class="border rounded-md py-2 px-4 mr-2">-</button>
+                                        <button wire:click="decreaseQuantity('{{$cartItem->id ?? $cartItem->id_from_cookie}}')" class="border rounded-md py-2 px-4 mr-2 cursor-pointer">
+                                            -
+                                        </button>
                                         <span class="text-center w-8">{{$cartItem->quantity}}</span>
-                                        <button wire:click="increaseQuantity('{{$cartItem->id ?? $cartItem->id_from_cookie}}')" class="border rounded-md py-2 px-4 ml-2">+</button>
+                                        <button wire:click="increaseQuantity('{{$cartItem->id ?? $cartItem->id_from_cookie}}')" class="border rounded-md py-2 px-4 ml-2 cursor-pointer">
+                                            +
+                                        </button>
                                     </div>
                                 </td>
                                 <td class="py-4">{{Number::currency($cartItem->total_price,'eur')}}</td>
                                 <td>
                                     <button wire:click="removeItem('{{$cartItem->id ?? $cartItem->id_from_cookie}}')"
-                                        class="bg-slate-300 border-2 border-slate-400 rounded-lg px-3 py-1 hover:bg-red-500 hover:text-white hover:border-red-700">
+                                        class="bg-red-400 border-2 border-red-400 rounded-lg px-3 py-1 hover:bg-red-500  hover:border-red-500 cursor-pointer text-white">
                                         <span>Remove</span>
                                         <div wire:loading
                                              wire:target="removeItem({{$cartItem->id ?? $cartItem->id_from_cookie}})"
@@ -76,7 +80,20 @@
                         <span class="font-semibold">{{Number::currency($cart->total_price ?? 0,'eur')}}</span>
                     </div>
                     @if($cart->cartItems)
-                        <button class="bg-blue-500 text-white py-2 px-4 rounded-lg mt-4 w-full">Checkout</button>
+                        <button class="bg-blue-500 text-white hover:bg-blue-600 py-2 px-4 rounded-lg mt-4 w-full cursor-pointer">
+                            Checkout
+                        </button>
+                        <button wire:click="clearCart()"
+                            class="bg-red-600 border-2 border-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg mt-4 w-full cursor-pointer">
+                            <span> Clear Cart</span>
+                            <div wire:loading
+                                 wire:target="clearCart()"
+                                 class="animate-spin inline-block size-6 border-3 border-current border-t-transparent rounded-[999px] text-primary"
+                                 role="status"
+                                 aria-label="loading">
+                                <span class="sr-only">Loading...</span>
+                            </div>
+                        </button>
                     @endif
                 </div>
             </div>

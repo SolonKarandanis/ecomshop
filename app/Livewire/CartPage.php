@@ -49,8 +49,12 @@ class CartPage extends Component
     public function removeItem(string|int $cartItemId ):void{
         $cartIds[]=$cartItemId;
         $this->cartService->removeItemsFromCart($cartIds);
-        unset($this->cart);
         $this->cart = $this->cartService->getCart();
+        $this->dispatch('cartUpdated');
+    }
+
+    public function clearCart():void{
+        $this->cartService->clearCart();
         $this->dispatch('cartUpdated');
     }
 
