@@ -24,7 +24,7 @@ class CartPage extends Component
         $this->cart = $this->cartService->getCart();
     }
 
-    public function increaseQuantity(string $cartItemId): void
+    public function increaseQuantity(string|int $cartItemId): void
     {
         $this->cart = $this->cartService->getCart();
         $cartItem = $this->findCartItem($this->cart, $cartItemId);
@@ -35,7 +35,7 @@ class CartPage extends Component
         }
     }
 
-    public function decreaseQuantity(string $cartItemId): void
+    public function decreaseQuantity(string|int $cartItemId): void
     {
         $this->cart = $this->cartService->getCart();
         $cartItem = $this->findCartItem($this->cart, $cartItemId);
@@ -44,6 +44,14 @@ class CartPage extends Component
             $newQuantity = $cartItem->quantity - 1;
             $this->updateQuantity($cartItem, $newQuantity);
         }
+    }
+
+    public function removeItem(string|int $cartItemId ):void{
+        $cartIds[]=$cartItemId;
+        $this->cartService->removeItemsFromCart($cartIds);
+        unset($this->cart);
+        $this->cart = $this->cartService->getCart();
+        $this->dispatch('cartUpdated');
     }
 
     private function findCartItem($cart, string $cartItemId): ?CartItem
@@ -71,7 +79,6 @@ class CartPage extends Component
 
     public function render()
     {
-        $this->cart = $this->cartService->getCart();
         return view('livewire.cart-page');
     }
 }

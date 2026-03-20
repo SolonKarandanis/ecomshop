@@ -3,7 +3,6 @@
 namespace App\Livewire;
 
 use App\Dtos\AddToCartDto;
-use App\Models\Product;
 use App\Repositories\ProductRepository;
 use App\Services\CartService;
 use Jantinnerezo\LivewireAlert\Enums\Position;

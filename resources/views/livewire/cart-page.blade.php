@@ -33,8 +33,16 @@
                                 </td>
                                 <td class="py-4">{{Number::currency($cartItem->total_price,'eur')}}</td>
                                 <td>
-                                    <button class="bg-slate-300 border-2 border-slate-400 rounded-lg px-3 py-1 hover:bg-red-500 hover:text-white hover:border-red-700">
-                                        Remove
+                                    <button wire:click="removeItem('{{$cartItem->id ?? $cartItem->id_from_cookie}}')"
+                                        class="bg-slate-300 border-2 border-slate-400 rounded-lg px-3 py-1 hover:bg-red-500 hover:text-white hover:border-red-700">
+                                        <span>Remove</span>
+                                        <div wire:loading
+                                             wire:target="removeItem({{$cartItem->id ?? $cartItem->id_from_cookie}})"
+                                             class="animate-spin inline-block size-6 border-3 border-current border-t-transparent rounded-[999px] text-primary"
+                                             role="status"
+                                             aria-label="loading">
+                                            <span class="sr-only">Loading...</span>
+                                        </div>
                                     </button>
                                 </td>
                             </tr>
