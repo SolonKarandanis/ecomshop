@@ -5,7 +5,7 @@
             <div class="md:w-3/4">
                 <div class=" overflow-x-auto rounded-lg shadow-md p-6 mb-4 bg-white dark:bg-gray-200">
                     <table class="w-full">
-                        <thead>
+                        <thead class="hidden md:table-header-group">
                         <tr>
                             <th class="text-left font-semibold px-4">Product</th>
                             <th class="text-left font-semibold px-4">Price</th>
@@ -15,15 +15,20 @@
                         </thead>
                         <tbody>
                         @forelse($cart->cartItems as $cartItem)
-                            <tr wire:key="cart-item-{{ $cartItem->id ?? $cartItem->id_from_cookie }}">
-                                <td class="py-4">
+                            <tr wire:key="cart-item-{{ $cartItem->id ?? $cartItem->id_from_cookie }}" class="block md:table-row border-b border-gray-200">
+                                <td class="py-4 block md:table-cell">
+                                    <span class="inline-block md:hidden font-bold">Product:</span>
                                     <div class="flex items-center">
                                         <img class="h-16 w-16 mr-4" src="{{$cartItem->product->getThumbnailImage()}}" alt="{{$cartItem->product->name}}">
                                         <span class="font-semibold text-sm">{{$cartItem->product->name}}</span>
                                     </div>
                                 </td>
-                                <td class="px-4">{{Number::currency($cartItem->unit_price,'eur')}}</td>
-                                <td class="px-4">
+                                <td class="px-4 block md:table-cell">
+                                    <span class="inline-block md:hidden font-bold">Price:</span>
+                                    {{Number::currency($cartItem->unit_price,'eur')}}
+                                </td>
+                                <td class="px-4 block md:table-cell">
+                                    <span class="inline-block md:hidden font-bold">Quantity:</span>
                                     <div class="flex items-center">
                                         <button wire:click="decreaseQuantity('{{$cartItem->id ?? $cartItem->id_from_cookie}}')" class="border rounded-md py-2 px-4 mr-2 cursor-pointer">
                                             -
@@ -34,8 +39,11 @@
                                         </button>
                                     </div>
                                 </td>
-                                <td class="px-4">{{Number::currency($cartItem->total_price,'eur')}}</td>
-                                <td class="px-4">
+                                <td class="px-4 block md:table-cell">
+                                    <span class="inline-block md:hidden font-bold">Total:</span>
+                                    {{Number::currency($cartItem->total_price,'eur')}}
+                                </td>
+                                <td class="px-4 block md:table-cell">
                                     <button wire:click="removeItem('{{$cartItem->id ?? $cartItem->id_from_cookie}}')"
                                         wire:loading.attr="disabled"
                                         wire:target="removeItem('{{$cartItem->id ?? $cartItem->id_from_cookie}}')"
