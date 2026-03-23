@@ -22,7 +22,7 @@
                             <div>
                                 <label for="name" class="block text-sm mb-2 dark:text-white">Name</label>
                                 <div class="relative">
-                                    <input type="text" id="name" name="name" class="py-3 px-4 block w-full border
+                                    <input type="text" id="name" name="name" wire:model="name" class="py-3 px-4 block w-full border
                                     border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50
                                     disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400 dark:focus:ring-gray-600" aria-describedby="email-error">
                                     @error('name')
@@ -41,7 +41,7 @@
                             <div>
                                 <label for="email" class="block text-sm mb-2 dark:text-white">Email address</label>
                                 <div class="relative">
-                                    <input type="email" id="email"  name="email" class="py-3 px-4 block w-full border border-gray-200 rounded-lg text-sm
+                                    <input type="email" id="email"  name="email" wire:model="email" class="py-3 px-4 block w-full border border-gray-200 rounded-lg text-sm
                                     focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900
                                     dark:border-gray-700 dark:text-gray-400 dark:focus:ring-gray-600"  aria-describedby="email-error">
                                     @error('email')
@@ -52,7 +52,7 @@
                                         </div>
                                     @enderror
                                 </div>
-                                @error('name')
+                                @error('email')
                                     <p class="text-xs text-red-600 mt-2" id="email-error">{{$message}}</p>
                                 @enderror
                             </div>
@@ -64,7 +64,7 @@
                                     <label for="password" class="block text-sm mb-2 dark:text-white">Password</label>
                                 </div>
                                 <div class="relative">
-                                    <input type="password" id="password" name="password" class="py-3 border px-4 block w-full border-gray-200 rounded-lg text-sm
+                                    <input type="password" id="password" name="password" wire:model="password" class="py-3 border px-4 block w-full border-gray-200 rounded-lg text-sm
                                     focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none
                                     dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400 dark:focus:ring-gray-600" aria-describedby="password-error">
                                     @error('password')
@@ -75,7 +75,7 @@
                                         </div>
                                     @enderror
                                 </div>
-                                @error('name')
+                                @error('password')
                                     <p class="text-xs text-red-600 mt-2" id="password-error">{{$message}}</p>
                                 @enderror
                             </div>

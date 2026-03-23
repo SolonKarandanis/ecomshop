@@ -2,21 +2,32 @@
 
 namespace App\Livewire\Auth;
 
+use App\Http\Requests\Auth\RegisterUserRequest;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
 #[Title('Register')]
 class RegisterPage extends Component
 {
+    public string $name = '';
+    public string $email = '';
+    public string $password = '';
 
-    public function save(){
-        $this->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8',
+    public function save()
+    {
+        $validated = $this->validate((new RegisterUserRequest())->rules());
+
+        $user = User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
         ]);
 
-        return redirect()->intended();
+        auth()->login($user);
+
+        return redirect()->intended('/');
     }
     public function render()
     {
