@@ -90,7 +90,7 @@
                         <span class="font-semibold">Total</span>
                         <span class="font-semibold">{{Number::currency($cart->total_price ?? 0,'eur')}}</span>
                     </div>
-                    @if($cart->cartItems)
+                    @if($cart->cartItems->count() > 0)
                         <button class="bg-blue-500 text-white hover:bg-blue-600 py-2 px-4 rounded-lg mt-4 w-full cursor-pointer">
                             Checkout
                         </button>
