@@ -2,15 +2,25 @@
 
 namespace App\Repositories;
 
+use App\Dtos\CreateUserDTO;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Hash;
 
 class UserRepository
 {
 
     public function modelQuery(): Builder| User{
         return User::query();
+    }
+
+    public function createUser(CreateUserDTO $dto):User{
+        return $this->modelQuery()->create([
+            'name' => $dto->getName(),
+            'email' => $dto->getEmail(),
+            'password' => Hash::make($dto->getPassword()),
+        ]);
     }
 
     public function getUsersWithOrderedItems(): Collection{

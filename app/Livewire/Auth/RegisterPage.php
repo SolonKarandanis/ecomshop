@@ -2,9 +2,10 @@
 
 namespace App\Livewire\Auth;
 
+use App\Dtos\CreateUserDTO;
 use App\Http\Requests\Auth\RegisterUserRequest;
-use App\Models\User;
-use Illuminate\Support\Facades\Hash;
+use App\Repositories\UserRepository;
+use Illuminate\Auth\Events\Registered;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
@@ -15,18 +16,21 @@ class RegisterPage extends Component
     public string $email = '';
     public string $password = '';
 
+    protected UserRepository $userRepository;
+
+    public function boot(
+        UserRepository $userRepository
+    ): void{
+        $this->userRepository = $userRepository;
+    }
+
     public function save()
     {
         $validated = $this->validate((new RegisterUserRequest())->rules());
-
-        $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
-        ]);
-
+        $dto = CreateUserDTO::fromArray($validated);
+        $user = $this->userRepository->createUser($dto);
+        event(new Registered($user));
         auth()->login($user);
-
         return redirect()->intended('/');
     }
     public function render()
