@@ -21,12 +21,22 @@ Route::get('/categories', CategoriesPage::class)->name('categories');
 Route::get('/products', ProductsPage::class)->name('products');
 Route::get('/products/{slug}', ProductDetailPage::class)->name('product.detail');
 Route::get('/cart', CartPage::class)->name('cart');
-Route::get('/checkout', CheckoutPage::class)->name('checkout');
-Route::get('/my-orders', MyOrdersPage::class)->name('my-orders');
-Route::get('/my-orders/{id}', OrderDetailsPage::class)->name('my-orders.detail');
-Route::get('/login', LoginPage::class)->name('login');
-Route::get('/register', RegisterPage::class)->name('register');
-Route::get('/forgot-password', ForgotPasswordPage::class)->name('forgot-password');
-Route::get('/reset-password', ResetPasswordPage::class)->name('reset-password');
-Route::get('/success', SuccessPage::class)->name('success');
-Route::get('/cancel', CancelPage::class)->name('cancel');
+
+Route::middleware('guest')->group(function () {
+    Route::get('/login', LoginPage::class)->name('login');
+    Route::get('/register', RegisterPage::class)->name('register');
+    Route::get('/forgot-password', ForgotPasswordPage::class)->name('forgot-password');
+    Route::get('/reset-password', ResetPasswordPage::class)->name('reset-password');
+});
+
+Route::middleware('auth')->group(function () {
+    Route::get('/logout', function () {
+        auth()->logout();
+        return redirect('/');
+    });
+    Route::get('/checkout', CheckoutPage::class)->name('checkout');
+    Route::get('/my-orders', MyOrdersPage::class)->name('my-orders');
+    Route::get('/my-orders/{id}', OrderDetailsPage::class)->name('my-orders.detail');
+    Route::get('/success', SuccessPage::class)->name('success');
+    Route::get('/cancel', CancelPage::class)->name('cancel');
+});

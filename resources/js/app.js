@@ -10,3 +10,7 @@ window.Swal = Swal
 document.addEventListener('livewire:navigated', () => {
     window.HSStaticMethods.autoInit();
 })
+
+document.addEventListener('livewire:updated', () => {
+    window.HSStaticMethods.autoInit();
+})
