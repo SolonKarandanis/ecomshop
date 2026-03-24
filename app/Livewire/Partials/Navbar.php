@@ -11,6 +11,8 @@ class Navbar extends Component
     protected CartService $cartService;
     public $total_cart_items = 0;
 
+    public string $username = 'Solon';
+
     public function boot(CartService $cartService){
         $this->cartService = $cartService;
     }
