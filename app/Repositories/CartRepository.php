@@ -24,14 +24,18 @@ class CartRepository
                 'cartItems',
                 'cartItems.product'
             ])
-            ->where('user_id',$userId)
-            ->firstOrCreate(['user_id'=>$userId,'total_price'=>0]);
+            ->firstOrCreate(
+                ['user_id' => $userId],
+                ['total_price' => 0]
+            );
     }
 
     public function getCartId(int $userId): int{
         $cart= $this->modelQuery()
-            ->where('user_id',$userId)
-            ->firstOrCreate(['user_id'=>$userId,'total_price'=>0]);
+            ->firstOrCreate(
+                ['user_id' => $userId],
+                ['total_price' => 0]
+            );
         return $cart->id;
     }
 

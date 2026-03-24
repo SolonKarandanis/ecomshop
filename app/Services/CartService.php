@@ -28,13 +28,16 @@ class CartService
     ){}
 
     public function getCart(): Cart{
+        Log::debug('Cached cart', [$this->cachedCart]);
         if($this->cachedCart){
             return $this->cachedCart;
         }
         if(Auth::check()){
+            Log::debug('Getting cart from database');
             $cart = $this->getCartFromDatabase();
         }
         else{
+            Log::debug('Getting cart from cookies');
             $cart = $this->getCartFromCookies();
         }
         $this->cachedCart = $cart;
@@ -108,6 +111,7 @@ class CartService
     public function saveCartToDatabase(array $addToCartRequests): void
     {
         $cartId = $this->cartRepository->getCartId(Auth::id());
+        Log::debug('Cart id ', [$cartId]);
         $productsToBeAdded = $this->fetchProductsToBeAdded($addToCartRequests);
         $newCartItems = [];
         foreach ($addToCartRequests as $request) {
@@ -120,6 +124,7 @@ class CartService
                 $request->getProductId(),
                 $attributes
             );
+            Log::debug('Existing item ', [$existingItem]);
             $product = $productsToBeAdded->find($request->getProductId());
             $price = $this->calculatePriceWithAttributes($product, $attributes);
             $request->setPrice($price);
