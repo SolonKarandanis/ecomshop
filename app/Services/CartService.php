@@ -233,7 +233,8 @@ class CartService
             return;
         }
         $this->cartRepository->batchUpdateCartItems($updates, $idsToUpdate);
-        $this->recalculateCartTotalPrice();
+        $cart = $this->getCartFromDatabase();
+        $this->recalculateCartTotalPrice($cart);
     }
 
     /**

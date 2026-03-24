@@ -22,7 +22,9 @@ class CartRepository
         return $this->modelQuery()
             ->with([
                 'cartItems',
-                'cartItems.product'
+                'cartItems.product',
+                'cartItems.product.productAttributeValues.attribute',
+                'cartItems.product.productAttributeValues.media',
             ])
             ->firstOrCreate(
                 ['user_id' => $userId],
@@ -145,7 +147,6 @@ class CartRepository
         }
 
         $table = (new CartItem())->getTable();
-        $cases = [];
         $params = [];
 
         $quantityCase = "quantity = CASE id ";
