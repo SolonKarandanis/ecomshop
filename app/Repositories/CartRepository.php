@@ -60,9 +60,11 @@ class CartRepository
             ->first();
     }
 
-    public function updateItemQuantity(int $cartItemId, int $quantity): void{
+    public function updateItemQuantity(int $cartItemId, int $quantity,int $unitPrice, int $totalPrice): void{
         $this->itemModelQuery()->where('id',$cartItemId)->update([
-            'quantity' => DB::raw('quantity+'.$quantity),
+            'quantity' => $quantity,
+            'unit_price' => $unitPrice,
+            'total_price' => $totalPrice,
         ]);
     }
 

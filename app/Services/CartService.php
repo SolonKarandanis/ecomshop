@@ -124,13 +124,14 @@ class CartService
                 $request->getProductId(),
                 $attributes
             );
-            Log::debug('Existing item ', [$existingItem]);
             $product = $productsToBeAdded->find($request->getProductId());
             $price = $this->calculatePriceWithAttributes($product, $attributes);
             $request->setPrice($price);
 
             if ($existingItem) {
-                $this->cartRepository->updateItemQuantity($existingItem->id, $request->getQuantity());
+                $request->setQuantity($existingItem->quantity + $request->getQuantity());
+                $totalPrice = $request->getQuantity()* $request->getPrice();
+                $this->cartRepository->updateItemQuantity($existingItem->id, $request->getQuantity(),$request->getPrice(), $totalPrice);
             } else {
                 $newCartItems[] = $request;
             }
