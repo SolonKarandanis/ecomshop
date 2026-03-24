@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Auth;
 
+use App\Http\Requests\Auth\LoginRequest;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
@@ -11,11 +12,8 @@ class LoginPage extends Component
     public string $email = '';
     public string $password = '';
     public function performLogin(){
-        $this->validate([
-            'email' => 'required|email',
-            'password' => 'required'
-        ]);
-        if(!auth()->attempt(['email' => $this->email, 'password' => $this->password])){
+        $validated = $this->validate((new LoginRequest())->rules());
+        if(!auth()->attempt(['email' => $validated['email'], 'password' => $validated['password']])){
             session()->flash('error', 'Invalid Credentials');
             return;
         }
