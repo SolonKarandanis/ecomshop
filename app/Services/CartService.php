@@ -191,24 +191,25 @@ class CartService
     }
 
     /**
+     * @param Cart $cart
      * @param UpdateCartItemsDTO[] $updateCartItemRequests
      */
-    public function updateItemsQuantity(array $updateCartItemRequests):void{
+    public function updateItemsQuantity(Cart $cart,array $updateCartItemRequests):void{
         if(Auth::check()){
-            $this->updateCartItemsInDatabase($updateCartItemRequests);
+            $this->updateCartItemsInDatabase($cart,$updateCartItemRequests);
         }
         else{
-            $this->updateCartItemsInCookies($updateCartItemRequests);
+            $this->updateCartItemsInCookies($cart,$updateCartItemRequests);
         }
     }
 
     /**
+     * @param Cart $cart
      * @param UpdateCartItemsDTO[] $updateCartItemRequests
      */
-    protected function updateCartItemsInDatabase(array $updateCartItemRequests): void
+    protected function updateCartItemsInDatabase(Cart $cart,array $updateCartItemRequests): void
     {
         Log::debug('Attempting to update cart items in the database.');
-        $cart = $this->getCartFromDatabase();
         $cartItems = $cart->cartItems;
         $updates = [];
         $idsToUpdate = [];
@@ -227,21 +228,24 @@ class CartService
                     'attributes' => json_encode($attributes),
                 ];
                 $idsToUpdate[] = $existingCartItem->id;
+
+                $existingCartItem->quantity = $quantity;
+                $existingCartItem->total_price = $totalPrice;
+                $existingCartItem->attributes = json_encode($attributes);
             }
         }
         if (empty($updates)) {
             return;
         }
         $this->cartRepository->batchUpdateCartItems($updates, $idsToUpdate);
-        $cart = $this->getCartFromDatabase();
         $this->recalculateCartTotalPrice($cart);
     }
 
     /**
+     * @param Cart $cart
      * @param UpdateCartItemsDTO[] $updateCartItemRequests
      */
-    protected function updateCartItemsInCookies(array $updateCartItemRequests):void{
-        $cart = $this->getCart();
+    protected function updateCartItemsInCookies(Cart $cart,array $updateCartItemRequests):void{
         $cartItems = $cart->cartItems;
         $cartItemsForCookie = [];
         foreach ($cartItems as $item) {

@@ -31,7 +31,7 @@ class CartPage extends Component
 
         if ($cartItem) {
             $newQuantity = $cartItem->quantity + 1;
-            $this->updateQuantity($cartItem, $newQuantity);
+            $this->updateQuantity($this->cart,$cartItem, $newQuantity);
         }
     }
 
@@ -42,7 +42,7 @@ class CartPage extends Component
 
         if ($cartItem && $cartItem->quantity > 1) {
             $newQuantity = $cartItem->quantity - 1;
-            $this->updateQuantity($cartItem, $newQuantity);
+            $this->updateQuantity($this->cart,$cartItem, $newQuantity);
         }
     }
 
@@ -66,7 +66,7 @@ class CartPage extends Component
         });
     }
 
-    private function updateQuantity(CartItem $cartItem, int $newQuantity): void
+    private function updateQuantity(Cart $cart,CartItem $cartItem, int $newQuantity): void
     {
         $attributes = json_decode($cartItem->attributes, true) ?? [];
         $cartItemId = $cartItem->id ?? $cartItem->id_from_cookie;
@@ -77,7 +77,7 @@ class CartPage extends Component
             $newQuantity,
             $attributes
         );
-        $this->cartService->updateItemsQuantity([$updateDto]);
+        $this->cartService->updateItemsQuantity($cart,[$updateDto]);
         $this->cart = $this->cartService->getCart();
     }
 
