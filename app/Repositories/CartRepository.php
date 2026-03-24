@@ -84,14 +84,14 @@ class CartRepository
 
     public function deleteCartItem(int $cartId,int $cartItemId):void{
         $this->itemModelQuery()
-            ->where('id', $cartId)
+            ->where('cart_id', $cartId)
             ->where('id', $cartItemId)
             ->delete();
     }
 
     public function deleteCartItems(int $cartId,array $cartItemIds):void{
         $this->itemModelQuery()
-            ->where('id', $cartId)
+            ->where('cart_id', $cartId)
             ->whereIn('id', $cartItemIds)
             ->delete();
     }

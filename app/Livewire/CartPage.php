@@ -55,6 +55,7 @@ class CartPage extends Component
 
     public function clearCart():void{
         $this->cartService->clearCart();
+        $this->cart = $this->cartService->getCart();
         $this->dispatch('cartUpdated');
     }
 
