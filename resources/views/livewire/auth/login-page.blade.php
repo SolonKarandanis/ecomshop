@@ -17,21 +17,14 @@
 
                     <hr class="my-5 border-slate-300">
 
-                    <!-- Form -->
                     <form wire:submit.prevent="performLogin()">
-
                         @if(session('error'))
                             <div class="bg-red-500 text-sm text-white rounded-lg p-4 mb-4" role="alert">
                                 {{session('error')}}
                             </div>
                         @endif
-
                         <div class="grid gap-y-4">
-                            <!-- Form Group -->
                             <x-input name="email" label="Email address" type="email" wire:model="email" />
-                            <!-- End Form Group -->
-
-                            <!-- Form Group -->
                             <x-input name="password" label="Password" type="password" wire:model="password" required>
                                 <x-slot:labelAction>
                                     <a href="/forgot-password" class="text-sm text-blue-600 decoration-2 hover:underline font-medium" wire:navigate>
@@ -39,14 +32,12 @@
                                     </a>
                                 </x-slot:labelAction>
                             </x-input>
-                            <!-- End Form Group -->
                             <button type="submit" class="w-full py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent
                             bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600">
                                 Sign in
                             </button>
                         </div>
                     </form>
-                    <!-- End Form -->
                 </div>
             </div>
         </main>
