@@ -83,7 +83,7 @@ class CartService
             }
         }
         $cart->setRelation('cartItems', collect($cartItems));
-        $this->recalculateCartTotalPrice();
+        $this->recalculateCartTotalPrice($cart);
 
         return $cart;
     }
