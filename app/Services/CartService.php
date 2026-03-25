@@ -28,7 +28,7 @@ class CartService
     ){}
 
     public function getCart(): Cart{
-        Log::debug('Cached cart', [$this->cachedCart]);
+        Log::debug('Cached cart', [!is_null($this->cachedCart)]);
         if($this->cachedCart){
             return $this->cachedCart;
         }
@@ -400,7 +400,7 @@ class CartService
             $this->cartRepository->batchUpdateCartItems($itemsToUpdate, $idsToUpdate);
         }
         $this->clearCartFromCookies();
-        $this->recalculateCartTotalPrice();
+        $this->recalculateCartTotalPrice($dbCart);
     }
 
     protected function getFromCookies(string $cookieName): array|string|null{
