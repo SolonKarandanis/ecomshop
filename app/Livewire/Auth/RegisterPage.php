@@ -4,8 +4,7 @@ namespace App\Livewire\Auth;
 
 use App\Dtos\CreateUserDTO;
 use App\Http\Requests\Auth\RegisterUserRequest;
-use App\Repositories\UserRepository;
-use Illuminate\Auth\Events\Registered;
+use App\Services\UserService;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
@@ -16,20 +15,19 @@ class RegisterPage extends Component
     public string $email = '';
     public string $password = '';
 
-    protected UserRepository $userRepository;
+    protected UserService $userService;
 
     public function boot(
-        UserRepository $userRepository
+        UserService $userService
     ): void{
-        $this->userRepository = $userRepository;
+        $this->userService = $userService;
     }
 
     public function save()
     {
         $validated = $this->validate((new RegisterUserRequest())->rules());
         $dto = CreateUserDTO::fromArray($validated);
-        $user = $this->userRepository->createUser($dto);
-        event(new Registered($user));
+        $user = $this->userService->createUser($dto);
         auth()->login($user);
         return redirect()->intended('/');
     }
