@@ -385,7 +385,7 @@ class CartService
                 ];
                 $idsToUpdate[] = $existingItem->id;
             } else {
-                $itemsToCreate[] = new AddToCartDto(
+                $itemsToCreate[] = AddToCartDto::withAttributes(
                     $cookieItem->product_id,
                     $cookieItem->quantity,
                     $cookieItem->unit_price,
@@ -399,6 +399,7 @@ class CartService
         if (!empty($itemsToUpdate)) {
             $this->cartRepository->batchUpdateCartItems($itemsToUpdate, $idsToUpdate);
         }
+        $dbCart = $this->getCartFromDatabase();
         $this->clearCartFromCookies();
         $this->recalculateCartTotalPrice($dbCart);
     }
