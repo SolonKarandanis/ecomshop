@@ -23,6 +23,11 @@ class UserRepository
         ]);
     }
 
+    public function saveUser(User $user): User{
+        $user->save();
+        return $user;
+    }
+
     public function getUsersWithOrderedItems(): Collection{
         return $this->modelQuery()
             ->select('users.name')
