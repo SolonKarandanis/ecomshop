@@ -20,7 +20,10 @@
                                    wire:model="firstName"
                                    id="firstName"
                                    type="text"
-                                   class="w-full rounded-lg border py-2 px-3 dark:bg-gray-700 dark:text-white dark:border-none" >
+                                   class="w-full rounded-lg border py-2 px-3 dark:bg-gray-700 dark:text-white dark:border-none @error('firstName') border-red-500 @enderror" >
+                            @error('firstName')
+                                <p class="text-xs text-red-600 mt-2" id="firstName-error">{{ $message }}</p>
+                            @enderror
                         </div>
                         <div>
                             <label class="block text-gray-700 dark:text-white mb-1" for="lastName">
@@ -30,7 +33,10 @@
                                    wire:model="lastName"
                                    id="lastName"
                                    type="text"
-                                   class="w-full rounded-lg border py-2 px-3 dark:bg-gray-700 dark:text-white dark:border-none" >
+                                   class="w-full rounded-lg border py-2 px-3 dark:bg-gray-700 dark:text-white  @error('lastName') border-red-500 @enderror" >
+                            @error('lastName')
+                                <p class="text-xs text-red-600 mt-2" id="lastName-error">{{ $message }}</p>
+                            @enderror
                         </div>
                     </div>
                     <div class="mt-4">
@@ -41,7 +47,10 @@
                                wire:model="phone"
                                id="phone"
                                type="text"
-                               class="w-full rounded-lg border py-2 px-3 dark:bg-gray-700 dark:text-white dark:border-none" >
+                               class="w-full rounded-lg border py-2 px-3 dark:bg-gray-700 dark:text-white  @error('phone') border-red-500 @enderror" >
+                        @error('phone')
+                            <p class="text-xs text-red-600 mt-2" id="phone-error">{{ $message }}</p>
+                        @enderror
                     </div>
                     <div class="mt-4">
                         <label class="block text-gray-700 dark:text-white mb-1" for="address">
@@ -51,7 +60,10 @@
                                wire:model="address"
                                id="address"
                                type="text"
-                               class="w-full rounded-lg border py-2 px-3 dark:bg-gray-700 dark:text-white dark:border-none" >
+                               class="w-full rounded-lg border py-2 px-3 dark:bg-gray-700 dark:text-white  @error('address') border-red-500 @enderror" >
+                        @error('address')
+                            <p class="text-xs text-red-600 mt-2" id="address-error">{{ $message }}</p>
+                        @enderror
                     </div>
                     <div class="mt-4">
                         <label class="block text-gray-700 dark:text-white mb-1" for="city">
@@ -61,7 +73,10 @@
                                wire:model="city"
                                id="city"
                                type="text"
-                               class="w-full rounded-lg border py-2 px-3 dark:bg-gray-700 dark:text-white dark:border-none" >
+                               class="w-full rounded-lg border py-2 px-3 dark:bg-gray-700 dark:text-white @error('city') border-red-500 @enderror" >
+                        @error('city')
+                            <p class="text-xs text-red-600 mt-2" id="city-error">{{ $message }}</p>
+                        @enderror
                     </div>
                     <div class="grid grid-cols-2 gap-4 mt-4">
                         <div>
@@ -72,7 +87,10 @@
                                    wire:model="state"
                                    id="state"
                                    type="text"
-                                   class="w-full rounded-lg border py-2 px-3 dark:bg-gray-700 dark:text-white dark:border-none" >
+                                   class="w-full rounded-lg border py-2 px-3 dark:bg-gray-700 dark:text-white @error('state') border-red-500 @enderror" >
+                            @error('state')
+                                <p class="text-xs text-red-600 mt-2" id="state-error">{{ $message }}</p>
+                            @enderror
                         </div>
                         <div>
                             <label class="block text-gray-700 dark:text-white mb-1" for="zipCode">
@@ -82,21 +100,23 @@
                                    wire:model="zipCode"
                                    id="zipCode"
                                    type="text"
-                                   class="w-full rounded-lg border py-2 px-3 dark:bg-gray-700 dark:text-white dark:border-none" >
+                                   class="w-full rounded-lg border py-2 px-3 dark:bg-gray-700 dark:text-white @error('zipCode') border-red-500 @enderror" >
+                            @error('zipCode')
+                                <p class="text-xs text-red-600 mt-2" id="zipCode-error">{{ $message }}</p>
+                            @enderror
                         </div>
                     </div>
                 </div>
                 <div class="text-lg font-semibold mb-4 text-gray-700 dark:text-white">
                     Select Payment Method
                 </div>
-                <ul class="grid w-full gap-6 md:grid-cols-2">
+                <ul class="grid w-full gap-6 md:grid-cols-2 @error('paymentMethod') border-red-500 @enderror">
                     <li>
                         <input name="paymentMethod"
                                wire:model="paymentMethod"
                                id="cod"
                                type="radio"
                                class="hidden peer"
-                               required=""
                                value="cod">
                         <label class="inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700" for="cod">
                             <div class="block">
@@ -116,7 +136,6 @@
                                id="stripe"
                                type="radio"
                                class="hidden peer"
-                               required=""
                                value="stripe">
                         <label class="inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700" for="stripe">
                             <div class="block">
@@ -131,6 +150,9 @@
                         </label>
                     </li>
                 </ul>
+                @error('paymentMethod')
+                    <p class="text-xs text-red-600 mt-2" id="paymentMethod-error">{{ $message }}</p>
+                @enderror
             </div>
             <!-- End Card -->
         </div>
@@ -174,7 +196,7 @@
                 </div>
                 </hr>
             </div>
-            <button type="submit" class="bg-green-500 mt-4 w-full p-3 rounded-lg text-lg text-white hover:bg-green-600">
+            <button type="submit" class="bg-green-500 mt-4 w-full p-3 rounded-lg text-lg text-white hover:bg-green-600 cursor-pointer">
                 Place Order
             </button>
             <div class="bg-white mt-4 rounded-xl shadow p-4 sm:p-7 dark:bg-slate-900">
