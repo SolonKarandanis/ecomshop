@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Http\Requests\CheckoutRequest;
 use App\Models\Cart;
 use App\Services\CartService;
 use Livewire\Attributes\Title;
@@ -30,6 +31,10 @@ class CheckoutPage extends Component
     public function mount(): void
     {
         $this->cart = $this->cartService->getCart();
+    }
+
+    public function save(){
+        $validated = $this->validate((new CheckoutRequest())->rules());
     }
     public function render()
     {
