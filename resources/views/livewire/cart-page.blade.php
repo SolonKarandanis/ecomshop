@@ -91,9 +91,11 @@
                         <span class="font-semibold">{{Number::currency($cart->total_price ?? 0,'eur')}}</span>
                     </div>
                     @if($cart->cartItems->count() > 0)
-                        <button class="bg-blue-500 text-white hover:bg-blue-600 py-2 px-4 rounded-lg mt-4 w-full cursor-pointer">
-                            Checkout
-                        </button>
+                        @auth
+                            <button class="bg-blue-500 text-white hover:bg-blue-600 py-2 px-4 rounded-lg mt-4 w-full cursor-pointer">
+                                Checkout
+                            </button>
+                        @endauth
                         <button wire:click="clearCart()"
                             wire:loading.attr="disabled"
                             wire:target="clearCart"

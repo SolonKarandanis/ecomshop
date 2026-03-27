@@ -17,14 +17,12 @@
                                 First Name
                             </label>
                             <input class="w-full rounded-lg border py-2 px-3 dark:bg-gray-700 dark:text-white dark:border-none" id="first_name" type="text">
-                            </input>
                         </div>
                         <div>
                             <label class="block text-gray-700 dark:text-white mb-1" for="last_name">
                                 Last Name
                             </label>
                             <input class="w-full rounded-lg border py-2 px-3 dark:bg-gray-700 dark:text-white dark:border-none" id="last_name" type="text">
-                            </input>
                         </div>
                     </div>
                     <div class="mt-4">
@@ -32,21 +30,18 @@
                             Phone
                         </label>
                         <input class="w-full rounded-lg border py-2 px-3 dark:bg-gray-700 dark:text-white dark:border-none" id="phone" type="text">
-                        </input>
                     </div>
                     <div class="mt-4">
                         <label class="block text-gray-700 dark:text-white mb-1" for="address">
                             Address
                         </label>
                         <input class="w-full rounded-lg border py-2 px-3 dark:bg-gray-700 dark:text-white dark:border-none" id="address" type="text">
-                        </input>
                     </div>
                     <div class="mt-4">
                         <label class="block text-gray-700 dark:text-white mb-1" for="city">
                             City
                         </label>
                         <input class="w-full rounded-lg border py-2 px-3 dark:bg-gray-700 dark:text-white dark:border-none" id="city" type="text">
-                        </input>
                     </div>
                     <div class="grid grid-cols-2 gap-4 mt-4">
                         <div>
@@ -54,14 +49,12 @@
                                 State
                             </label>
                             <input class="w-full rounded-lg border py-2 px-3 dark:bg-gray-700 dark:text-white dark:border-none" id="state" type="text">
-                            </input>
                         </div>
                         <div>
                             <label class="block text-gray-700 dark:text-white mb-1" for="zip">
                                 ZIP Code
                             </label>
                             <input class="w-full rounded-lg border py-2 px-3 dark:bg-gray-700 dark:text-white dark:border-none" id="zip" type="text">
-                            </input>
                         </div>
                     </div>
                 </div>
