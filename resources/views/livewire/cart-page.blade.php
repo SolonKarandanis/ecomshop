@@ -92,9 +92,11 @@
                     </div>
                     @if($cart->cartItems->count() > 0)
                         @auth
-                            <button class="bg-blue-500 text-white hover:bg-blue-600 py-2 px-4 rounded-lg mt-4 w-full cursor-pointer">
-                                Checkout
-                            </button>
+                            <a href="{{ route('checkout') }}" wire:navigate>
+                                <button class="bg-blue-500 text-white hover:bg-blue-600 py-2 px-4 rounded-lg mt-4 w-full cursor-pointer">
+                                    Checkout
+                                </button>
+                            </a>
                         @endauth
                         <button wire:click="clearCart()"
                             wire:loading.attr="disabled"
