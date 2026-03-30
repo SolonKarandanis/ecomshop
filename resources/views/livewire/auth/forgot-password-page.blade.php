@@ -27,7 +27,9 @@
                                 <!-- Form Group -->
                                 <x-input name="email" label="Email address" type="email" wire:model="email" />
                                 <!-- End Form Group -->
-                                <button type="submit" class="w-full py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600">Reset password</button>
+                                <x-button type="submit" variant="primary" :full-width="true" :on-click="'save()'" :loading="true">
+                                    Reset password
+                                </x-button>
                             </div>
                         </form>
                         <!-- End Form -->

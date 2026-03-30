@@ -44,21 +44,12 @@
                                     {{Number::currency($cartItem->total_price,'eur')}}
                                 </td>
                                 <td class="px-4 block md:table-cell">
-                                    <button wire:click="removeItem('{{$cartItem->id ?? $cartItem->id_from_cookie}}')"
-                                        wire:loading.attr="disabled"
-                                        wire:target="removeItem('{{$cartItem->id ?? $cartItem->id_from_cookie}}')"
-                                        class="flex items-center bg-red-400 border-2 border-red-400 rounded-lg px-4 py-2 hover:bg-red-500  hover:border-red-500 cursor-pointer text-white">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.134-2.09-2.134H8.09a2.09 2.09 0 00-2.09 2.134v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-                                        </svg>
-                                        <div wire:loading
-                                             wire:target="removeItem({{$cartItem->id ?? $cartItem->id_from_cookie}})"
-                                             class="animate-spin inline-block size-6 border-3 border-current border-t-transparent rounded-[999px] text-primary"
-                                             role="status"
-                                             aria-label="loading">
-                                            <span class="sr-only">Loading...</span>
-                                        </div>
-                                    </button>
+                                    <x-button
+                                        variant="danger-outline"
+                                        wire:click="removeItem('{{ $cartItem->id ?? $cartItem->id_from_cookie }}')"
+                                        :loading="true"
+                                        icon="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.134-2.09-2.134H8.09a2.09 2.09 0 00-2.09 2.134v.916m7.5 0a48.667 48.667 0 00-7.5 0"
+                                    />
                                 </td>
                             </tr>
                             @empty
@@ -93,31 +84,24 @@
                     @if($cart->cartItems->count() > 0)
                         @auth
                             <a href="{{ route('checkout') }}" wire:navigate>
-                                <button class="bg-blue-500 text-white hover:bg-blue-600 py-2 px-4 rounded-lg mt-4 w-full cursor-pointer">
+                                <x-button variant="primary" :full-width="true" class="mt-4 py-2 px-4">
                                     Checkout
-                                </button>
+                                </x-button>
                             </a>
                         @endauth
-                        <button wire:click="clearCart()"
-                            wire:loading.attr="disabled"
-                            wire:target="clearCart"
-                            class="flex items-center justify-center bg-red-600 border-2 border-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg mt-4 w-full cursor-pointer">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.134-2.09-2.134H8.09a2.09 2.09 0 00-2.09 2.134v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-                            </svg>
-                            <span class="ml-2"> Clear Cart</span>
-                            <div wire:loading
-                                 wire:target="clearCart()"
-                                 class="animate-spin inline-block size-6 border-3 border-current border-t-transparent rounded-[999px] text-primary"
-                                 role="status"
-                                 aria-label="loading">
-                                <span class="sr-only">Loading...</span>
-                            </div>
-                        </button>
+                        <x-button
+                            variant="danger"
+                            :full-width="true"
+                            wire:click="clearCart()"
+                            :loading="true"
+                            icon="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.134-2.09-2.134H8.09a2.09 2.09 0 00-2.09 2.134v.916m7.5 0a48.667 48.667 0 00-7.5 0"
+                            class="mt-4 py-2 px-4"
+                        >
+                            Clear Cart
+                        </x-button>
                     @endif
                 </div>
             </div>
         </div>
     </div>
 </div>
-

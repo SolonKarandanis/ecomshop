@@ -96,19 +96,14 @@
                                         </p>
                                     </div>
                                     <div class="flex justify-center p-4 border-t border-gray-300 dark:border-gray-700">
-                                        <button wire:click.prevent="addToCart({{$product->id}})" class="text-gray-500 flex items-center space-x-2 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-300 cursor-pointer">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="w-4 h-4 bi bi-cart3 " viewBox="0 0 16 16">
-                                                <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .49.598l-1 5a.5.5 0 0 1-.465.401l-9.397.472L4.415 11H13a.5.5 0 0 1 0 1H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l.84 4.479 9.144-.459L13.89 4H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"></path>
-                                            </svg>
+                                        <x-button
+                                            variant="add-to-cart-gray"
+                                            wire:click.prevent="addToCart({{$product->id}})"
+                                            :loading="true"
+                                            icon="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .49.598l-1 5a.5.5 0 0 1-.465.401l-9.397.472L4.415 11H13a.5.5 0 0 1 0 1H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l.84 4.479 9.144-.459L13.89 4H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"
+                                        >
                                             <span>Add to Cart</span>
-                                            <div wire:loading
-                                                 wire:target="addToCart({{$product->id}})"
-                                                class="animate-spin inline-block size-6 border-3 border-current border-t-transparent rounded-[999px] text-primary"
-                                                role="status"
-                                                aria-label="loading">
-                                                <span class="sr-only">Loading...</span>
-                                            </div>
-                                        </button>
+                                        </x-button>
                                     </div>
                                 </div>
                             </div>
