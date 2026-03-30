@@ -22,7 +22,7 @@
                             <x-input name="email" label="Email address" type="email" wire:model="email" />
                             <x-input name="password" label="Password" type="password" wire:model="password" />
                             <!-- End Form Group -->
-                            <x-button type="submit" variant="primary" :full-width="true" :on-click="'save()'" :loading="true">
+                            <x-button type="submit" variant="primary" :full-width="true" :loading="true" :wire-target="'save'">
                                 Sign up
                             </x-button>
                         </div>

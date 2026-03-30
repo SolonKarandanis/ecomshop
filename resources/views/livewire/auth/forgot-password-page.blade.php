@@ -27,7 +27,7 @@
                                 <!-- Form Group -->
                                 <x-input name="email" label="Email address" type="email" wire:model="email" />
                                 <!-- End Form Group -->
-                                <x-button type="submit" variant="primary" :full-width="true" :on-click="'save()'" :loading="true">
+                                <x-button type="submit" variant="primary" :full-width="true" :on-click="'save()'" :loading="true" :wire-target="'save'">
                                     Reset password
                                 </x-button>
                             </div>

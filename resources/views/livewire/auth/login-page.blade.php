@@ -32,7 +32,7 @@
                                     </a>
                                 </x-slot:labelAction>
                             </x-input>
-                            <x-button type="submit" variant="primary" :full-width="true">
+                            <x-button type="submit" variant="primary" :full-width="true" :loading="true" :wire-target="'performLogin'">
                                 Sign in
                             </x-button>
                         </div>

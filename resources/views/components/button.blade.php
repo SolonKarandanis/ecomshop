@@ -5,6 +5,7 @@
     'loading' => false,
     'disabled' => false,
     'icon' => '',
+    'wireTarget' => null,
 ])
 
 @php
@@ -30,12 +31,28 @@
     }
 
     $classes = "$baseClasses {$variantClasses[$variant]} $widthClasses $paddingClasses";
-    $wireTarget = $attributes->get('wire:click');
+
+    $target = $wireTarget;
+    if (!$target) {
+        $clickAction = $attributes->get('wire:click');
+        if ($clickAction) {
+            preg_match('/^([a-zA-Z0-9_]+)/', $clickAction, $matches);
+            if (!empty($matches)) {
+                $target = $matches[1];
+            }
+        }
+    }
 @endphp
 
 <button
     type="{{ $type }}"
-    @if($loading && $wireTarget) wire:loading.attr="disabled" wire:target="{{ $wireTarget }}" @endif
+    @if($loading)
+        @if($target)
+            wire:loading.attr="disabled" wire:target="{{ $target }}"
+        @else
+            wire:loading.attr="disabled"
+        @endif
+    @endif
     @if($disabled) disabled @endif
     {{ $attributes->merge(['class' => $classes]) }}
 >
@@ -45,8 +62,14 @@
         </svg>
     @endif
     {{ $slot }}
-    @if($loading && $wireTarget)
-        <div wire:loading wire:target="{{ $wireTarget }}" class="animate-spin inline-block size-6 border-3 border-current border-t-transparent rounded-[999px] text-primary" role="status" aria-label="loading">
+    @if($loading)
+        <div class="animate-spin inline-block size-6 border-3 border-current border-t-transparent rounded-[999px] text-primary" role="status" aria-label="loading"
+            @if($target)
+                wire:loading wire:target="{{ $target }}"
+            @else
+                wire:loading
+            @endif
+        >
             <span class="sr-only">Loading...</span>
         </div>
     @endif

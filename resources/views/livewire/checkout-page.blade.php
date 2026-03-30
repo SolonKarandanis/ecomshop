@@ -196,7 +196,7 @@
                 </div>
                 </hr>
             </div>
-            <x-button type="submit" variant="success" :full-width="true" class="mt-4 p-3 text-lg" wire:click="save()" :loading="true">
+            <x-button type="submit" variant="success" :full-width="true" class="mt-4 p-3 text-lg" :loading="true" wire-target="save">
                 Place Order
             </x-button>
             <div class="bg-white mt-4 rounded-xl shadow p-4 sm:p-7 dark:bg-slate-900">

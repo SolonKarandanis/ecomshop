@@ -18,7 +18,7 @@
                             <div class="grid gap-y-4">
                                 <x-input name="password" label="Password" type="password" wire:model="password" required />
                                 <x-input name="password_confirmation" label="Confirm Password" type="password" wire:model="password_confirmation" required />
-                                <x-button type="submit" variant="primary" :full-width="true" :on-click="'save()'" :loading="true">
+                                <x-button type="submit" variant="primary" :full-width="true" :on-click="'save()'" :loading="true" :wire-target="'save'">
                                     Save password
                                 </x-button>
                             </div>
