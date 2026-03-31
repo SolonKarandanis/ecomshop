@@ -71,7 +71,7 @@ class CheckoutPage extends Component
 
         $redirect_url = '';
         if($validated['paymentMethod']=='stripe'){
-            Stripe::setApiKey(env('STRIPE_SECRET'));
+            Stripe::setApiKey(config('app.stripe_secret_key'));
             $sessionCheckout = Session::create([
                 'payment_method_types' => ['card'],
                 'customer_email' => auth()->user()->email,
