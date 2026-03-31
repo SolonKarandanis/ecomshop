@@ -20,7 +20,7 @@
                                    wire:model="firstName"
                                    id="firstName"
                                    type="text"
-                                   class="w-full rounded-lg border py-2 px-3 dark:bg-gray-700 dark:text-white dark:border-none @error('firstName') border-red-500 @enderror" >
+                                   class="w-full rounded-lg border py-2 px-3 dark:bg-gray-700 dark:text-white @error('firstName') border-red-500 @enderror" >
                             @error('firstName')
                                 <p class="text-xs text-red-600 mt-2" id="firstName-error">{{ $message }}</p>
                             @enderror
