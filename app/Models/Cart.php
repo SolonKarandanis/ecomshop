@@ -14,6 +14,16 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Cart newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Cart newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Cart query()
+ * @property int $id
+ * @property int $user_id
+ * @property float $total_price
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Cart whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Cart whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Cart whereTotalPrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Cart whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Cart whereUserId($value)
  * @mixin \Eloquent
  */
 class Cart extends Model
