@@ -55,6 +55,11 @@ class OrderItem extends Model
         'quantity',
         'unit_amount',
         'total_amount',
+        'attributes',
+    ];
+
+    protected $casts = [
+        'attributes' => 'string',
     ];
 
     public function order():BelongsTo{

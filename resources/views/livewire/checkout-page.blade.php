@@ -80,15 +80,15 @@
                     </div>
                     <div class="grid grid-cols-2 gap-4 mt-4">
                         <div>
-                            <label class="block text-gray-700 dark:text-white mb-1" for="state">
-                                State
+                            <label class="block text-gray-700 dark:text-white mb-1" for="country">
+                                Country
                             </label>
-                            <input name="state"
-                                   wire:model="state"
-                                   id="state"
+                            <input name="country"
+                                   wire:model="country"
+                                   id="country"
                                    type="text"
-                                   class="w-full rounded-lg border py-2 px-3 dark:bg-gray-700 dark:text-white @error('state') border-red-500 @enderror" >
-                            @error('state')
+                                   class="w-full rounded-lg border py-2 px-3 dark:bg-gray-700 dark:text-white @error('country') border-red-500 @enderror" >
+                            @error('country')
                                 <p class="text-xs text-red-600 mt-2" id="state-error">{{ $message }}</p>
                             @enderror
                         </div>

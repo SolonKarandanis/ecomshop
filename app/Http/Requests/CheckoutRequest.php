@@ -14,7 +14,7 @@ class CheckoutRequest extends FormRequest
             'phone' => ['required', 'string', 'min:2', 'max:200'],
             'address' => ['required', 'string', 'min:2', 'max:200'],
             'city' => ['required', 'string', 'min:2', 'max:200'],
-            'state' => ['required', 'string', 'min:2', 'max:200'],
+            'country' => ['required', 'string', 'min:2', 'max:200'],
             'zipCode' => ['required', 'string', 'min:2', 'max:200'],
             'paymentMethod' => ['required', 'string'],
         ];
