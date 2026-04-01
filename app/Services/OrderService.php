@@ -45,17 +45,6 @@ class OrderService
                 $line_items[] = $line_item;
                 $order_items[]=[new OrderItem($cartItem)];
             }
-            $order = new Order();
-            $order->user_id = auth()->user()->id;
-            $order->grand_total= $cart->total_price;
-            $order->payment_method = $paymentMethod;
-            $order->payment_status = 'pending';
-            $order->order_status=OrderStatusEnum::Draft->value;
-            $order->currency = 'eur';
-            $order->shipping_amount=0;
-            $order->shipping_method='none';
-            $order->notes='Order placed'.auth()->user()->name;
-            $order->setRelation('orderItems',$order_items);
 
             $redirect_url = '';
             if($paymentMethod=='stripe'){
@@ -68,6 +57,17 @@ class OrderService
                 $redirect_url=route('success');
             }
 
+            $order = new Order();
+            $order->user_id = auth()->user()->id;
+            $order->grand_total= $cart->total_price;
+            $order->payment_method = $paymentMethod;
+            $order->payment_status = 'pending';
+            $order->order_status=OrderStatusEnum::Draft->value;
+            $order->currency = config('app.currency');
+            $order->shipping_amount=0;
+            $order->shipping_method='none';
+            $order->notes='Order placed'.auth()->user()->name;
+            $order->setRelation('orderItems',$order_items);
             $order->save();
 
             $this->addressRepository->create($order->id,$dto);
