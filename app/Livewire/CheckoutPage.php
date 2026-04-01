@@ -3,17 +3,12 @@
 namespace App\Livewire;
 
 use App\Dtos\CheckoutDTO;
-use App\Enums\OrderStatusEnum;
 use App\Http\Requests\CheckoutRequest;
-use App\Models\Address;
 use App\Models\Cart;
-use App\Models\Order;
-use App\Models\OrderItem;
 use App\Services\CartService;
+use App\Services\OrderService;
 use Livewire\Attributes\Title;
 use Livewire\Component;
-use Stripe\Checkout\Session;
-use Stripe\Stripe;
 
 #[Title('Checkout')]
 class CheckoutPage extends Component
@@ -26,12 +21,15 @@ class CheckoutPage extends Component
     public string $state = '';
     public string $zipCode = '';
     public string $paymentMethod = '';
+    protected OrderService $orderService;
     protected CartService $cartService;
     public ?Cart $cart = null;
 
     public function boot(
+        OrderService $orderService,
         CartService $cartService
     ): void{
+        $this->orderService = $orderService;
         $this->cartService = $cartService;
     }
 
@@ -43,69 +41,7 @@ class CheckoutPage extends Component
     public function save(){
         $validated = $this->validate((new CheckoutRequest())->rules());
         $dto = CheckoutDTO::fromArray($validated);
-        $cart = $this->cartService->getCart();
-        $line_items=[];
-        $order_items=[];
-        foreach ($cart->cartItems as $cartItem){
-            $line_items[]=[
-                'price_data'=>[
-                    'currency'=>config('app.currency'),
-                    'unit_amount'=>$cartItem->total_price * 100, //stripe wants unit amount in cents
-                    'product_data'=>[
-                        'name'=>$cartItem->product->name,
-                    ]
-                ],
-                'quantity'=>$cartItem->quantity,
-            ];
-            $order_items[]=[new OrderItem($cartItem)];
-        }
-
-        $order = new Order();
-        $order->user_id = auth()->user()->id;
-        $order->grand_total= $cart->total_price;
-        $order->payment_method = $validated['paymentMethod'];
-        $order->payment_status = 'pending';
-        $order->order_status=OrderStatusEnum::Draft->value;
-        $order->currency = 'eur';
-        $order->shipping_amount=0;
-        $order->shipping_method='none';
-        $order->notes='Order placed'.auth()->user()->name;
-        $order->setRelation('orderItems',$order_items);
-
-        $redirect_url = '';
-        if($validated['paymentMethod']=='stripe'){
-            Stripe::setApiKey(config('app.stripe_secret_key'));
-            $sessionCheckout = Session::create([
-                'payment_method_types' => ['card'],
-                'customer_email' => auth()->user()->email,
-                'line_items'=>$line_items,
-                'mode'=>'payment',
-                'success_url'=>route('success').'?session_id={CHECKOUT_SESSION_ID}',
-                'cancel_url'=>route('cancel'),
-            ]);
-            $redirect_url=$sessionCheckout->url;
-        }
-
-        if($validated['paymentMethod']=='cod'){
-            $redirect_url=route('success');
-        }
-
-        $order->save();
-
-        $address = new Address();
-        $address->user_id = auth()->user()->id;
-        $address->order_id = $order->id;
-        $address->first_name = $validated['firstName'];
-        $address->last_name = $validated['lastName'];
-        $address->phone = $validated['phone'];
-        $address->city = $validated['city'];
-        $address->street_address = $validated['address'];
-        $address->country=$validated['country'];
-        $address->postal_code=$validated['zipCode'];
-        $address->save();
-
-        $this->cartService->clearCart();
-
+        $redirect_url = $this->orderService->checkout($dto);
         return redirect($redirect_url);
     }
     public function render()

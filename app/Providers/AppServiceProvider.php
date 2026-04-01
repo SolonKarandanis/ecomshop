@@ -2,10 +2,14 @@
 
 namespace App\Providers;
 
+use App\Repositories\AddressRepository;
 use App\Repositories\CartRepository;
+use App\Repositories\OrderRepository;
 use App\Repositories\ProductRepository;
 use App\Repositories\UserRepository;
 use App\Services\CartService;
+use App\Services\OrderService;
+use App\Services\StripeService;
 use App\Services\UserService;
 use Filament\Support\Assets\Js;
 use Filament\Support\Facades\FilamentAsset;
@@ -26,6 +30,15 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton(UserService::class, function ($app) {
             return new UserService($app->make(UserRepository::class));
+        });
+
+        $this->app->singleton(OrderService::class, function ($app) {
+            return new OrderService(
+                $app->make(OrderRepository::class),
+                $app->make(AddressRepository::class),
+                $app->make(CartService::class),
+                $app->make(StripeService::class)
+            );
         });
     }
 
