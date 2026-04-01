@@ -2,6 +2,8 @@
 
 namespace App\Livewire;
 
+use App\Dtos\CheckoutDTO;
+use App\Enums\OrderStatusEnum;
 use App\Http\Requests\CheckoutRequest;
 use App\Models\Address;
 use App\Models\Cart;
@@ -40,14 +42,15 @@ class CheckoutPage extends Component
 
     public function save(){
         $validated = $this->validate((new CheckoutRequest())->rules());
+        $dto = CheckoutDTO::fromArray($validated);
         $cart = $this->cartService->getCart();
         $line_items=[];
         $order_items=[];
         foreach ($cart->cartItems as $cartItem){
             $line_items[]=[
                 'price_data'=>[
-                    'currency'=>'eur',
-                    'unit_amount'=>$cartItem->total_price * 100,
+                    'currency'=>config('app.currency'),
+                    'unit_amount'=>$cartItem->total_price * 100, //stripe wants unit amount in cents
                     'product_data'=>[
                         'name'=>$cartItem->product->name,
                     ]
@@ -62,7 +65,7 @@ class CheckoutPage extends Component
         $order->grand_total= $cart->total_price;
         $order->payment_method = $validated['paymentMethod'];
         $order->payment_status = 'pending';
-        $order->order_status='draft';
+        $order->order_status=OrderStatusEnum::Draft->value;
         $order->currency = 'eur';
         $order->shipping_amount=0;
         $order->shipping_method='none';

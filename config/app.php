@@ -122,6 +122,7 @@ return [
         'driver' => env('APP_MAINTENANCE_DRIVER', 'file'),
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
+    'currency'=>env('APP_CURRENCY', 'eur'),
     'stripe_secret_key' => env('STRIPE_SECRET_KEY'),
 
 ];
