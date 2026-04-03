@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Dtos\CheckoutDTO;
 use App\Enums\OrderStatusEnum;
+use App\Enums\PaymentMethodEnum;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Repositories\AddressRepository;
@@ -47,13 +48,13 @@ class OrderService
             }
 
             $redirect_url = '';
-            if($paymentMethod=='stripe'){
+            if($paymentMethod==PaymentMethodEnum::STRIPE->value){
                 Stripe::setApiKey(config('app.stripe_secret_key'));
                 $sessionCheckout = $this->stripeService->createSession($line_items);
                 $redirect_url=$sessionCheckout->url;
             }
 
-            if($paymentMethod=='cod'){
+            if($paymentMethod==PaymentMethodEnum::CASH_ON_DELIVERY->value){
                 $redirect_url=route('success');
             }
 
