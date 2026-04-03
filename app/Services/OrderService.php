@@ -65,7 +65,7 @@ class OrderService
             $order = new Order();
             $order->user_id = auth()->user()->id;
             $order->grand_total= $cart->total_price;
-            $order->payment_method = $paymentMethod;
+            $order->payment_method_id = $paymentMethods->get($paymentMethod);
             $order->payment_status = 'pending';
             $order->order_status=OrderStatusEnum::Draft->value;
             $order->currency = config('app.currency');
