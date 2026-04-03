@@ -3,8 +3,10 @@
 namespace App\Services;
 
 use App\Dtos\CheckoutDTO;
+use App\Enums\OrderPaymentStatusEnum;
 use App\Enums\OrderStatusEnum;
 use App\Enums\PaymentMethodEnum;
+use App\Enums\ShippingMethodEnum;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Repositories\AddressRepository;
@@ -66,11 +68,11 @@ class OrderService
             $order->user_id = auth()->user()->id;
             $order->grand_total= $cart->total_price;
             $order->payment_method_id = $paymentMethods->get($paymentMethod);
-            $order->payment_status = 'pending';
+            $order->payment_status = OrderPaymentStatusEnum::PENDING->value;
             $order->order_status=OrderStatusEnum::Draft->value;
             $order->currency = config('app.currency');
             $order->shipping_amount=0;
-            $order->shipping_method='none';
+            $order->shipping_method=ShippingMethodEnum::NONE->value;
             $order->notes='Order placed'.auth()->user()->name;
             $order->setRelation('orderItems',$order_items);
             $order->save();
