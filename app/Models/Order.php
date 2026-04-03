@@ -41,6 +41,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property-read int|null $items_count
  * @property-read \App\Models\User $user
  * @property-read \App\Models\PaymentMethod $paymentMethod
+ * @property-read \App\Models\StripeOrderDetail|null $stripeOrderDetail
  * @mixin \Eloquent
  */
 class Order extends Model
@@ -75,6 +76,11 @@ class Order extends Model
     public function paymentMethod(): BelongsTo
     {
         return $this->belongsTo(PaymentMethod::class);
+    }
+
+    public function stripeOrderDetail(): HasOne
+    {
+        return $this->hasOne(StripeOrderDetail::class);
     }
 
 }
