@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Dtos\CheckoutDTO;
+use App\Dtos\CreateOrderDTO;
 use App\Enums\OrderPaymentStatusEnum;
 use App\Enums\OrderStatusEnum;
 use App\Enums\PaymentMethodEnum;
@@ -12,6 +13,7 @@ use App\Models\OrderItem;
 use App\Repositories\AddressRepository;
 use App\Repositories\OrderRepository;
 use App\Repositories\PaymentMethodRepository;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Stripe\Stripe;
@@ -63,19 +65,9 @@ class OrderService
             if($paymentMethod==PaymentMethodEnum::CASH_ON_DELIVERY->value){
                 $redirect_url=route('success');
             }
+            $paymentMethodId=$paymentMethods->get($paymentMethod);
 
-            $order = new Order();
-            $order->user_id = auth()->user()->id;
-            $order->grand_total= $cart->total_price;
-            $order->payment_method_id = $paymentMethods->get($paymentMethod);
-            $order->payment_status = OrderPaymentStatusEnum::PENDING->value;
-            $order->order_status=OrderStatusEnum::Draft->value;
-            $order->currency = config('app.currency');
-            $order->shipping_amount=0;
-            $order->shipping_method=ShippingMethodEnum::NONE->value;
-            $order->notes='Order placed'.auth()->user()->name;
-            $order->setRelation('orderItems',$order_items);
-            $order->save();
+            $order = $this->createNewOrder($cart->total_price,$paymentMethodId,$order_items);
 
             $this->addressRepository->create($order->id,$dto);
 
@@ -88,5 +80,23 @@ class OrderService
             DB::rollBack();
             return back()->with('error',$exception->getMessage()? :'Something went wrong!');
         }
+    }
+
+    protected function createNewOrder(int $totalPrice,int $paymentMethodId, array $orderItems): Order
+    {
+        $createOrderDto = new CreateOrderDTO($totalPrice,$paymentMethodId,$orderItems);
+        $order = new Order();
+        $order->user_id = auth()->user()->id;
+        $order->grand_total= $totalPrice;
+        $order->payment_method_id = $paymentMethodId;
+        $order->payment_status = OrderPaymentStatusEnum::PENDING->value;
+        $order->order_status=OrderStatusEnum::Draft->value;
+        $order->currency = config('app.currency');
+        $order->shipping_amount=0;
+        $order->shipping_method=ShippingMethodEnum::NONE->value;
+        $order->notes='Order placed'.auth()->user()->name;
+        $order->setRelation('orderItems',$orderItems);
+        $order->save();
+        return $order;
     }
 }
