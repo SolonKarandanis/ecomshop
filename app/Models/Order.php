@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property int $id
  * @property int $user_id
  * @property numeric|null $grand_total
- * @property string|null $payment_method
+ * @property int|null $payment_method_id
  * @property string|null $payment_status
  * @property string $order_status
  * @property string|null $currency
@@ -30,7 +30,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Order whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Order whereNotes($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Order whereOrderStatus($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Order wherePaymentMethod($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Order wherePaymentMethodId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Order wherePaymentStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Order whereShippingAmount($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Order whereShippingMethod($value)
@@ -40,6 +40,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\OrderItem> $items
  * @property-read int|null $items_count
  * @property-read \App\Models\User $user
+ * @property-read \App\Models\PaymentMethod $paymentMethod
  * @mixin \Eloquent
  */
 class Order extends Model
@@ -49,7 +50,7 @@ class Order extends Model
     protected $fillable = [
         'user_id',
         'grand_total',
-        'payment_method',
+        'payment_method_id',
         'payment_status',
         'order_status',
         'currency',
@@ -69,6 +70,11 @@ class Order extends Model
 
     public function address():HasOne{
         return $this->hasOne(Address::class);
+    }
+
+    public function paymentMethod(): BelongsTo
+    {
+        return $this->belongsTo(PaymentMethod::class);
     }
 
 }
