@@ -4,20 +4,20 @@ namespace App\Enums;
 
 enum OrderStatusEnum:string
 {
-    case Draft = 'draft';
-    case Paid = 'paid';
-    case Shipped = 'shipped';
-    case Delivered = 'delivered';
-    case Cancelled = 'cancelled';
+    case Draft = 'order.status.draft';
+    case Paid = 'order.status.paid';
+    case Shipped = 'order.status.shipped';
+    case Delivered = 'order.status.delivered';
+    case Cancelled = 'order.status.cancelled';
 
     public static function labels(): array
     {
         return [
-            self::Draft->value => __('Draft'),
-            self::Paid->value => __('Paid'),
-            self::Shipped->value => __('Shipped'),
-            self::Delivered->value => __('Delivered'),
-            self::Cancelled->value => __('Cancelled'),
+            self::Draft->value => __('order.status.draft'),
+            self::Paid->value => __('order.status.paid'),
+            self::Shipped->value => __('order.status.shipped'),
+            self::Delivered->value => __('order.status.delivered'),
+            self::Cancelled->value => __('order.status.cancelled'),
         ];
     }
 }

@@ -9,6 +9,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Repositories\AddressRepository;
 use App\Repositories\OrderRepository;
+use App\Repositories\PaymentMethodRepository;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Stripe\Stripe;
@@ -18,6 +19,7 @@ class OrderService
     public function __construct(
         private readonly OrderRepository $orderRepository,
         private readonly AddressRepository $addressRepository,
+        private readonly PaymentMethodRepository $paymentMethodRepository,
         private readonly CartService $cartService,
         private readonly StripeService $stripeService
     ){}
@@ -46,6 +48,8 @@ class OrderService
                 $line_items[] = $line_item;
                 $order_items[]=[new OrderItem($cartItem)];
             }
+
+            $paymentMethods = $this->paymentMethodRepository->findAll()->pluck('id', 'resource_key');
 
             $redirect_url = '';
             if($paymentMethod==PaymentMethodEnum::STRIPE->value){

@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Repositories\AddressRepository;
 use App\Repositories\CartRepository;
 use App\Repositories\OrderRepository;
+use App\Repositories\PaymentMethodRepository;
 use App\Repositories\ProductRepository;
 use App\Repositories\UserRepository;
 use App\Services\CartService;
@@ -36,6 +37,7 @@ class AppServiceProvider extends ServiceProvider
             return new OrderService(
                 $app->make(OrderRepository::class),
                 $app->make(AddressRepository::class),
+                $app->make(PaymentMethodRepository::class),
                 $app->make(CartService::class),
                 $app->make(StripeService::class)
             );
