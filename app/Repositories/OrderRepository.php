@@ -41,4 +41,15 @@ class OrderRepository
             return $order;
         });
     }
+
+    public function getOrderById(int $orderId): Order{
+        return $this->modelQuery()
+            ->with([
+                'items',
+                'items.product',
+                'items.product.productAttributeValues.attribute',
+                'items.product.productAttributeValues.media',
+            ])
+            ->find($orderId);
+    }
 }

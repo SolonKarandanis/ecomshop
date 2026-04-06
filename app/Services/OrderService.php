@@ -28,6 +28,10 @@ class OrderService
         private readonly StripeService $stripeService
     ){}
 
+    public function getOrderById(int $orderId):Order{
+        return $this->orderRepository->getOrderById($orderId);
+    }
+
     /**
      * @throws \Throwable
      */
