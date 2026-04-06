@@ -18,7 +18,7 @@ class CheckoutPage extends Component
     public string $phone = '';
     public string $address = '';
     public string $city = '';
-    public string $state = '';
+    public string $country = '';
     public string $zipCode = '';
     public string $paymentMethod = '';
     protected OrderService $orderService;
@@ -38,6 +38,9 @@ class CheckoutPage extends Component
         $this->cart = $this->cartService->getCart();
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function save(){
         $validated = $this->validate((new CheckoutRequest())->rules());
         $dto = CheckoutDTO::fromArray($validated);

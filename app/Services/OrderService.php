@@ -51,27 +51,40 @@ class OrderService
                     'quantity'=>$cartItem->quantity,
                 ];
                 $line_items[] = $line_item;
-                $order_items[]=[new OrderItem($cartItem)];
+                $order_items[]=[
+                    'product_id' => $cartItem->product_id,
+                    'quantity' => $cartItem->quantity,
+                    'unit_amount' => $cartItem->unit_price,
+                    'total_amount' => $cartItem->total_price,
+                    'attributes' => $cartItem->attributes,
+                ];
             }
             $paymentMethods = $this->paymentMethodRepository->findAll()->pluck('id', 'resource_key');
             $paymentMethodId=$paymentMethods->get($paymentMethod);
-
+            Log::debug('OrderService creating order');
             $order = $this->createNewOrder($cart->total_price,$paymentMethodId,$order_items);
+            Log::debug('OrderService created order ',[$order->id]);
 
             $redirect_url = '';
             if($paymentMethod==PaymentMethodEnum::STRIPE->value){
+                Log::debug('OrderService paymentMethod: Stripe');
                 Stripe::setApiKey(config('app.stripe_secret_key'));
                 $sessionCheckout = $this->stripeService->createSession($line_items);
+                Log::debug('OrderService $sessionCheckout:',[$sessionCheckout->id]);
                 $this->stripeOrderDetailRepository->createStripeOrderDetail($order->id,$sessionCheckout->id);
                 $redirect_url=$sessionCheckout->url;
             }
 
             if($paymentMethod==PaymentMethodEnum::CASH_ON_DELIVERY->value){
+                Log::debug('OrderService paymentMethod: Cash on delivery');
                 $redirect_url=route('success');
             }
 
+            Log::debug('OrderService creating address');
             $this->addressRepository->create($order->id,$dto);
+            Log::debug('OrderService created address');
 
+            Log::debug('OrderService clearing cart');
             $this->cartService->clearCart();
             DB::commit();
             return $redirect_url;
