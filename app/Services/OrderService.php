@@ -13,7 +13,6 @@ use App\Models\OrderItem;
 use App\Repositories\AddressRepository;
 use App\Repositories\OrderRepository;
 use App\Repositories\PaymentMethodRepository;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Stripe\Stripe;
@@ -24,6 +23,7 @@ class OrderService
         private readonly OrderRepository $orderRepository,
         private readonly AddressRepository $addressRepository,
         private readonly PaymentMethodRepository $paymentMethodRepository,
+        private readonly StripeOrderDetailRepository $stripeOrderDetailRepository,
         private readonly CartService $cartService,
         private readonly StripeService $stripeService
     ){}
@@ -82,21 +82,12 @@ class OrderService
         }
     }
 
-    protected function createNewOrder(int $totalPrice,int $paymentMethodId, array $orderItems): Order
+    /**
+     * @throws \Throwable
+     */
+    protected function createNewOrder(int $totalPrice, int $paymentMethodId, array $orderItems): Order
     {
         $createOrderDto = new CreateOrderDTO($totalPrice,$paymentMethodId,$orderItems);
-        $order = new Order();
-        $order->user_id = auth()->user()->id;
-        $order->grand_total= $totalPrice;
-        $order->payment_method_id = $paymentMethodId;
-        $order->payment_status = OrderPaymentStatusEnum::PENDING->value;
-        $order->order_status=OrderStatusEnum::Draft->value;
-        $order->currency = config('app.currency');
-        $order->shipping_amount=0;
-        $order->shipping_method=ShippingMethodEnum::NONE->value;
-        $order->notes='Order placed'.auth()->user()->name;
-        $order->setRelation('orderItems',$orderItems);
-        $order->save();
-        return $order;
+        return $this->orderRepository->createOrder($createOrderDto);
     }
 }

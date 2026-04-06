@@ -7,6 +7,7 @@ use App\Repositories\CartRepository;
 use App\Repositories\OrderRepository;
 use App\Repositories\PaymentMethodRepository;
 use App\Repositories\ProductRepository;
+use App\Repositories\StripeOrderDetailRepository;
 use App\Repositories\UserRepository;
 use App\Services\CartService;
 use App\Services\OrderService;
@@ -38,6 +39,7 @@ class AppServiceProvider extends ServiceProvider
                 $app->make(OrderRepository::class),
                 $app->make(AddressRepository::class),
                 $app->make(PaymentMethodRepository::class),
+                $app->make(StripeOrderDetailRepository::class),
                 $app->make(CartService::class),
                 $app->make(StripeService::class)
             );
