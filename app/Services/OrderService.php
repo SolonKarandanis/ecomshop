@@ -7,6 +7,7 @@ use App\Dtos\CreateOrderDTO;
 use App\Enums\PaymentMethodEnum;
 use App\Mail\OrderPlaced;
 use App\Models\Order;
+use App\Models\OrderItem;
 use App\Repositories\AddressRepository;
 use App\Repositories\OrderRepository;
 use App\Repositories\PaymentMethodRepository;
@@ -53,13 +54,8 @@ class OrderService
                     'quantity'=>$cartItem->quantity,
                 ];
                 $line_items[] = $line_item;
-                $order_items[]=[
-                    'product_id' => $cartItem->product_id,
-                    'quantity' => $cartItem->quantity,
-                    'unit_amount' => $cartItem->unit_price,
-                    'total_amount' => $cartItem->total_price,
-                    'attributes' => $cartItem->attributes,
-                ];
+                $orderItem = new OrderItem($cartItem);
+                $order_items[]=$orderItem->attributesToArray();
             }
 
             $paymentMethods = $this->paymentMethodRepository->findAll()->pluck('id', 'resource_key');
