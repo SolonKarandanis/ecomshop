@@ -39,11 +39,12 @@ class OrderService
         DB::beginTransaction();
         try{
             $cart = $this->cartService->getCart();
+            Log::debug('OrderService checkout cartItems count: ', [$cart->cartItems->count()]);
             foreach ($cart->cartItems as $cartItem){
                 $line_item=[
                     'price_data'=>[
                         'currency'=>config('app.currency'),
-                        'unit_amount'=>$cartItem->total_price * 100, //stripe wants unit amount in cents
+                        'unit_amount'=>$cartItem->unit_price * 100, //stripe wants unit amount in cents
                         'product_data'=>[
                             'name'=>$cartItem->product->name,
                         ]
@@ -58,6 +59,9 @@ class OrderService
                     'total_amount' => $cartItem->total_price,
                     'attributes' => $cartItem->attributes,
                 ];
+            }
+            if (empty($line_items)) {
+                throw new \Exception('Cart is empty');
             }
             $paymentMethods = $this->paymentMethodRepository->findAll()->pluck('id', 'resource_key');
             $paymentMethodId=$paymentMethods->get($paymentMethod);

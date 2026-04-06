@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('order_id')->constrained()->onDelete('cascade');
             $table->string('session_id');
-            $table->string('payment_intent_id');
+            $table->string('payment_intent_id')->nullable();
             $table->string('customer_id')->nullable();
             $table->timestamps();
         });
