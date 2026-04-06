@@ -4,18 +4,16 @@ namespace App\Services;
 
 use App\Dtos\CheckoutDTO;
 use App\Dtos\CreateOrderDTO;
-use App\Enums\OrderPaymentStatusEnum;
-use App\Enums\OrderStatusEnum;
 use App\Enums\PaymentMethodEnum;
-use App\Enums\ShippingMethodEnum;
+use App\Mail\OrderPlaced;
 use App\Models\Order;
-use App\Models\OrderItem;
 use App\Repositories\AddressRepository;
 use App\Repositories\OrderRepository;
 use App\Repositories\PaymentMethodRepository;
 use App\Repositories\StripeOrderDetailRepository;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Stripe\Stripe;
 
 class OrderService
@@ -40,6 +38,9 @@ class OrderService
         try{
             $cart = $this->cartService->getCart();
             Log::debug('OrderService checkout cartItems count: ', [$cart->cartItems->count()]);
+            if (empty($cart->cartItems)) {
+                throw new \Exception('Cart is empty');
+            }
             foreach ($cart->cartItems as $cartItem){
                 $line_item=[
                     'price_data'=>[
@@ -60,9 +61,7 @@ class OrderService
                     'attributes' => $cartItem->attributes,
                 ];
             }
-            if (empty($line_items)) {
-                throw new \Exception('Cart is empty');
-            }
+
             $paymentMethods = $this->paymentMethodRepository->findAll()->pluck('id', 'resource_key');
             $paymentMethodId=$paymentMethods->get($paymentMethod);
             Log::debug('OrderService creating order');
@@ -91,6 +90,7 @@ class OrderService
             Log::debug('OrderService clearing cart');
             $this->cartService->clearCart();
             DB::commit();
+            Mail::to(request()->user())->send(new OrderPlaced($order));
             return $redirect_url;
         }
         catch (\Exception $exception){
