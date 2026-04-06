@@ -13,6 +13,7 @@ use App\Models\OrderItem;
 use App\Repositories\AddressRepository;
 use App\Repositories\OrderRepository;
 use App\Repositories\PaymentMethodRepository;
+use App\Repositories\StripeOrderDetailRepository;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Stripe\Stripe;
@@ -52,22 +53,22 @@ class OrderService
                 $line_items[] = $line_item;
                 $order_items[]=[new OrderItem($cartItem)];
             }
-
             $paymentMethods = $this->paymentMethodRepository->findAll()->pluck('id', 'resource_key');
+            $paymentMethodId=$paymentMethods->get($paymentMethod);
+
+            $order = $this->createNewOrder($cart->total_price,$paymentMethodId,$order_items);
 
             $redirect_url = '';
             if($paymentMethod==PaymentMethodEnum::STRIPE->value){
                 Stripe::setApiKey(config('app.stripe_secret_key'));
                 $sessionCheckout = $this->stripeService->createSession($line_items);
+                $this->stripeOrderDetailRepository->createStripeOrderDetail($order->id,$sessionCheckout->id);
                 $redirect_url=$sessionCheckout->url;
             }
 
             if($paymentMethod==PaymentMethodEnum::CASH_ON_DELIVERY->value){
                 $redirect_url=route('success');
             }
-            $paymentMethodId=$paymentMethods->get($paymentMethod);
-
-            $order = $this->createNewOrder($cart->total_price,$paymentMethodId,$order_items);
 
             $this->addressRepository->create($order->id,$dto);
 
