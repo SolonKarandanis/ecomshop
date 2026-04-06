@@ -45,11 +45,26 @@ class OrderRepository
     public function getOrderById(int $orderId): Order{
         return $this->modelQuery()
             ->with([
+                'address',
                 'items',
                 'items.product',
                 'items.product.productAttributeValues.attribute',
                 'items.product.productAttributeValues.media',
             ])
             ->find($orderId);
+    }
+
+    public function getLatestOrder(int $userId): Order{
+        return $this->modelQuery()
+            ->with([
+                'address',
+                'items',
+                'items.product',
+                'items.product.productAttributeValues.attribute',
+                'items.product.productAttributeValues.media',
+            ])
+            ->where('user_id', $userId)
+            ->orderBy('created_at', 'desc')
+            ->first();
     }
 }

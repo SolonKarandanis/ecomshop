@@ -32,6 +32,10 @@ class OrderService
         return $this->orderRepository->getOrderById($orderId);
     }
 
+    public function getUsersLatestOrder(int $userId):Order{
+        return $this->orderRepository->getLatestOrder($userId);
+    }
+
     /**
      * @throws \Throwable
      */
