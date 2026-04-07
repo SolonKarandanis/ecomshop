@@ -68,7 +68,7 @@ class CartService
                 'quantity' => $itemData['quantity'],
                 'unit_price' => $itemData['price'],
                 'total_price' => $itemData['price'] * $itemData['quantity'],
-                'attributes' => json_encode($itemData['attribute_ids']),
+                'attributes' => $itemData['attribute_ids'],
             ];
             $cartItem = new CartItem($modelData);
             // This is a bit of a hack to keep the cookie item id without modifying the model
@@ -154,7 +154,7 @@ class CartService
             $attributes = $request->getAttributes();
             ksort($attributes);
             $existingItem = $cart->cartItems->first(function (CartItem $item) use ($request, $attributes) {
-                $itemAttributes = json_decode($item->attributes, true) ?? [];
+                $itemAttributes = $item->attributes ?? [];
                 ksort($itemAttributes);
                 return $item->product_id === $request->getProductId() && $itemAttributes === $attributes;
             });
@@ -167,7 +167,7 @@ class CartService
                     'product_id' => $request->getProductId(),
                     'quantity' => $request->getQuantity(),
                     'unit_price' => $price,
-                    'attributes' => json_encode($attributes),
+                    'attributes' => $attributes,
                 ];
                 $newItem = new CartItem($newItemData);
                 $newItem->id_from_cookie = (string) Str::uuid();
@@ -176,7 +176,7 @@ class CartService
         }
         $cartItemsForCookie = [];
         foreach ($cart->cartItems as $item) {
-            $itemAttributes = json_decode($item->attributes, true) ?? [];
+            $itemAttributes = $item->attributes ?? [];
             ksort($itemAttributes);
             $cartItemsForCookie[] = [
                 'id' => $item->id_from_cookie,
@@ -225,13 +225,13 @@ class CartService
                     'id' => $existingCartItem->id,
                     'quantity' => $quantity,
                     'total_price' => $totalPrice,
-                    'attributes' => json_encode($attributes),
+                    'attributes' => $attributes,
                 ];
                 $idsToUpdate[] = $existingCartItem->id;
 
                 $existingCartItem->quantity = $quantity;
                 $existingCartItem->total_price = $totalPrice;
-                $existingCartItem->attributes = json_encode($attributes);
+                $existingCartItem->attributes = $attributes;
             }
         }
         if (empty($updates)) {
@@ -249,7 +249,7 @@ class CartService
         $cartItems = $cart->cartItems;
         $cartItemsForCookie = [];
         foreach ($cartItems as $item) {
-            $attributeIds = json_decode($item->attributes, true) ?? [];
+            $attributeIds = $item->attributes ?? [];
             ksort($attributeIds);
             $key = $item->product_id . '_' . json_encode($attributeIds);
             $cartItemsForCookie[$key] = [
@@ -280,7 +280,7 @@ class CartService
                 'quantity' => $itemData['quantity'],
                 'unit_price' => $itemData['price'],
                 'total_price' => $itemData['price'] * $itemData['quantity'],
-                'attributes' => json_encode($itemData['attribute_ids']),
+                'attributes' => $itemData['attribute_ids'],
             ];
             $cartItem = new CartItem($modelData);
             $cartItem->id_from_cookie = $itemData['id'] ?? null;
@@ -368,11 +368,11 @@ class CartService
         $itemsToUpdate = [];
         $idsToUpdate = [];
         foreach ($cookieCart->cartItems as $cookieItem) {
-            $attributes = json_decode($cookieItem->attributes, true) ?? [];
+            $attributes = $cookieItem->attributes ?? [];
             ksort($attributes);
             $existingItem = $dbCartItems->first(function (CartItem $dbItem) use ($cookieItem, $attributes) {
                 return $dbItem->product_id === $cookieItem->product_id &&
-                       json_decode($dbItem->attributes, true) === $attributes;
+                       $dbItem->attributes === $attributes;
             });
             if ($existingItem) {
                 $newQuantity = $existingItem->quantity + $cookieItem->quantity;
@@ -381,7 +381,7 @@ class CartService
                     'id' => $existingItem->id,
                     'quantity' => $newQuantity,
                     'total_price' => $totalPrice,
-                    'attributes' => json_encode($attributes),
+                    'attributes' => $attributes,
                 ];
                 $idsToUpdate[] = $existingItem->id;
             } else {
@@ -409,7 +409,7 @@ class CartService
     }
 
     protected function getCartItemsForCookies($item):array{
-        $attributeIds = json_decode($item->attributes, true) ?? [];
+        $attributeIds = $item->attributes ?? [];
         ksort($attributeIds);
         $key = $item->product_id . '_' . json_encode($attributeIds);
 

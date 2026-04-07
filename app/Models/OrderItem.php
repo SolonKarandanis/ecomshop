@@ -45,7 +45,7 @@ class OrderItem extends Model
             $this->quantity = $cartItem->quantity;
             $this->unit_amount = $cartItem->unit_price;
             $this->total_amount = $cartItem->total_price;
-            $this->attributes = $cartItem->attributes;
+            $this->setAttribute('attributes', $cartItem->attributes);
         }
     }
 
@@ -59,7 +59,7 @@ class OrderItem extends Model
     ];
 
     protected $casts = [
-        'attributes' => 'string',
+        'attributes' => 'array',
     ];
 
     public function order():BelongsTo{

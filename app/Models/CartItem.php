@@ -48,7 +48,7 @@ class CartItem extends Model
     ];
 
     protected $casts = [
-        'attributes' => 'string',
+        'attributes' => 'array',
     ];
 
     public function cart():BelongsTo{

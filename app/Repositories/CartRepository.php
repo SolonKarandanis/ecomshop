@@ -58,7 +58,7 @@ class CartRepository
         return $this->itemModelQuery()
             ->where('cart_id',$cartId)
             ->where('product_id',$productId)
-            ->where('attributes',json_encode($attributes))
+            ->where('attributes',$attributes)
             ->first();
     }
 
@@ -78,7 +78,7 @@ class CartRepository
             'quantity' => $addToCartDto->getQuantity(),
             'unit_price' => $addToCartDto->getPrice(),
             'total_price' => $total_price,
-            'attributes' => json_encode($addToCartDto->getAttributes()),
+            'attributes' => $addToCartDto->getAttributes(),
         ]);
     }
 
@@ -162,7 +162,7 @@ class CartRepository
             $params[] = $update['id'];
             $params[] = $update['total_price'];
             $params[] = $update['id'];
-            $params[] = $update['attributes'];
+            $params[] = is_array($update['attributes']) ? json_encode($update['attributes']) : $update['attributes'];
         }
 
         $quantityCase .= "END";

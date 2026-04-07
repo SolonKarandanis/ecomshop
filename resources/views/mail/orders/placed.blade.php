@@ -20,7 +20,7 @@
             </tr>
             <tr>
                 <td>Order Total</td>
-                <td>{{\Illuminate\Support\Number::currency($order->total_price)}}</td>
+                <td>{{\Illuminate\Support\Number::currency($order->grand_total)}}</td>
             </tr>
         </table>
     </x-mail::table>
@@ -56,7 +56,7 @@
                         {{$orderItem->quantity}}
                     </td>
                     <td>
-                        {{\Illuminate\Support\Number::currency($orderItem->price)}}
+                        {{\Illuminate\Support\Number::currency($orderItem->total_amount)}}
                     </td>
                 </tr>
             @endforeach

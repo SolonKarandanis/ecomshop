@@ -69,7 +69,7 @@ class CartPage extends Component
 
     private function updateQuantity(Cart $cart,CartItem $cartItem, int $newQuantity): void
     {
-        $attributes = json_decode($cartItem->attributes, true) ?? [];
+        $attributes = $cartItem->attributes ?? [];
         $cartItemId = $cartItem->id ?? $cartItem->id_from_cookie;
 
         $updateDto = new UpdateCartItemsDTO(
