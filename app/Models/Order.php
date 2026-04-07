@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -81,6 +82,13 @@ class Order extends Model
     public function stripeOrderDetail(): HasOne
     {
         return $this->hasOne(StripeOrderDetail::class);
+    }
+
+    public function createdAtDiff():Attribute
+    {
+        return Attribute::make(
+            get:fn()=> $this->created_at->diffForHumans()
+        );
     }
 
 }
