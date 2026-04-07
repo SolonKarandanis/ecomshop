@@ -93,9 +93,9 @@ class OrderService
 
             Log::debug('OrderService clearing cart');
             $this->cartService->clearCart();
+            DB::commit();
             $order = $this->getUsersLatestOrder(auth()->user()->id);
             Mail::to(request()->user())->send(new OrderPlaced($order));
-            DB::commit();
             return $redirect_url;
         }
         catch (\Exception $exception){

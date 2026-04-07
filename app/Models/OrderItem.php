@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\Attribute;
+use App\Models\AttributeOptions;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -61,6 +63,25 @@ class OrderItem extends Model
     protected $casts = [
         'attributes' => 'array',
     ];
+
+    public function getAttributeNamesAndOptions(): array
+    {
+        if (!$this->attributes || !is_array($this->attributes)) {
+            return [];
+        }
+
+        $result = [];
+        foreach ($this->attributes as $attributeId => $optionId) {
+            $attribute = Attribute::find($attributeId);
+            $option = AttributeOptions::find($optionId);
+
+            if ($attribute && $option) {
+                $result[$attribute->name] = $option->option_name;
+            }
+        }
+
+        return $result;
+    }
 
     public function order():BelongsTo{
         return $this->belongsTo(Order::class);
