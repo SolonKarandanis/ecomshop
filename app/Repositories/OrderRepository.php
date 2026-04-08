@@ -58,6 +58,7 @@ class OrderRepository
         return $this->modelQuery()
             ->with([
                 'address',
+                'paymentMethod',
                 'items',
                 'items.product',
                 'items.product.productAttributeValues.attribute',
@@ -66,5 +67,10 @@ class OrderRepository
             ->where('user_id', $userId)
             ->orderBy('created_at', 'desc')
             ->first();
+    }
+
+    public function updateOrder(Order $order): bool
+    {
+        return $order->save();
     }
 }

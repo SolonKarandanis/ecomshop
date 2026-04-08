@@ -50,7 +50,7 @@
                             Payment Method:
                         </p>
                         <p class="text-base font-semibold leading-4 text-gray-800 dark:text-gray-400 ">
-                            Cash on Delivery
+                            {{$order->paymentMethod->resource_key}}
                         </p>
                     </div>
                 </div>
@@ -61,21 +61,21 @@
                             <div class="flex flex-col items-center justify-center w-full pb-4 space-y-4 border-b border-gray-200 dark:border-gray-700">
                                 <div class="flex justify-between w-full">
                                     <p class="text-base leading-4 text-gray-800 dark:text-gray-400">Subtotal</p>
-                                    <p class="text-base leading-4 text-gray-600 dark:text-gray-400">₹157,495.00</p>
+                                    <p class="text-base leading-4 text-gray-600 dark:text-gray-400">{{Number::currency($order->grand_total ?? 0,'eur')}}</p>
                                 </div>
                                 <div class="flex items-center justify-between w-full">
                                     <p class="text-base leading-4 text-gray-800 dark:text-gray-400">Discount
                                     </p>
-                                    <p class="text-base leading-4 text-gray-600 dark:text-gray-400">00</p>
+                                    <p class="text-base leading-4 text-gray-600 dark:text-gray-400">{{Number::currency($order->shipping_amount ?? 0,'eur')}}</p>
                                 </div>
                                 <div class="flex items-center justify-between w-full">
                                     <p class="text-base leading-4 text-gray-800 dark:text-gray-400">Shipping</p>
-                                    <p class="text-base leading-4 text-gray-600 dark:text-gray-400">00</p>
+                                    <p class="text-base leading-4 text-gray-600 dark:text-gray-400">{{Number::currency($order->shipping_amount ?? 0,'eur')}}</p>
                                 </div>
                             </div>
                             <div class="flex items-center justify-between w-full">
                                 <p class="text-base font-semibold leading-4 text-gray-800 dark:text-gray-400">Total</p>
-                                <p class="text-base font-semibold leading-4 text-gray-600 dark:text-gray-400">₹157,495.00</p>
+                                <p class="text-base font-semibold leading-4 text-gray-600 dark:text-gray-400">{{Number::currency($order->grand_total ?? 0,'eur')}}</p>
                             </div>
                         </div>
                         <div class="flex flex-col w-full px-2 space-y-4 md:px-8 ">

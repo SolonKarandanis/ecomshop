@@ -4,7 +4,9 @@ namespace App\Services;
 
 use App\Dtos\CheckoutDTO;
 use App\Dtos\CreateOrderDTO;
+use App\Enums\OrderPaymentStatusEnum;
 use App\Enums\PaymentMethodEnum;
+use App\Enums\StripePaymentStatusEnum;
 use App\Mail\OrderPlaced;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -15,6 +17,7 @@ use App\Repositories\StripeOrderDetailRepository;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Stripe\Exception\ApiErrorException;
 use Stripe\Stripe;
 
 class OrderService
@@ -112,5 +115,30 @@ class OrderService
     {
         $createOrderDto = new CreateOrderDTO($totalPrice,$paymentMethodId,$orderItems);
         return $this->orderRepository->createOrder($createOrderDto);
+    }
+
+    /**
+     * @throws ApiErrorException
+     * @throws \Throwable
+     */
+    public function successOrFailStripeOrder(string $sessionId, Order $latestOrder): ?Order{
+        DB::beginTransaction();
+        try{
+            $sessionInfo = $this->stripeService->retrieveSession($sessionId);
+            if($sessionInfo->payment_status != StripePaymentStatusEnum::PAID->value){
+                $latestOrder->payment_status= OrderPaymentStatusEnum::FAILED->value;
+            }
+            else if($sessionInfo->payment_status == StripePaymentStatusEnum::PAID->value){
+                $latestOrder->payment_status= OrderPaymentStatusEnum::PAID->value;
+            }
+            $this->orderRepository->updateOrder($latestOrder);
+            DB::commit();
+            return $latestOrder;
+        }
+        catch (\Exception $exception){
+            Log::error($exception);
+            DB::rollBack();
+            return null;
+        }
     }
 }

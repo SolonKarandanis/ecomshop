@@ -34,6 +34,10 @@ class AppServiceProvider extends ServiceProvider
             return new UserService($app->make(UserRepository::class));
         });
 
+        $this->app->singleton(StripeService::class, function ($app) {
+            return new StripeService();
+        });
+
         $this->app->singleton(OrderService::class, function ($app) {
             return new OrderService(
                 $app->make(OrderRepository::class),
