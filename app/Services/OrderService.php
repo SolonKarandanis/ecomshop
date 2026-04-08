@@ -14,6 +14,7 @@ use App\Repositories\AddressRepository;
 use App\Repositories\OrderRepository;
 use App\Repositories\PaymentMethodRepository;
 use App\Repositories\StripeOrderDetailRepository;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -37,6 +38,10 @@ class OrderService
 
     public function getUsersLatestOrder(int $userId):Order{
         return $this->orderRepository->getLatestOrder($userId);
+    }
+
+    public function getUsersOrders(int $userId,?int $perPage): LengthAwarePaginator|array{
+        return $this->orderRepository->getUsersOrders($userId, $perPage);
     }
 
     /**

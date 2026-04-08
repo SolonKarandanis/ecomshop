@@ -6,6 +6,7 @@ use App\Dtos\CreateOrderDTO;
 use App\Models\Order;
 use App\Models\OrderItem;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 
 class OrderRepository
@@ -67,6 +68,13 @@ class OrderRepository
             ->where('user_id', $userId)
             ->orderBy('created_at', 'desc')
             ->first();
+    }
+
+    public function getUsersOrders(int $userId,?int $perPage): LengthAwarePaginator|array{
+        return $this->modelQuery()
+            ->where('user_id', $userId)
+            ->orderBy('created_at', 'desc')
+            ->paginate($perPage??10);
     }
 
     public function updateOrder(Order $order): bool
