@@ -124,6 +124,25 @@ class CartService
                 $request->getProductId(),
                 $attributes
             );
+
+            // Check if the item is already in $newCartItems to be added
+            $alreadyInNewItems = false;
+            foreach ($newCartItems as $newItemDto) {
+                if ($newItemDto->getProductId() === $request->getProductId()) {
+                    $newItemAttributes = $newItemDto->getAttributes();
+                    ksort($newItemAttributes);
+                    if ($newItemAttributes === $attributes) {
+                        $newItemDto->setQuantity($newItemDto->getQuantity() + $request->getQuantity());
+                        $alreadyInNewItems = true;
+                        break;
+                    }
+                }
+            }
+
+            if ($alreadyInNewItems) {
+                continue;
+            }
+
             $product = $productsToBeAdded->find($request->getProductId());
             $price = $this->calculatePriceWithAttributes($product, $attributes);
             $request->setPrice($price);
@@ -155,8 +174,11 @@ class CartService
             ksort($attributes);
             $existingItem = $cart->cartItems->first(function (CartItem $item) use ($request, $attributes) {
                 $itemAttributes = $item->attributes ?? [];
+                if (is_string($itemAttributes)) {
+                    $itemAttributes = json_decode($itemAttributes, true) ?? [];
+                }
                 ksort($itemAttributes);
-                return $item->product_id === $request->getProductId() && $itemAttributes === $attributes;
+                return (int)$item->product_id === (int)$request->getProductId() && $itemAttributes === $attributes;
             });
             $product = $productsToBeAdded->find($request->getProductId());
             $price = $this->calculatePriceWithAttributes($product, $attributes);
@@ -371,8 +393,13 @@ class CartService
             $attributes = $cookieItem->attributes ?? [];
             ksort($attributes);
             $existingItem = $dbCartItems->first(function (CartItem $dbItem) use ($cookieItem, $attributes) {
-                return $dbItem->product_id === $cookieItem->product_id &&
-                       $dbItem->attributes === $attributes;
+                $dbAttributes = $dbItem->attributes ?? [];
+                if (is_string($dbAttributes)) {
+                    $dbAttributes = json_decode($dbAttributes, true) ?? [];
+                }
+                ksort($dbAttributes);
+                return (int)$dbItem->product_id === (int)$cookieItem->product_id &&
+                       $dbAttributes === $attributes;
             });
             if ($existingItem) {
                 $newQuantity = $existingItem->quantity + $cookieItem->quantity;

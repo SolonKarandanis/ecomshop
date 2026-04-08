@@ -55,10 +55,11 @@ class CartRepository
     }
 
     public function findItemByProductIdAndAttributes(int $cartId,int $productId, array $attributes): CartItem| null{
+        $attributesJson = json_encode($attributes);
         return $this->itemModelQuery()
             ->where('cart_id',$cartId)
             ->where('product_id',$productId)
-            ->where('attributes',$attributes)
+            ->where('attributes',$attributesJson)
             ->first();
     }
 
