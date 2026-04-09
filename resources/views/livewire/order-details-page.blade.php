@@ -22,7 +22,7 @@
                         </p>
                     </div>
                     <div class="mt-1 flex items-center gap-x-2 text-gray-800 dark:text-gray-200">
-                        <div>Jace Grimes</div>
+                        <div>{{$order->address->getFullNameAttribute()}}</div>
                     </div>
                 </div>
             </div>
@@ -49,7 +49,7 @@
                     </div>
                     <div class="mt-1 flex items-center gap-x-2">
                         <h3 class="text-xl font-medium text-gray-800 dark:text-gray-200">
-                            17-02-2024
+                            {{$order->created_at->format('d-m-Y')}}
                         </h3>
                     </div>
                 </div>
@@ -74,7 +74,9 @@
                         </p>
                     </div>
                     <div class="mt-1 flex items-center gap-x-2">
-                        <span class="bg-yellow-500 py-1 px-3 rounded text-white shadow">Processing</span>
+                        <span class="{{$this->getOrderStatusClass($order->order_status)}} py-1 px-3 rounded text-white shadow">
+                            {{$order->order_status}}
+                        </span>
                     </div>
                 </div>
             </div>
@@ -100,7 +102,9 @@
                         </p>
                     </div>
                     <div class="mt-1 flex items-center gap-x-2">
-                        <span class="bg-green-500 py-1 px-3 rounded text-white shadow">Paid</span>
+                        <span class="{{$this->getPaymentStatusClass($order->payment_status)}} py-1 px-3 rounded text-white shadow">
+                            {{$order->payment_status}}
+                        </span>
                     </div>
                 </div>
             </div>
@@ -122,36 +126,21 @@
                     </tr>
                     </thead>
                     <tbody>
-
-                    <!--[if BLOCK]><![endif]-->
-                    <tr wire:key="53">
-                        <td class="py-4">
-                            <div class="flex items-center">
-                                <img class="h-16 w-16 mr-4" src="http://localhost:8000/storage/products/01HND3J5XS7ZC5J84BK5YDM6Z2.jpg" alt="Product image">
-                                <span class="font-semibold">Samsung Galaxy Watch6</span>
-                            </div>
-                        </td>
-                        <td class="py-4">₹29,999.00</td>
-                        <td class="py-4">
-                            <span class="text-center w-8">1</span>
-                        </td>
-                        <td class="py-4">₹29,999.00</td>
-                    </tr>
-                    <tr wire:key="54">
-                        <td class="py-4">
-                            <div class="flex items-center">
-                                <img class="h-16 w-16 mr-4" src="http://localhost:8000/storage/products/01HND30J0P7C6MWQ1XQK7YDQKA.jpg" alt="Product image">
-                                <span class="font-semibold">Samsung Galaxy Book3</span>
-                            </div>
-                        </td>
-                        <td class="py-4">₹75,000.00</td>
-                        <td class="py-4">
-                            <span class="text-center w-8">5</span>
-                        </td>
-                        <td class="py-4">₹375,000.00</td>
-                    </tr>
-                    <!--[if ENDBLOCK]><![endif]-->
-
+                    @foreach($order->items as $orderItem)
+                        <tr wire:key="{{$orderItem->id}}">
+                            <td class="py-6 max-w-3xs">
+                                <div class="flex items-center">
+                                    <img class="h-16 w-16 mr-4" src="{{$orderItem->product->getThumbnailImage()}}" alt="{{$orderItem->product->name}}">
+                                    <span class="font-semibold text-sm">{{$orderItem->product->name}}</span>
+                                </div>
+                            </td>
+                            <td class="py-4">{{Number::currency($orderItem->unit_amount ?? 0,'eur')}}</td>
+                            <td class="py-4 ">
+                                <span class="text-center w-8">{{$orderItem->quantity}}</span>
+                            </td>
+                            <td class="py-4">{{Number::currency($orderItem->total_amount ?? 0,'eur')}}</td>
+                        </tr>
+                    @endforeach
                     </tbody>
                 </table>
             </div>
@@ -160,11 +149,13 @@
                 <h1 class="font-3xl font-bold text-slate-500 mb-3">Shipping Address</h1>
                 <div class="flex justify-between items-center">
                     <div>
-                        <p>42227 Zoila Glens, Oshkosh, Michigan, 55928</p>
+                        <p>
+                            {{$order->address->street_address}},{{$order->address->city}}, {{$order->address->country}}, {{$order->address->postal_code}}
+                        </p>
                     </div>
                     <div>
                         <p class="font-semibold">Phone:</p>
-                        <p>023-509-0009</p>
+                        <p>{{$order->address->phone}}</p>
                     </div>
                 </div>
             </div>
@@ -175,20 +166,20 @@
                 <h2 class="text-lg font-semibold mb-4">Summary</h2>
                 <div class="flex justify-between mb-2">
                     <span>Subtotal</span>
-                    <span>₹404,999.00</span>
+                    <span>{{Number::currency($order->grand_total ?? 0,'eur')}}</span>
                 </div>
                 <div class="flex justify-between mb-2">
                     <span>Taxes</span>
-                    <span>₹0.00</span>
+                    <span>0</span>
                 </div>
                 <div class="flex justify-between mb-2">
                     <span>Shipping</span>
-                    <span>₹0.00</span>
+                    <span>{{Number::currency($order->shipping_amount ?? 0,'eur')}}</span>
                 </div>
                 <hr class="my-2">
                 <div class="flex justify-between mb-2">
                     <span class="font-semibold">Grand Total</span>
-                    <span class="font-semibold">₹404,999.00</span>
+                    <span class="font-semibold">{{Number::currency($order->grand_total ?? 0,'eur')}}</span>
                 </div>
 
             </div>

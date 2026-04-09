@@ -17,7 +17,7 @@
                         </thead>
                         <tbody>
                             @foreach($orders as $order)
-                                <tr class="odd:bg-white even:bg-gray-100 dark:odd:bg-slate-900 dark:even:bg-slate-800">
+                                <tr wire:key="{{$order->id}}" class="odd:bg-white even:bg-gray-100 dark:odd:bg-slate-900 dark:even:bg-slate-800">
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-gray-200">
                                         {{$order->id}}
                                     </td>

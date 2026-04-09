@@ -3,12 +3,14 @@
 namespace App\Livewire;
 
 use App\Services\OrderService;
+use App\Traits\HasStatusClasses;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
 #[Title('Order Details')]
 class OrderDetailsPage extends Component
 {
+    use HasStatusClasses;
     public $id;
     protected OrderService $orderService;
 
