@@ -21,7 +21,7 @@ class MyOrdersPage extends Component
     }
     public function render()
     {
-        $result = $this->orderService->getUsersOrders(auth()->user()->id,10);
+        $result = $this->orderService->getUsersOrders(auth()->user()->id,5);
         return view('livewire.my-orders-page',['orders'=>$result]);
     }
 }

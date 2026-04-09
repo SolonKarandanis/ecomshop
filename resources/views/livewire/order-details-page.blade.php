@@ -4,7 +4,7 @@
     <!-- Grid -->
     <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mt-5">
         <!-- Card -->
-        <div class="flex flex-col bg-white border shadow-sm rounded-xl dark:bg-slate-900 dark:border-gray-800">
+        <div class="flex flex-col bg-white border shadow-sm rounded-xl dark:bg-slate-900 dark:border-gray-800 overflow-hidden">
             <div class="p-4 md:p-5 flex gap-x-4">
                 <div class="shrink-0 flex justify-center items-center size-11.5 bg-gray-100 rounded-lg dark:bg-gray-800">
                     <svg class="shrink-0 size-5 text-gray-600 dark:text-gray-400" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -15,14 +15,14 @@
                     </svg>
                 </div>
 
-                <div class="grow">
+                <div class="grow min-w-0">
                     <div class="flex items-center gap-x-2">
-                        <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                        <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 truncate">
                             Customer
                         </p>
                     </div>
                     <div class="mt-1 flex items-center gap-x-2 text-gray-800 dark:text-gray-200">
-                        <div>{{$order->address->getFullNameAttribute()}}</div>
+                        <div class="truncate">{{$order->address->getFullNameAttribute()}}</div>
                     </div>
                 </div>
             </div>
@@ -30,7 +30,7 @@
         <!-- End Card -->
 
         <!-- Card -->
-        <div class="flex flex-col bg-white border shadow-sm rounded-xl dark:bg-slate-900 dark:border-gray-800">
+        <div class="flex flex-col bg-white border shadow-sm rounded-xl dark:bg-slate-900 dark:border-gray-800 overflow-hidden">
             <div class="p-4 md:p-5 flex gap-x-4">
                 <div class="shrink-0 flex justify-center items-center size-11.5 bg-gray-100 rounded-lg dark:bg-gray-800">
                     <svg class="shrink-0 size-5 text-gray-600 dark:text-gray-400" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -41,14 +41,14 @@
                     </svg>
                 </div>
 
-                <div class="grow">
+                <div class="grow min-w-0">
                     <div class="flex items-center gap-x-2">
-                        <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                        <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 truncate">
                             Order Date
                         </p>
                     </div>
                     <div class="mt-1 flex items-center gap-x-2">
-                        <h3 class="text-xl font-medium text-gray-800 dark:text-gray-200">
+                        <h3 class="text-xl font-medium text-gray-800 dark:text-gray-200 truncate">
                             {{$order->created_at->format('d-m-Y')}}
                         </h3>
                     </div>
@@ -58,7 +58,7 @@
         <!-- End Card -->
 
         <!-- Card -->
-        <div class="flex flex-col bg-white border shadow-sm rounded-xl dark:bg-slate-900 dark:border-gray-800">
+        <div class="flex flex-col bg-white border shadow-sm rounded-xl dark:bg-slate-900 dark:border-gray-800 overflow-hidden">
             <div class="p-4 md:p-5 flex gap-x-4">
                 <div class="shrink-0 flex justify-center items-center size-11.5 bg-gray-100 rounded-lg dark:bg-gray-800">
                     <svg class="shrink-0 size-5 text-gray-600 dark:text-gray-400" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -67,14 +67,14 @@
                     </svg>
                 </div>
 
-                <div class="grow">
+                <div class="grow min-w-0">
                     <div class="flex items-center gap-x-2">
-                        <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                        <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 truncate">
                             Order Status
                         </p>
                     </div>
                     <div class="mt-1 flex items-center gap-x-2">
-                        <span class="{{$this->getOrderStatusClass($order->order_status)}} py-1 px-3 rounded text-white shadow">
+                        <span class="{{$this->getOrderStatusClass($order->order_status)}} py-1 px-3 rounded text-white shadow text-sm truncate">
                             {{$order->order_status}}
                         </span>
                     </div>
@@ -84,7 +84,7 @@
         <!-- End Card -->
 
         <!-- Card -->
-        <div class="flex flex-col bg-white border shadow-sm rounded-xl dark:bg-slate-900 dark:border-gray-800">
+        <div class="flex flex-col bg-white border shadow-sm rounded-xl dark:bg-slate-900 dark:border-gray-800 overflow-hidden">
             <div class="p-4 md:p-5 flex gap-x-4">
                 <div class="shrink-0 flex justify-center items-center size-11.5 bg-gray-100 rounded-lg dark:bg-gray-800">
                     <svg class="shrink-0 size-5 text-gray-600 dark:text-gray-400" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -95,14 +95,14 @@
                     </svg>
                 </div>
 
-                <div class="grow">
+                <div class="grow min-w-0">
                     <div class="flex items-center gap-x-2">
-                        <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                        <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 truncate">
                             Payment Status
                         </p>
                     </div>
                     <div class="mt-1 flex items-center gap-x-2">
-                        <span class="{{$this->getPaymentStatusClass($order->payment_status)}} py-1 px-3 rounded text-white shadow">
+                        <span class="{{$this->getPaymentStatusClass($order->payment_status)}} py-1 px-3 rounded text-white shadow text-sm truncate">
                             {{$order->payment_status}}
                         </span>
                     </div>
