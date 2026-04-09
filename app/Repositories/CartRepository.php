@@ -43,9 +43,12 @@ class CartRepository
 
     public function getCartItemsCount(int $userId): int
     {
-        $cartId = $this->getCartId($userId);
         return $this->itemModelQuery()
-            ->where('cart_id', $cartId)
+            ->whereIn('cart_id', function ($query) use ($userId) {
+                $query->select('id')
+                    ->from('carts')
+                    ->where('user_id', $userId);
+            })
             ->count();
     }
 

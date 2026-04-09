@@ -376,7 +376,12 @@ class CartService
 
     public function getCartItemsCount(): int
     {
-        return $this->getCart()->cartItems->count();
+        if(Auth::check()){
+            return $this->cartRepository->getCartItemsCount(Auth::id());
+        }else{
+            return $this->getCart()->cartItems->count();
+        }
+
     }
 
     public function moveCartItemsToDatabase():void{

@@ -12,7 +12,7 @@
                             <th scope="col" class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">Order Status</th>
                             <th scope="col" class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">Payment Status</th>
                             <th scope="col" class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">Order Amount</th>
-                            <th scope="col" class="px-6 py-3 text-end text-xs font-medium text-gray-500 uppercase">Action</th>
+                            <th scope="col" class="px-8 py-3 text-end text-xs font-medium text-gray-500 uppercase">Action</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -21,16 +21,16 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-gray-200">
                                         {{$order->id}}
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">
+                                    <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">
                                         {{$order->created_at->format('d M, Y')}}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">
-                                        <span class="bg-orange-500 py-1 px-3 rounded text-white shadow">
+                                        <span class="{{$this->getOrderStatusClass($order->order_status)}} py-1 px-3 rounded text-white shadow">
                                             {{$order->order_status}}
                                         </span>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">
-                                        <span class="bg-green-500 py-1 px-3 rounded text-white shadow">
+                                        <span class="{{$this->getPaymentStatusClass($order->payment_status)}} py-1 px-3 rounded text-white shadow">
                                             {{$order->payment_status}}
                                         </span>
                                     </td>
@@ -38,15 +38,18 @@
                                         {{Number::currency($order->grand_total ?? 0,'eur')}}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-end text-sm font-medium">
-                                        <a href="#" class="bg-slate-600 text-white py-2 px-4 rounded-md hover:bg-slate-500">View Details</a>
+                                        <a href="{{ route('my-orders.detail',$order->id) }}" wire:navigate class="bg-slate-600 text-white py-2
+                                        px-4 rounded-md hover:bg-slate-500">
+                                            View Details
+                                        </a>
                                     </td>
                                 </tr>
                             @endforeach
-{{--                            <div class="flex justify-end mt-6">--}}
-{{--                                {{$orders->links()}}--}}
-{{--                            </div>--}}
                         </tbody>
                     </table>
+                    <div class="flex justify-end mt-6">
+                        {{$orders->links()}}
+                    </div>
                 </div>
             </div>
         </div>
