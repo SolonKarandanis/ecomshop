@@ -15,11 +15,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        $adminUser = User::factory()->create([
+            'name' => 'Admin',
+            'email' => 'skarandanis@gmail.com',
+            'password' => bcrypt('7ujm&UJM'),
         ]);
 
         $this->call(PaymentMethodSeeder::class);
