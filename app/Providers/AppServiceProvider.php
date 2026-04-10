@@ -56,9 +56,12 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Paginator::useTailwind();
-        FilamentAsset::register([
-            // Local asset build using Vite
-            Js::make('sweetalert2', Vite::asset('resources/js/app.js')),
-        ]);
+
+        if (! $this->app->runningInConsole()) {
+            FilamentAsset::register([
+                // Local asset build using Vite
+                Js::make('sweetalert2', Vite::asset('resources/js/app.js')),
+            ]);
+        }
     }
 }
