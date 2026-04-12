@@ -44,10 +44,10 @@ jobs:
             cd /home/${{ secrets.SSH_USERNAME }}/domains/solonkarandanis.com
             git fetch --all
             git reset --hard origin/main
-            php artisan migrate --force
-            php artisan config:cache
-            php artisan route:cache
-            php artisan view:cache
+            /usr/local/bin/php8.3 artisan migrate --force
+            /usr/local/bin/php8.3 artisan config:cache
+            /usr/local/bin/php8.3 artisan route:cache
+            /usr/local/bin/php8.3 artisan view:cache
 
       # --- STEP 3: Transfer the built assets separately ---
       # This moves the 'public/build' folder created in Step 1 to your server
