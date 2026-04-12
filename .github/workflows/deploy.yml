@@ -30,7 +30,7 @@ jobs:
           tools: composer
 
       - name: Install PHP deps (no-dev)
-        run: /opt/alt/php83/usr/bin/php /usr/local/bin/composer2 install --no-interaction --prefer-dist --optimize-autoloader --no-dev
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
 
       - name: Deploy via SSH
         uses: appleboy/ssh-action@master
