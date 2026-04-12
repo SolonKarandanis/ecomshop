@@ -26,11 +26,11 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.2"
+          php-version: "8.3"
           tools: composer
 
       - name: Install PHP deps (no-dev)
-        run: /opt/alt/php84/usr/bin/php /usr/local/bin/composer2 install --no-interaction --prefer-dist --optimize-autoloader --no-dev
+        run: /opt/alt/php83/usr/bin/php /usr/local/bin/composer2 install --no-interaction --prefer-dist --optimize-autoloader --no-dev
 
       - name: Deploy via SSH
         uses: appleboy/ssh-action@master
