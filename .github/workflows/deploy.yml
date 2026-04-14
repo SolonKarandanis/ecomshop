@@ -44,6 +44,7 @@ jobs:
             cd /home/${{ secrets.SSH_USERNAME }}/domains/solonkarandanis.com
             git fetch --all
             git reset --hard origin/main
+            rm -f bootstrap/cache/*.php
             composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev --no-scripts
             php artisan config:clear
             php artisan migrate --force
