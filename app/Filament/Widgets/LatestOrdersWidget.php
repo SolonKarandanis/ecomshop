@@ -43,18 +43,18 @@ class LatestOrdersWidget extends TableWidget
                 TextColumn::make('order_status')
                     ->badge()
                     ->color(fn(string $state):string=> match($state){
-                        'new' => 'info',
-                        'processing' => 'warning',
-                        'shipped' => 'success',
-                        'delivered' => 'success',
-                        'cancelled' => 'danger',
+                        'order.status.draft' => 'info',
+                        'order.status.paid' => 'info',
+                        'order.status.shipped' => 'warning',
+                        'order.status.delivered' => 'success',
+                        'order.status.cancelled' => 'danger',
                     })
                     ->icon(fn(string $state):string=>match($state){
-                        'new' => 'heroicon-m-sparkles',
-                        'processing' => 'heroicon-m-arrow-path',
-                        'shipped' => 'heroicon-m-truck',
-                        'delivered' => 'heroicon-m-check-badge',
-                        'cancelled' => 'heroicon-m-x-circle',
+                        'order.status.draft' => 'heroicon-m-sparkles',
+                        'order.status.paid' => 'heroicon-m-arrow-path',
+                        'order.status.shipped' => 'heroicon-m-truck',
+                        'order.status.delivered' => 'heroicon-m-check-badge',
+                        'order.status.cancelled' => 'heroicon-m-x-circle',
                     })
                     ->searchable()
                     ->sortable(),
