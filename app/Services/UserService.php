@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Dtos\CreateUserDTO;
 use App\Dtos\ResetPasswordDTO;
 use App\Models\User;
+use App\Repositories\RoleRepository;
 use App\Repositories\UserRepository;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Auth\Events\Registered;
@@ -15,7 +16,10 @@ use Illuminate\Support\Str;
 
 class UserService
 {
-    public function __construct(private readonly UserRepository $userRepository){}
+    public function __construct(
+        private readonly UserRepository $userRepository,
+        private readonly RoleRepository $roleRepository,
+    ){}
 
     public function createUser(CreateUserDTO $dto):User{
         $user= $this->userRepository->createUser($dto);

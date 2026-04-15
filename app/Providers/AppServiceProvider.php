@@ -7,6 +7,7 @@ use App\Repositories\CartRepository;
 use App\Repositories\OrderRepository;
 use App\Repositories\PaymentMethodRepository;
 use App\Repositories\ProductRepository;
+use App\Repositories\RoleRepository;
 use App\Repositories\StripeOrderDetailRepository;
 use App\Repositories\UserRepository;
 use App\Services\CartService;
@@ -32,7 +33,10 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton(UserService::class, function ($app) {
-            return new UserService($app->make(UserRepository::class));
+            return new UserService(
+                $app->make(UserRepository::class),
+                $app->make(RoleRepository::class),
+            );
         });
 
         $this->app->singleton(StripeService::class, function ($app) {
