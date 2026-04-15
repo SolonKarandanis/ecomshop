@@ -2,6 +2,10 @@
 
 namespace App\Filament\Resources\Orders\Schemas;
 
+use App\Enums\OrderPaymentStatusEnum;
+use App\Enums\OrderStatusEnum;
+use App\Enums\PaymentMethodEnum;
+use App\Models\PaymentMethod;
 use App\Models\Product;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Repeater;
@@ -31,45 +35,35 @@ class OrderForm
                             ->searchable()
                             ->preload()
                             ->required(),
-                        Select::make('payment_method')
-                            ->options([
-                                'stripe' => 'Stripe',
-                                'paypal' => 'Paypal',
-                                'cod' => 'Cash On Delivery',
-                            ])
+                        Select::make('payment_method_id')
+                            ->label('Payment Method')
+                            ->relationship('paymentMethod', 'resource_key')
+                            ->getOptionLabelFromRecordUsing(fn (PaymentMethod $record) => \App\Enums\PaymentMethodEnum::labels()[$record->resource_key] ?? $record->resource_key)
+                            ->searchable()
+                            ->preload()
                             ->required(),
                         Select::make('payment_status')
-                            ->options([
-                                'pending' => 'Pending',
-                                'paid' => 'Paid',
-                                'failed' => 'Failed',
-                            ])
-                            ->default('pending')
+                            ->options(OrderPaymentStatusEnum::labels())
+                            ->default(OrderPaymentStatusEnum::PENDING->value)
                             ->required(),
                         ToggleButtons::make('order_status')
                             ->inline()
-                            ->default('new')
+                            ->default(OrderStatusEnum::Draft->value)
                             ->required()
-                            ->options([
-                                'new' => 'New',
-                                'processing' => 'Processing',
-                                'shipped' => 'Shipped',
-                                'delivered' => 'Delivered',
-                                'cancelled' => 'Cancelled',
-                            ])
+                            ->options(OrderStatusEnum::labels())
                             ->colors([
-                                'new' => 'info',
-                                'processing' => 'warning',
-                                'shipped' => 'success',
-                                'delivered' => 'success',
-                                'cancelled' => 'danger',
+                                OrderStatusEnum::Draft->value => 'info',
+                                OrderStatusEnum::Paid->value => 'warning',
+                                OrderStatusEnum::Shipped->value => 'success',
+                                OrderStatusEnum::Delivered->value => 'success',
+                                OrderStatusEnum::Cancelled->value => 'danger',
                             ])
                             ->icons([
-                                'new' => 'heroicon-m-sparkles',
-                                'processing' => 'heroicon-m-arrow-path',
-                                'shipped' => 'heroicon-m-truck',
-                                'delivered' => 'heroicon-m-check-badge',
-                                'cancelled' => 'heroicon-m-x-circle',
+                                OrderStatusEnum::Draft->value => 'heroicon-m-sparkles',
+                                OrderStatusEnum::Paid->value => 'heroicon-m-arrow-path',
+                                OrderStatusEnum::Shipped->value => 'heroicon-m-truck',
+                                OrderStatusEnum::Delivered->value => 'heroicon-m-check-badge',
+                                OrderStatusEnum::Cancelled->value => 'heroicon-m-x-circle',
                             ]),
                         Select::make('currency')
                             ->options([

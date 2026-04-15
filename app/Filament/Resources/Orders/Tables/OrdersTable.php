@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Orders\Tables;
 
+use App\Enums\OrderStatusEnum;
+use App\Enums\PaymentMethodEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -24,20 +26,16 @@ class OrdersTable
                     ->numeric()
                     ->sortable()
                     ->money('eur'),
-                TextColumn::make('payment_method')
+                TextColumn::make('paymentMethod.resource_key')
+                    ->label('Payment Method')
+                    ->formatStateUsing(fn ($state) => \App\Enums\PaymentMethodEnum::labels()[$state] ?? $state)
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('payment_status')
                     ->searchable()
                     ->sortable(),
                 SelectColumn::make('order_status')
-                    ->options([
-                        'new' => 'New',
-                        'processing' => 'Processing',
-                        'shipped' => 'Shipped',
-                        'delivered' => 'Delivered',
-                        'cancelled' => 'Cancelled',
-                    ])
+                    ->options(OrderStatusEnum::labels())
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('currency')
