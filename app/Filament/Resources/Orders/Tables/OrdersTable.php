@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Orders\Tables;
 
+use App\Enums\OrderPaymentStatusEnum;
 use App\Enums\OrderStatusEnum;
 use App\Enums\PaymentMethodEnum;
 use Filament\Actions\BulkActionGroup;
@@ -28,10 +29,11 @@ class OrdersTable
                     ->money('eur'),
                 TextColumn::make('paymentMethod.resource_key')
                     ->label('Payment Method')
-                    ->formatStateUsing(fn ($state) => \App\Enums\PaymentMethodEnum::labels()[$state] ?? $state)
+                    ->formatStateUsing(fn ($state) => PaymentMethodEnum::labels()[$state] ?? $state)
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('payment_status')
+                    ->formatStateUsing(fn ($state) => OrderPaymentStatusEnum::labels()[$state] ?? $state)
                     ->searchable()
                     ->sortable(),
                 SelectColumn::make('order_status')

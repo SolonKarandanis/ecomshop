@@ -2,6 +2,9 @@
 
 namespace App\Filament\Resources\Orders\Schemas;
 
+use App\Enums\OrderPaymentStatusEnum;
+use App\Enums\OrderStatusEnum;
+use App\Enums\PaymentMethodEnum;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Schema;
 
@@ -16,11 +19,15 @@ class OrderInfolist
                 TextEntry::make('grand_total')
                     ->numeric()
                     ->placeholder('-'),
-                TextEntry::make('payment_method')
+                TextEntry::make('paymentMethod.resource_key')
+                    ->label('Payment Method')
+                    ->formatStateUsing(fn ($state) => PaymentMethodEnum::labels()[$state] ?? $state)
                     ->placeholder('-'),
                 TextEntry::make('payment_status')
+                    ->formatStateUsing(fn ($state) => OrderPaymentStatusEnum::labels()[$state] ?? $state)
                     ->placeholder('-'),
-                TextEntry::make('order_status'),
+                TextEntry::make('order_status')
+                    ->formatStateUsing(fn ($state) => OrderStatusEnum::labels()[$state] ?? $state),
                 TextEntry::make('currency')
                     ->placeholder('-'),
                 TextEntry::make('shipping_amount')

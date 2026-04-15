@@ -38,7 +38,7 @@ class OrderForm
                         Select::make('payment_method_id')
                             ->label('Payment Method')
                             ->relationship('paymentMethod', 'resource_key')
-                            ->getOptionLabelFromRecordUsing(fn (PaymentMethod $record) => \App\Enums\PaymentMethodEnum::labels()[$record->resource_key] ?? $record->resource_key)
+                            ->getOptionLabelFromRecordUsing(fn (PaymentMethod $record) => PaymentMethodEnum::labels()[$record->resource_key] ?? $record->resource_key)
                             ->searchable()
                             ->preload()
                             ->required(),
