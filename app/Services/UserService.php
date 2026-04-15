@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Dtos\CreateUserDTO;
 use App\Dtos\ResetPasswordDTO;
-use App\Enums\RolesEnum;
 use App\Models\User;
 use App\Repositories\RoleRepository;
 use App\Repositories\UserRepository;
