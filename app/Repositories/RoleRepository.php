@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Enums\RolesEnum;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Spatie\Permission\Models\Role;
@@ -23,5 +24,9 @@ class RoleRepository
 
     public function getRoleByName(string $name): Role{
         return $this->modelQuery()->where("name", $name)->first();
+    }
+
+    public function getBuyerRole(): Role{
+        return $this->getRoleByName(RolesEnum::ROLE_BUYER->value);
     }
 }

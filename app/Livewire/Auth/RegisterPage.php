@@ -27,7 +27,7 @@ class RegisterPage extends Component
     {
         $validated = $this->validate((new RegisterUserRequest())->rules());
         $dto = CreateUserDTO::fromArray($validated);
-        $user = $this->userService->createUser($dto);
+        $user = $this->userService->createBuyer($dto);
         auth()->login($user);
         return redirect()->intended('/');
     }
