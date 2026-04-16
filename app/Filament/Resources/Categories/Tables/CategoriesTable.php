@@ -22,7 +22,7 @@ class CategoriesTable
                 TextColumn::make('slug')
                     ->searchable(),
                 ImageColumn::make('image')
-                    ->disk('public'),
+                    ->disk('media'),
                 IconColumn::make('is_active')
                     ->boolean(),
                 TextColumn::make('created_at')

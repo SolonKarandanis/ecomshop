@@ -32,7 +32,8 @@ class CategoryForm
                             ->unique(Category::class, 'slug',ignoreRecord: true),
                     ]),
                     SpatieMediaLibraryFileUpload::make('image')
-                        ->collection('category-images'),
+                        ->collection('category-images')
+                        ->disk('media'),
                     Toggle::make('is_active')
                         ->required()
                         ->default(true),

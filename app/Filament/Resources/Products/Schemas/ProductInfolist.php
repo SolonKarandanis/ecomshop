@@ -20,7 +20,7 @@ class ProductInfolist
                 TextEntry::make('name'),
                 TextEntry::make('slug'),
                 ImageEntry::make('images')
-                    ->disk('public')
+                    ->disk('media')
                     ->placeholder('-')
                     ->getStateUsing(function ($record) {
                         $productAttributeValue = $record->productAttributeValues()

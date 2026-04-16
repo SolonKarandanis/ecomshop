@@ -41,10 +41,12 @@ class ProductForm
                         MarkdownEditor::make('description')
                             ->columnSpanFull()
                             ->fileAttachmentsDirectory('products/attachments')
+                            ->fileAttachmentsDisk('media')
                     ])->columns(2),
                     Section::make('Product Images')->schema([
                         SpatieMediaLibraryFileUpload::make('images')
                             ->collection('product-images')
+                            ->disk('media')
                             ->multiple()
                             ->maxFiles(5)
                             ->reorderable()
@@ -81,6 +83,7 @@ class ProductForm
                                     Group::make()->schema([
                                         SpatieMediaLibraryFileUpload::make('images')
                                             ->collection('product-attribute-images')
+                                            ->disk('media')
                                             ->multiple()
                                             ->maxFiles(10)
                                             ->reorderable()

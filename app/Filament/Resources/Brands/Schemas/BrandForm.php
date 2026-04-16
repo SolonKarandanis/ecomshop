@@ -32,7 +32,8 @@ class BrandForm
                             ->unique(Brand::class, 'slug',ignoreRecord: true),
                     ]),
                     SpatieMediaLibraryFileUpload::make('image')
-                        ->collection('brand-images'),
+                        ->collection('brand-images')
+                        ->disk('media'),
                     Toggle::make('is_active')
                         ->required()
                         ->default(true),
