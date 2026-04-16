@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\Products\Schemas;
 
 use Filament\Infolists\Components\IconEntry;
-use Filament\Infolists\Components\ImageEntry;
+use Filament\Infolists\Components\SpatieMediaLibraryImageEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Schema;
 
@@ -19,22 +19,10 @@ class ProductInfolist
                     ->label('Brand'),
                 TextEntry::make('name'),
                 TextEntry::make('slug'),
-                ImageEntry::make('images')
+                SpatieMediaLibraryImageEntry::make('images')
+                    ->collection('product-images')
                     ->disk('media')
-                    ->placeholder('-')
-                    ->getStateUsing(function ($record) {
-                        $productAttributeValue = $record->productAttributeValues()
-                            ->whereHas('attribute', function ($query) {
-                                $query->where('name', 'attribute.color');
-                            })
-                            ->first();
-
-                        if ($productAttributeValue && $productAttributeValue->hasMedia('product-attribute-images')) {
-
-                            return $productAttributeValue->getFirstMediaUrl('product-attribute-images','thumb');
-                        }
-                        return null;
-                    }),
+                    ->placeholder('-'),
                 TextEntry::make('description')
                     ->placeholder('-')
                     ->columnSpanFull(),
