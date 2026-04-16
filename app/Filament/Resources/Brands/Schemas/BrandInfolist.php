@@ -17,6 +17,7 @@ class BrandInfolist
                 TextEntry::make('slug'),
                 SpatieMediaLibraryImageEntry::make('image')
                     ->collection('brand-images')
+                    ->disk('media')
                     ->placeholder('-'),
                 IconEntry::make('is_active')
                     ->boolean(),

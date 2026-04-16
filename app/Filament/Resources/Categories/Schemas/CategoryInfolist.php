@@ -17,6 +17,7 @@ class CategoryInfolist
                 TextEntry::make('slug'),
                 SpatieMediaLibraryImageEntry::make('image')
                     ->collection('category-images')
+                    ->disk('media')
                     ->placeholder('-'),
                 IconEntry::make('is_active')
                     ->boolean(),
