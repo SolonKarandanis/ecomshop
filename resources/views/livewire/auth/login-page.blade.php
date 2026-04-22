@@ -4,13 +4,13 @@
             <div class="bg-white border border-gray-200 rounded-xl shadow-sm dark:bg-gray-800 dark:border-gray-700">
                 <div class="p-4 sm:p-7">
                     <div class="text-center">
-                        <h1 class="block text-2xl font-bold text-gray-800 dark:text-white">Sign in</h1>
+                        <h1 class="block text-2xl font-bold text-gray-800 dark:text-white">{{__('login.title')}}</h1>
                         <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                            Don't have an account yet?
+                            {{__('login.sign_up_action')}}
                             <a class="text-blue-600 decoration-2 hover:underline font-medium dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600"
                                href="/register"
                                wire:navigate>
-                                Sign up here
+                                {{__('login.sign_up_link')}}
                             </a>
                         </p>
                     </div>
@@ -28,12 +28,12 @@
                             <x-input name="password" label="Password" type="password" wire:model="password" required>
                                 <x-slot:labelAction>
                                     <a href="/forgot-password" class="text-sm text-blue-600 decoration-2 hover:underline font-medium" wire:navigate>
-                                        Forgot password?
+                                        {{__('login.forgot_password_link')}}
                                     </a>
                                 </x-slot:labelAction>
                             </x-input>
                             <x-button type="submit" variant="primary" :full-width="true" :loading="true" :wire-target="'performLogin'">
-                                Sign in
+                                {{__('login.buttons.sign_in')}}
                             </x-button>
                         </div>
                     </form>

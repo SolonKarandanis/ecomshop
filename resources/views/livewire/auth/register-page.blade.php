@@ -4,13 +4,13 @@
             <div class="bg-white border border-gray-200 rounded-xl shadow-sm dark:bg-gray-800 dark:border-gray-700">
                 <div class="p-4 sm:p-7">
                     <div class="text-center">
-                        <h1 class="block text-2xl font-bold text-gray-800 dark:text-white">Sign up</h1>
+                        <h1 class="block text-2xl font-bold text-gray-800 dark:text-white">{{__('register.title')}}</h1>
                         <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                            Already have an account?
+                            {{__('register.sign_in_action')}}
                             <a class="text-blue-600 decoration-2 hover:underline font-medium dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600"
                                href="/login"
                                wire:navigate>
-                                Sign in here
+                                {{__('register.sign_in_link')}}
                             </a>
                         </p>
                     </div>
@@ -18,12 +18,12 @@
                     <!-- Form -->
                     <form wire:submit.prevent="save()">
                         <div class="grid gap-y-4">
-                            <x-input name="name" label="Name" type="name" wire:model="name" />
-                            <x-input name="email" label="Email address" type="email" wire:model="email" />
-                            <x-input name="password" label="Password" type="password" wire:model="password" />
+                            <x-input name="name" label="{{__('register.name')}}" type="name" wire:model="name" />
+                            <x-input name="email" label="{{__('register.email')}}" type="email" wire:model="email" />
+                            <x-input name="password" label="{{__('register.password')}}" type="password" wire:model="password" />
                             <!-- End Form Group -->
                             <x-button type="submit" variant="primary" :full-width="true" :loading="true" :wire-target="'save'">
-                                Sign up
+                                {{__('register.buttons.sign_up')}}
                             </x-button>
                         </div>
                     </form>
