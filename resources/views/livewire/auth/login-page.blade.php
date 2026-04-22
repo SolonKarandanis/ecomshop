@@ -24,8 +24,8 @@
                             </div>
                         @endif
                         <div class="grid gap-y-4">
-                            <x-input name="email" label="Email address" type="email" wire:model="email" />
-                            <x-input name="password" label="Password" type="password" wire:model="password" required>
+                            <x-input name="email" label="{{__('login.email')}}" type="email" wire:model="email" />
+                            <x-input name="password" label="{{__('login.password')}}" type="password" wire:model="password" required>
                                 <x-slot:labelAction>
                                     <a href="/forgot-password" class="text-sm text-blue-600 decoration-2 hover:underline font-medium" wire:navigate>
                                         {{__('login.forgot_password_link')}}

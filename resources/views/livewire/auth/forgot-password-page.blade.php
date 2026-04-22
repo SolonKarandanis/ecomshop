@@ -4,13 +4,13 @@
             <div class="mt-7 bg-white border border-gray-200 rounded-xl shadow-sm dark:bg-gray-800 dark:border-gray-700">
                 <div class="p-4 sm:p-7">
                     <div class="text-center">
-                        <h1 class="block text-2xl font-bold text-gray-800 dark:text-white">Forgot password?</h1>
+                        <h1 class="block text-2xl font-bold text-gray-800 dark:text-white">{{__('forgot-password.title')}}</h1>
                         <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                            Remember your password?
+                            {{__('forgot-password.sign_in_action')}}
                             <a class="text-blue-600 decoration-2 hover:underline font-medium dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600"
                                href="/login"
                                wire:navigate>
-                                Sign in here
+                                {{__('forgot-password.sign_in_link')}}
                             </a>
                         </p>
                     </div>
@@ -25,10 +25,10 @@
                             @endif
                             <div class="grid gap-y-4">
                                 <!-- Form Group -->
-                                <x-input name="email" label="Email address" type="email" wire:model="email" />
+                                <x-input name="email" label="{{__('forgot-password.email')}}" type="email" wire:model="email" />
                                 <!-- End Form Group -->
                                 <x-button type="submit" variant="primary" :full-width="true" :on-click="'save()'" :loading="true" :wire-target="'save'">
-                                    Reset password
+                                    {{__('forgot-password.buttons.reset_password')}}
                                 </x-button>
                             </div>
                         </form>

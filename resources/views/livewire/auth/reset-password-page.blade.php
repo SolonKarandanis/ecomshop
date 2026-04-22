@@ -4,7 +4,7 @@
             <div class="mt-7 bg-white border border-gray-200 rounded-xl shadow-sm dark:bg-gray-800 dark:border-gray-700">
                 <div class="p-4 sm:p-7">
                     <div class="text-center">
-                        <h1 class="block text-2xl font-bold text-gray-800 dark:text-white">Reset password</h1>
+                        <h1 class="block text-2xl font-bold text-gray-800 dark:text-white">{{__('reset-password.title')}}</h1>
                     </div>
 
                     <div class="mt-5">
@@ -16,10 +16,10 @@
                                 </div>
                             @endif
                             <div class="grid gap-y-4">
-                                <x-input name="password" label="Password" type="password" wire:model="password" required />
-                                <x-input name="password_confirmation" label="Confirm Password" type="password" wire:model="password_confirmation" required />
+                                <x-input name="password" label="{{__('reset-password.password')}}" type="password" wire:model="password" required />
+                                <x-input name="password_confirmation" label="{{__('reset-password.password_confirmation')}}" type="password" wire:model="password_confirmation" required />
                                 <x-button type="submit" variant="primary" :full-width="true" :on-click="'save()'" :loading="true" :wire-target="'save'">
-                                    Save password
+                                    {{__('reset-password.buttons.save_password')}}
                                 </x-button>
                             </div>
                         </form>
