@@ -4,11 +4,10 @@ namespace App\Livewire;
 
 use App\Dtos\ProductSearchFilterDto;
 use App\Dtos\AddToCartDto;
-use App\Models\Product;
+use App\Enums\MessageSeverityEnum;
 use App\Repositories\ProductRepository;
 use App\Services\CartService;
-use Jantinnerezo\LivewireAlert\Enums\Position;
-use Jantinnerezo\LivewireAlert\Facades\LivewireAlert;
+use App\Services\UiService;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
 use Livewire\Attributes\On;
@@ -44,6 +43,8 @@ class ProductsPage extends Component
     protected ProductRepository $productRepository;
     protected CartService $cartService;
 
+    protected UiService $uiService;
+
     #[On('categoriesUpdated')]
     public function updateCategories($categories)
     {
@@ -68,22 +69,17 @@ class ProductsPage extends Component
         );
         $this->cartService->addItemsToCart([$addToCartDto]);
         $this->dispatch('cartUpdated');
-        LivewireAlert::title('Add To Cart')
-            ->text('Product added to cart successfully!')
-            ->success()
-            ->timer(2000)
-            ->toast()
-            ->position(Position::TopEnd)
-            ->show();
-
+        $this->uiService->showMessage(MessageSeverityEnum::SUCCESS,'Add To Cart','Product added to cart successfully!');
     }
 
     public function boot(
         ProductRepository $productRepository,
-        CartService $cartService
+        CartService $cartService,
+        UiService $uiService
     ): void{
         $this->productRepository = $productRepository;
         $this->cartService = $cartService;
+        $this->uiService = $uiService;
     }
     public function render()
     {
