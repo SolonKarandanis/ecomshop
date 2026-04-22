@@ -20,17 +20,18 @@ class UiService
         foreach($text as $textItem){
             switch ($messageSeverity){
                 case MessageSeverityEnum::INFO:
-                    $alert->info()->text($textItem)->show();
+                    $alert->info()->text($textItem);
                     break;
                 case MessageSeverityEnum::SUCCESS:
-                    $alert->success()->text($textItem)->show();
+                    $alert->success()->text($textItem);
                     break;
                 case MessageSeverityEnum::WARNING:
-                    $alert->warning()->text($textItem)->show();
+                    $alert->warning()->text($textItem);
                     break;
                 case MessageSeverityEnum::ERROR:
-                    $alert->error()->text($textItem)->show();
+                    $alert->error()->text($textItem);
             }
         }
+        $alert->show();
     }
 }
