@@ -11,6 +11,7 @@ use App\Repositories\CartRepository;
 use App\Repositories\ProductRepository;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
@@ -95,76 +96,84 @@ class CartService
 
     /**
      * @param AddToCartDto[] $addToCartRequests
+     * @throws \Throwable
      */
-    public function addItemsToCart(array $addToCartRequests):void{
+    public function addItemsToCart(array $addToCartRequests):bool{
         if(Auth::check()){
-            $this->saveCartToDatabase($addToCartRequests);
+            return $this->saveCartToDatabase($addToCartRequests);
         }
         else{
-            $this->saveCartToCookies($addToCartRequests);
+            return $this->saveCartToCookies($addToCartRequests);
         }
     }
 
     /**
      * @param AddToCartDto[] $addToCartRequests
+     * @throws \Throwable
      */
-    public function saveCartToDatabase(array $addToCartRequests): void
+    public function saveCartToDatabase(array $addToCartRequests): bool
     {
-        $cartId = $this->cartRepository->getCartId(Auth::id());
-        Log::debug('Cart id ', [$cartId]);
-        $productsToBeAdded = $this->fetchProductsToBeAdded($addToCartRequests);
-        $newCartItems = [];
-        foreach ($addToCartRequests as $request) {
-            $this->setAttributesIfEmptyToRequest($request, $productsToBeAdded);
-            $attributes = $request->getAttributes();
-            ksort($attributes);
-            $request->setAttributes($attributes);
-            $existingItem = $this->cartRepository->findItemByProductIdAndAttributes(
-                $cartId,
-                $request->getProductId(),
-                $attributes
-            );
-
-            // Check if the item is already in $newCartItems to be added
-            $alreadyInNewItems = false;
-            foreach ($newCartItems as $newItemDto) {
-                if ($newItemDto->getProductId() === $request->getProductId()) {
-                    $newItemAttributes = $newItemDto->getAttributes();
-                    ksort($newItemAttributes);
-                    if ($newItemAttributes === $attributes) {
-                        $newItemDto->setQuantity($newItemDto->getQuantity() + $request->getQuantity());
-                        $alreadyInNewItems = true;
-                        break;
+        DB::beginTransaction();
+        try{
+            $cartId = $this->cartRepository->getCartId(Auth::id());
+            Log::debug('Cart id ', [$cartId]);
+            $productsToBeAdded = $this->fetchProductsToBeAdded($addToCartRequests);
+            $newCartItems = [];
+            foreach ($addToCartRequests as $request) {
+                $this->setAttributesIfEmptyToRequest($request, $productsToBeAdded);
+                $attributes = $request->getAttributes();
+                ksort($attributes);
+                $request->setAttributes($attributes);
+                $existingItem = $this->cartRepository->findItemByProductIdAndAttributes(
+                    $cartId,
+                    $request->getProductId(),
+                    $attributes
+                );
+                // Check if the item is already in $newCartItems to be added
+                $alreadyInNewItems = false;
+                foreach ($newCartItems as $newItemDto) {
+                    if ($newItemDto->getProductId() === $request->getProductId()) {
+                        $newItemAttributes = $newItemDto->getAttributes();
+                        ksort($newItemAttributes);
+                        if ($newItemAttributes === $attributes) {
+                            $newItemDto->setQuantity($newItemDto->getQuantity() + $request->getQuantity());
+                            $alreadyInNewItems = true;
+                            break;
+                        }
                     }
                 }
+                if ($alreadyInNewItems) {
+                    continue;
+                }
+                $product = $productsToBeAdded->find($request->getProductId());
+                $price = $this->calculatePriceWithAttributes($product, $attributes);
+                $request->setPrice($price);
+                if ($existingItem) {
+                    $request->setQuantity($existingItem->quantity + $request->getQuantity());
+                    $totalPrice = $request->getQuantity()* $request->getPrice();
+                    $this->cartRepository->updateItemQuantity($existingItem->id, $request->getQuantity(),$request->getPrice(), $totalPrice);
+                } else {
+                    $newCartItems[] = $request;
+                }
             }
-
-            if ($alreadyInNewItems) {
-                continue;
+            if (!empty($newCartItems)) {
+                $this->cartRepository->createCartItems($cartId, $newCartItems);
             }
-
-            $product = $productsToBeAdded->find($request->getProductId());
-            $price = $this->calculatePriceWithAttributes($product, $attributes);
-            $request->setPrice($price);
-
-            if ($existingItem) {
-                $request->setQuantity($existingItem->quantity + $request->getQuantity());
-                $totalPrice = $request->getQuantity()* $request->getPrice();
-                $this->cartRepository->updateItemQuantity($existingItem->id, $request->getQuantity(),$request->getPrice(), $totalPrice);
-            } else {
-                $newCartItems[] = $request;
-            }
+            $this->recalculateCartTotalPrice();
+            DB::commit();
+            return true;
         }
-        if (!empty($newCartItems)) {
-            $this->cartRepository->createCartItems($cartId, $newCartItems);
+        catch (\Exception $exception){
+            Log::error($exception);
+            DB::rollBack();
+            return false;
         }
-        $this->recalculateCartTotalPrice();
     }
 
     /**
      * @param AddToCartDto[] $addToCartRequests
      */
-    public function saveCartToCookies(array $addToCartRequests): void
+    public function saveCartToCookies(array $addToCartRequests): bool
     {
         $cart = $this->getCart();
         $productsToBeAdded = $this->fetchProductsToBeAdded($addToCartRequests);
@@ -210,6 +219,7 @@ class CartService
         }
         $this->putItemsToCookies($cartItemsForCookie);
         $this->recalculateCartTotalPrice();
+        return true;
     }
 
     /**

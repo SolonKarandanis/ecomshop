@@ -59,6 +59,9 @@ class ProductsPage extends Component
         $this->resetPage();
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function addToCart(int $productId): void
     {
         $product = $this->productRepository->getProductById($productId);
@@ -67,9 +70,19 @@ class ProductsPage extends Component
             1,
             $product->price
         );
-        $this->cartService->addItemsToCart([$addToCartDto]);
-        $this->dispatch('cartUpdated');
-        $this->uiService->showMessage(MessageSeverityEnum::SUCCESS,'Add To Cart','Product added to cart successfully!');
+        $result= $this->cartService->addItemsToCart([$addToCartDto]);
+        $this->handleActionResult($result);
+    }
+
+    protected function handleActionResult(bool $result):void
+    {
+        if($result){
+            $this->dispatch('cartUpdated');
+            $this->uiService->showMessage(MessageSeverityEnum::SUCCESS,'Add To Cart','Product added to cart successfully!');
+        }
+        else{
+            $this->uiService->showMessage(MessageSeverityEnum::ERROR,'Add To Cart','Failed to add product to cart!');
+        }
     }
 
     public function boot(
