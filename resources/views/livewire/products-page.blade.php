@@ -8,17 +8,17 @@
             <div class="flex flex-wrap mb-24 -mx-3">
                 <div class="w-full pr-2 lg:w-1/4 lg:block">
                     <div class="p-4 mb-5 bg-white border border-gray-200 dark:border-gray-900 dark:bg-gray-900">
-                        <h2 class="text-2xl font-bold text-gray-700 dark:text-white"> Categories</h2>
+                        <h2 class="text-2xl font-bold text-gray-700 dark:text-white">{{__('products.categories')}}</h2>
                         <div class="w-16 pb-2 mb-6 border-b border-rose-600 dark:border-gray-400"></div>
                         @livewire('products.product-categories',['lazy'=>true])
                     </div>
                     <div class="p-4 mb-5 bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-900">
-                        <h2 class="text-2xl font-bold text-gray-700 dark:text-white">Brand</h2>
+                        <h2 class="text-2xl font-bold text-gray-700 dark:text-white">{{__('products.brands')}}</h2>
                         <div class="w-16 pb-2 mb-6 border-b border-rose-600 dark:border-gray-400"></div>
                         @livewire('products.product-brands',['lazy'=>true])
                     </div>
                     <div class="p-4 mb-5 bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-900">
-                        <h2 class="text-2xl font-bold text-gray-700 dark:text-white">Product Status</h2>
+                        <h2 class="text-2xl font-bold text-gray-700 dark:text-white">{{__('products.product_status.title')}}</h2>
                         <div class="w-16 pb-2 mb-6 border-b border-rose-600 dark:border-gray-400"></div>
                         <ul>
                             <li class="mb-4">
@@ -28,7 +28,7 @@
                                            wire:model.live="featured"
                                            type="checkbox"
                                            class="w-4 h-4 mr-2">
-                                    <span class="text-lg text-gray-700 dark:text-white">Is Featured</span>
+                                    <span class="text-lg text-gray-700 dark:text-white">{{__('products.product_status.is_featured')}}</span>
                                 </label>
                                 <label for="on_sale" class="flex items-center dark:text-gray-300">
                                     <input id="on_sale"
@@ -36,14 +36,14 @@
                                            wire:model.live="on_sale"
                                            type="checkbox"
                                            class="w-4 h-4 mr-2">
-                                    <span class="text-lg text-gray-700 dark:text-white">On Sale</span>
+                                    <span class="text-lg text-gray-700 dark:text-white">{{__('products.product_status.on_sale')}}</span>
                                 </label>
                             </li>
                         </ul>
                     </div>
 
                     <div class="p-4 mb-5 bg-white border border-gray-200 dark:bg-gray-900 dark:border-gray-900">
-                        <h2 class="text-2xl font-bold text-gray-700 dark:text-white">Price</h2>
+                        <h2 class="text-2xl font-bold text-gray-700 dark:text-white">{{__('products.price')}}</h2>
                         <div class="w-16 pb-2 mb-6 border-b border-rose-600 dark:border-gray-400"></div>
                         <div>
                             <div class="text-gray-700 dark:text-white">{{Number::currency($price_to,'eur')}}</div>
@@ -70,8 +70,8 @@
                         <div class="items-center justify-between hidden px-3 py-2 bg-gray-100 md:flex dark:bg-gray-900 ">
                             <div class="flex items-center justify-between">
                                 <select wire:model.live="sort" class="block w-40 text-base bg-gray-100 cursor-pointer text-gray-700 dark:text-white dark:bg-gray-900">
-                                    <option value="latest">Sort by latest</option>
-                                    <option value="price">Sort by Price</option>
+                                    <option value="latest">{{__('products.sort_by.latest')}}</option>
+                                    <option value="price">{{__('products.sort_by.price')}}</option>
                                 </select>
                             </div>
                         </div>
@@ -103,7 +103,7 @@
                                             wire-target="addToCart({{$product->id}})"
                                             icon="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .49.598l-1 5a.5.5 0 0 1-.465.401l-9.397.472L4.415 11H13a.5.5 0 0 1 0 1H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l.84 4.479 9.144-.459L13.89 4H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"
                                         >
-                                            <span>Add to Cart</span>
+                                            <span>{{__('products.buttons.add_to_cart')}}</span>
                                         </x-button>
                                     </div>
                                 </div>
