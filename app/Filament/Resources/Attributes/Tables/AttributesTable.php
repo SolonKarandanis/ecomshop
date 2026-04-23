@@ -15,6 +15,7 @@ class AttributesTable
         return $table
             ->columns([
                 TextColumn::make('name')
+                    ->formatStateUsing(fn (string $state): string => __("product-attributes.{$state}"))
                     ->searchable(),
             ])
             ->filters([

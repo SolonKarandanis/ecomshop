@@ -58,7 +58,7 @@ class ProductForm
                                 ->schema([
                                     Select::make('attribute_id')
                                         ->label('Attribute')
-                                        ->options(Attribute::query()->whereNotNull('name')->pluck('name', 'id')->toArray())
+                                        ->options(Attribute::query()->whereNotNull('name')->get()->pluck('name', 'id')->map(fn ($name) => __("product-attributes.{$name}"))->toArray())
                                         ->reactive()
                                         ->required(),
                                     Select::make('attribute_option_id')
@@ -66,9 +66,9 @@ class ProductForm
                                         ->options(function (Get $get) {
                                             $attribute = Attribute::find($get('attribute_id'));
                                             if ($attribute) {
-                                                return $attribute->attributeOptions()->whereNotNull('option_name')->pluck('option_name', 'id');
+                                                return $attribute->attributeOptions()->whereNotNull('option_name')->get()->pluck('option_name', 'id')->map(fn ($name) => __("product-attributes.{$name}"));
                                             }
-                                            return AttributeOptions::query()->whereNotNull('option_name')->pluck('option_name', 'id');
+                                            return AttributeOptions::query()->whereNotNull('option_name')->get()->pluck('option_name', 'id')->map(fn ($name) => __("product-attributes.{$name}"));
                                         })
                                         ->disabled(fn (Get $get) => !$get('attribute_id'))
                                         ->required(),

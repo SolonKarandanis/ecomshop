@@ -36,6 +36,7 @@ class AttributeOptionsRelationManager extends RelationManager
             ->recordTitleAttribute('name')
             ->columns([
                 TextColumn::make('option_name')
+                    ->formatStateUsing(fn (string $state): string => __("product-attributes.{$state}"))
                     ->searchable(),
             ])
             ->filters([
