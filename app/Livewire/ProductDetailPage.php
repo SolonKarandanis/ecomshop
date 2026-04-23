@@ -46,15 +46,15 @@ class ProductDetailPage extends Component
             $this->dispatch('cartUpdated');
             $this->uiService->showMessage(
                 MessageSeverityEnum::SUCCESS,
-                __('messages.add_to_cart.title'),
-                __('messages.add_to_cart.success')
+                __('products.messages.add_to_cart.title'),
+                __('products.messages.add_to_cart.success')
             );
         }
         else{
             $this->uiService->showMessage(
                 MessageSeverityEnum::ERROR,
-                __('messages.add_to_cart.title'),
-                __('messages.add_to_cart.error')
+                __('products.messages.add_to_cart.title'),
+                __('products.messages.add_to_cart.error')
             );
         }
     }

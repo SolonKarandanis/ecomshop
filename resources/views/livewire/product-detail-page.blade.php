@@ -7,12 +7,12 @@
         $colorAttributeValues = $product->colorAttributeValues;
         $colorAttributeId = $colorAttributeValues->first()->attribute->id;
         $colorOptions = $colorAttributeValues->map(function ($item) {
-            return ['id' => $item->attributeOption->id, 'name' => $item->attributeOption->option_name];
+            return ['id' => $item->attributeOption->id, 'name' => __("product-attributes.{$item->attributeOption->option_name}")];
         })->unique('id')->values();
         $attributes[] = [
             'id' => $colorAttributeId,
             'name' => 'color',
-            'label' => 'Color',
+            'label' => __('product-attributes.attribute.color'),
             'values' => $colorAttributeValues->values(),
             'options' => $colorOptions,
             'initial' => $colorOptions->isNotEmpty() ? $colorOptions->first()['id'] : null,
@@ -23,12 +23,12 @@
         $panelTypeAttributeValues = $product->panelTypeAttributeValues;
         $panelTypeAttributeId = $panelTypeAttributeValues->first()->attribute->id;
         $panelOptions = $panelTypeAttributeValues->map(function ($item) {
-            return ['id' => $item->attributeOption->id, 'name' => $item->attributeOption->option_name];
+            return ['id' => $item->attributeOption->id, 'name' => __("product-attributes.{$item->attributeOption->option_name}")];
         })->unique('id')->values();
         $attributes[] = [
             'id' => $panelTypeAttributeId,
             'name' => 'panel',
-            'label' => 'Panel Type',
+            'label' => __('product-attributes.attribute.panel.type'),
             'values' => $panelTypeAttributeValues->values(),
             'options' => $panelOptions,
             'initial' => $panelOptions->isNotEmpty() ? $panelOptions->first()['id'] : null,
@@ -39,12 +39,12 @@
         $hardDriveAttributeValues = $product->hardDriveAttributeValues;
         $hardDriveAttributeId = $hardDriveAttributeValues->first()->attribute->id;
         $hardDriveOptions = $hardDriveAttributeValues->map(function ($item) {
-            return ['id' => $item->attributeOption->id, 'name' => $item->attributeOption->option_name];
+            return ['id' => $item->attributeOption->id, 'name' => __("product-attributes.{$item->attributeOption->option_name}")];
         })->unique('id')->values();
         $attributes[] = [
             'id' => $hardDriveAttributeId,
             'name' => 'hard_drive',
-            'label' => 'Hard Drive',
+            'label' => __('product-attributes.attribute.hard.drive'),
             'values' => $hardDriveAttributeValues->values(),
             'options' => $hardDriveOptions,
             'initial' => $hardDriveOptions->isNotEmpty() ? $hardDriveOptions->first()['id'] : null,
@@ -55,12 +55,12 @@
         $keyboardAttributeValues = $product->keyboardAttributeValues;
         $keyboardAttributeId = $keyboardAttributeValues->first()->attribute->id;
         $keyboardOptions = $keyboardAttributeValues->map(function ($item) {
-            return ['id' => $item->attributeOption->id, 'name' => $item->attributeOption->option_name];
+            return ['id' => $item->attributeOption->id, 'name' => __("product-attributes.{$item->attributeOption->option_name}")];
         })->unique('id')->values();
         $attributes[] = [
             'id' => $keyboardAttributeId,
             'name' => 'keyboard',
-            'label' => 'Keyboard',
+            'label' => __('product-attributes.attribute.keyboard'),
             'values' => $keyboardAttributeValues->values(),
             'options' => $keyboardOptions,
             'initial' => $keyboardOptions->isNotEmpty() ? $keyboardOptions->first()['id'] : null,
@@ -71,12 +71,12 @@
         $ramAttributeValues = $product->ramAttributeValues;
         $ramAttributeId = $ramAttributeValues->first()->attribute->id;
         $ramOptions = $ramAttributeValues->map(function ($item) {
-            return ['id' => $item->attributeOption->id, 'name' => $item->attributeOption->option_name];
+            return ['id' => $item->attributeOption->id, 'name' => __("product-attributes.{$item->attributeOption->option_name}")];
         })->unique('id')->values();
         $attributes[] = [
             'id' => $ramAttributeId,
             'name' => 'ram',
-            'label' => 'RAM',
+            'label' => __('product-attributes.attribute.ram'),
             'values' => $ramAttributeValues->values(),
             'options' => $ramOptions,
             'initial' => $ramOptions->isNotEmpty() ? $ramOptions->first()['id'] : null,
@@ -87,12 +87,12 @@
         $gpuAttributeValues = $product->gpuAttributeValues;
         $gpuAttributeId = $gpuAttributeValues->first()->attribute->id;
         $gpuOptions = $gpuAttributeValues->map(function ($item) {
-            return ['id' => $item->attributeOption->id, 'name' => $item->attributeOption->option_name];
+            return ['id' => $item->attributeOption->id, 'name' => __("product-attributes.{$item->attributeOption->option_name}")];
         })->unique('id')->values();
         $attributes[] = [
             'id' => $gpuAttributeId,
             'name' => 'gpu',
-            'label' => 'GPU',
+            'label' => __('product-attributes.attribute.gpu'),
             'values' => $gpuAttributeValues->values(),
             'options' => $gpuOptions,
             'initial' => $gpuOptions->isNotEmpty() ? $gpuOptions->first()['id'] : null,
@@ -118,7 +118,7 @@
                                 <div class="relative mb-6 lg:mb-10 lg:h-2/4 ">
                                     <img :src="mainImage" alt="{{$product->name}}" class="object-cover w-full lg:h-full ">
                                 </div>
-                                <h3 class="text-gray-700 dark:text-gray-400 text-lg">Color:</h3>
+                                <h3 class="text-gray-700 dark:text-gray-400 text-lg">{{__('product-attributes.attribute.color')}}:</h3>
                                 <div class="flex-wrap hidden md:flex ">
                                     <template x-for="attributeValue in colorAttributeValuesForGallery">
                                         <template x-for="media in attributeValue.media">
