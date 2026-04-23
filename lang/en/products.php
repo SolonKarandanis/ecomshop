@@ -13,8 +13,4 @@ return [
         'latest'=>'Sort By latest',
         'price'=>'Sort By price',
     ],
-    'buttons'=>[
-        'add_to_cart'=>'Add to Cart',
-    ],
-    'title'=>'Products Page - EcomShop',
 ];

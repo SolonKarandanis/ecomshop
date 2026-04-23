@@ -1,20 +1,16 @@
 <?php
 
 return [
-    'categories'=>'Categories',
-    'brands'=>'Brand',
-    'product_status'=>[
-        'title'=>'Product Status',
-        'is_featured'=>'Is Featured',
-        'on_sale'=>'On Sale',
+    'categories' => 'Κατηγορίες',
+    'brands' => 'Μάρκα',
+    'product_status' => [
+        'title' => 'Κατάσταση Προϊόντος',
+        'is_featured' => 'Προτεινόμενο',
+        'on_sale' => 'Σε προσφορά',
     ],
-    'price'=>'Price',
-    'sort_by'=>[
-        'latest'=>'Sort By latest',
-        'price'=>'Sort By price',
+    'price' => 'Τιμή',
+    'sort_by' => [
+        'latest' => 'Ταξινόμηση κατά νεότερα',
+        'price' => 'Ταξινόμηση κατά τιμή',
     ],
-    'buttons'=>[
-        'add_to_cart'=>'Προσθήκη στο καλάθι',
-    ],
-    'title'=>'Σελίδα Προϊόντων - EcomShop',
 ];
