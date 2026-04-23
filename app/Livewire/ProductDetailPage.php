@@ -3,10 +3,10 @@
 namespace App\Livewire;
 
 use App\Dtos\AddToCartDto;
+use App\Enums\MessageSeverityEnum;
 use App\Repositories\ProductRepository;
 use App\Services\CartService;
-use Jantinnerezo\LivewireAlert\Enums\Position;
-use Jantinnerezo\LivewireAlert\Facades\LivewireAlert;
+use App\Services\UiService;
 use Livewire\Component;
 
 class ProductDetailPage extends Component
@@ -23,6 +23,11 @@ class ProductDetailPage extends Component
     protected ProductRepository $productRepository;
     protected CartService $cartService;
 
+    protected UiService $uiService;
+
+    /**
+     * @throws \Throwable
+     */
     public function addToCart(int $productId, int $quantity, array $attributes): void{
         $product = $this->productRepository->getProductById($productId);
         $addToCartDto = AddToCartDto::withAttributes(
@@ -31,23 +36,37 @@ class ProductDetailPage extends Component
             $product->price,
             $attributes
         );
-        $this->cartService->addItemsToCart([$addToCartDto]);
-        $this->dispatch('cartUpdated');
-        LivewireAlert::title('Add To Cart')
-            ->text('Product added to cart successfully!')
-            ->success()
-            ->timer(2000)
-            ->toast()
-            ->position(Position::TopEnd)
-            ->show();
+        $result= $this->cartService->addItemsToCart([$addToCartDto]);
+        $this->handleActionResult($result);
+    }
+
+    protected function handleActionResult(bool $result):void
+    {
+        if($result){
+            $this->dispatch('cartUpdated');
+            $this->uiService->showMessage(
+                MessageSeverityEnum::SUCCESS,
+                __('messages.add_to_cart.title'),
+                __('messages.add_to_cart.success')
+            );
+        }
+        else{
+            $this->uiService->showMessage(
+                MessageSeverityEnum::ERROR,
+                __('messages.add_to_cart.title'),
+                __('messages.add_to_cart.error')
+            );
+        }
     }
 
     public function boot(
         ProductRepository $productRepository,
-        CartService $cartService
+        CartService $cartService,
+        UiService $uiService
     ): void{
         $this->productRepository = $productRepository;
         $this->cartService = $cartService;
+        $this->uiService = $uiService;
     }
 
     public function mount($slug): void

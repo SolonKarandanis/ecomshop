@@ -176,7 +176,9 @@
                             </p>
                         </div>
                         <div class="w-32 mb-8 ">
-                            <label for="" class="w-full pb-1 text-xl font-semibold text-gray-700 border-b border-blue-300 dark:border-gray-600 dark:text-gray-400">Quantity</label>
+                            <label for="" class="w-full pb-1 text-xl font-semibold text-gray-700 border-b border-blue-300 dark:border-gray-600 dark:text-gray-400">
+                                {{__('product-details.quantity')}}
+                            </label>
                             <div class="relative flex flex-row w-full h-10 mt-6 bg-transparent rounded-lg">
                                 <button x-on:click="quantity > 1 ? quantity-- : 1"
                                         class="w-20 h-full text-gray-600 bg-gray-300 rounded-l outline-none cursor-pointer dark:hover:bg-gray-700 dark:text-gray-400 hover:text-gray-700 dark:bg-gray-900 hover:bg-gray-400">
