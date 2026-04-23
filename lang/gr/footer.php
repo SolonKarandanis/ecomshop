@@ -1,21 +1,20 @@
 <?php
-
 return [
-    'product_column'=>[
-        'title'=>'Product',
-        'categories' => 'Categories',
-        'all_products' => 'All Products',
-        'featured_products'=>'Featured Products',
+    'product_column' => [
+        'title' => 'Προϊόν',
+        'categories' => 'Κατηγορίες',
+        'all_products' => 'Όλα τα Προϊόντα',
+        'featured_products' => 'Προτεινόμενα Προϊόντα',
     ],
-    'company_column'=>[
-        'title'=>'Company',
-        'about' => 'About Us',
-        'blog' => 'Blog',
-        'customers'=>'Customers',
+    'company_column' => [
+        'title' => 'Εταιρεία',
+        'about' => 'Σχετικά με εμάς',
+        'blog' => 'Ιστολόιο',
+        'customers' => 'Πελάτες',
     ],
-    'subscribe_action'=>'Stay up to date with the latest news',
-    'email_placeholder' => 'Enter your email',
-    'buttons'=>[
-        'subscribe'=>'Subscribe',
+    'subscribe_action' => 'Μείνετε ενημερωμένοι με τα τελευταία νέα',
+    'email_placeholder' => 'Εισάγετε το email σας',
+    'buttons' => [
+        'subscribe' => 'Εγγραφή',
     ]
 ];

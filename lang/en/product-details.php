@@ -14,7 +14,6 @@ return [
         'price'=>'Sort By price',
     ],
     'buttons'=>[
-        'add_to_cart'=>'Προσθήκη στο καλάθι',
-    ],
-    'title'=>'Σελίδα Προϊόντων - EcomShop',
+        'add_to_cart'=>'Add to Cart',
+    ]
 ];

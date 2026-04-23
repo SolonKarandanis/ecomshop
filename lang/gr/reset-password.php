@@ -1,10 +1,9 @@
 <?php
-
 return [
-    'title'=>'Reset password',
-    'password'=>'Password',
-    'password_confirmation'=>'Confirm Password',
-    'buttons'=>[
-        'save_password'=>'Save password',
+    'title' => 'Επαναφορά κωδικού',
+    'password' => 'Κωδικός πρόσβασης',
+    'password_confirmation' => 'Επιβεβαίωση κωδικού',
+    'buttons' => [
+        'save_password' => 'Αποθήκευση κωδικού',
     ]
 ];

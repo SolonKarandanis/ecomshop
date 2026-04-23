@@ -14,7 +14,7 @@ use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithPagination;
 
-#[Title("Products Page - EcomShop")]
+#[Title('products.title')]
 class ProductsPage extends Component
 {
     use WithPagination;
@@ -78,10 +78,18 @@ class ProductsPage extends Component
     {
         if($result){
             $this->dispatch('cartUpdated');
-            $this->uiService->showMessage(MessageSeverityEnum::SUCCESS,'Add To Cart','Product added to cart successfully!');
+            $this->uiService->showMessage(
+                MessageSeverityEnum::SUCCESS,
+                __('messages.add_to_cart.title'),
+                __('messages.add_to_cart.success')
+            );
         }
         else{
-            $this->uiService->showMessage(MessageSeverityEnum::ERROR,'Add To Cart','Failed to add product to cart!');
+            $this->uiService->showMessage(
+                MessageSeverityEnum::ERROR,
+                __('messages.add_to_cart.title'),
+                __('messages.add_to_cart.error')
+            );
         }
     }
 

@@ -15,5 +15,6 @@ return [
     ],
     'buttons'=>[
         'add_to_cart'=>'Add to Cart',
-    ]
+    ],
+    'title'=>'Products Page - EcomShop',
 ];

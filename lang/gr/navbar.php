@@ -1,14 +1,13 @@
 <?php
-
 return [
-    'home'=>'Home',
-    'categories'=>'Categories',
-    'products'=>'Products',
-    'cart'=>'Cart',
-    'my_orders'=>'My Orders',
-    'my_account'=>'My Account',
-    'logout'=>'Logout',
+    'home'=>'Αρχική',
+    'categories'=>'Κατηγορίες',
+    'products'=>'Προϊόντα',
+    'cart'=>'Καλάθι',
+    'my_orders'=>'Οι Παραγγελίες μου',
+    'my_account'=>'Ο Λογαριασμός μου',
+    'logout'=>'Αποσύνδεση',
     'buttons'=>[
-        'log_in'=>'Log In',
+        'log_in'=>'Είσοδος',
     ]
 ];

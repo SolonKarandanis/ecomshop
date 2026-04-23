@@ -1,13 +1,12 @@
 <?php
-
 return [
-    'title'=>'Sign in',
-    'sign_up_action'=>"Don't have an account yet?",
-    'sign_up_link'=>'Sign up here',
-    'forgot_password_link'=>'Forgot password?',
-    'email'=>'Email address',
-    'password'=>'Password',
-    'buttons'=>[
-        'sign_in'=>'Sign in',
+    'title' => 'Είσοδος',
+    'sign_up_action' => "Δεν έχετε ακόμα λογαριασμό;",
+    'sign_up_link' => 'Εγγραφείτε εδώ',
+    'forgot_password_link' => 'Ξεχάσατε τον κωδικό πρόσβασης;',
+    'email' => 'Διεύθυνση email',
+    'password' => 'Κωδικός πρόσβασης',
+    'buttons' => [
+        'sign_in' => 'Είσοδος',
     ]
 ];
