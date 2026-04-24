@@ -18,18 +18,19 @@ class UiService
             ->toast()
             ->position(Position::TopEnd);
         foreach($text as $textItem){
+            $alert->text($textItem);
             switch ($messageSeverity){
                 case MessageSeverityEnum::INFO:
-                    $alert->info()->text($textItem);
+                    $alert->info();
                     break;
                 case MessageSeverityEnum::SUCCESS:
-                    $alert->success()->text($textItem);
+                    $alert->success();
                     break;
                 case MessageSeverityEnum::WARNING:
-                    $alert->warning()->text($textItem);
+                    $alert->warning();
                     break;
                 case MessageSeverityEnum::ERROR:
-                    $alert->error()->text($textItem);
+                    $alert->error();
             }
         }
         $alert->show();
