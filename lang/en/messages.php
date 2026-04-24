@@ -6,4 +6,19 @@ return [
         'success'=>'Product added to cart successfully!',
         'error'=>'Failed to add product to cart!',
     ],
+    'update_quantity'=>[
+        'title'=>'Update Quantity',
+        'success'=>'Product quantity updated successfully!',
+        'error'=>'Failed to update product quantity!',
+    ],
+    'remove_from_cart'=>[
+        'title'=>'Remove From Cart',
+        'success'=>'Product removed from cart successfully!',
+        'error'=>'Failed to remove product from cart!',
+    ],
+    'clear_cart'=>[
+        'title'=>'Clear Cart',
+        'success'=>'Cart cleared successfully!',
+        'error'=>'Failed to clear cart!',
+    ],
 ];
