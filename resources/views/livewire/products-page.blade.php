@@ -1,7 +1,6 @@
-@php
-    use Illuminate\Support\Number;
-    use Illuminate\Support\Str;
-@endphp
+@use('Illuminate\Support\Str')
+@use('Illuminate\Support\Number')
+
 <div class="w-full max-w-7xl py-10 px-4 sm:px-6 lg:px-8 mx-auto">
     <section class="py-10 bg-gray-50 font-poppins dark:bg-gray-800 rounded-lg">
         <div class="px-4 py-4 mx-auto max-w-7xl lg:py-6 md:px-6">
