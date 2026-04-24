@@ -3,20 +3,25 @@
 namespace App\Livewire;
 
 use App\Dtos\UpdateCartItemsDTO;
+use App\Enums\MessageSeverityEnum;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Services\CartService;
+use App\Services\UiService;
 use Livewire\Component;
 
 class CartPage extends Component
 {
     protected CartService $cartService;
+    protected UiService $uiService;
     public ?Cart $cart = null;
 
     public function boot(
-        CartService $cartService
+        CartService $cartService,
+        UiService $uiService
     ): void{
         $this->cartService = $cartService;
+        $this->uiService = $uiService;
     }
 
     public function mount(): void
@@ -24,6 +29,9 @@ class CartPage extends Component
         $this->cart = $this->cartService->getCart();
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function increaseQuantity(string|int $cartItemId): void
     {
         $this->cart = $this->cartService->getCart();
@@ -35,6 +43,9 @@ class CartPage extends Component
         }
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function decreaseQuantity(string|int $cartItemId): void
     {
         $this->cart = $this->cartService->getCart();
@@ -46,17 +57,29 @@ class CartPage extends Component
         }
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function removeItem(string|int $cartItemId ):void{
         $cartIds[]=$cartItemId;
-        $this->cartService->removeItemsFromCart($cartIds);
+        $result=$this->cartService->removeItemsFromCart($cartIds);
         $this->cart = $this->cartService->getCart();
-        $this->dispatch('cartUpdated');
+        $title=__('messages.remove_from_cart.title');
+        $success=__('messages.remove_from_cart.success');
+        $error=__('messages.remove_from_cart.error');
+        $this->handleActionResult($result,'cartUpdated',$title,$success,$error);
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function clearCart():void{
-        $this->cartService->clearCart();
+        $result=$this->cartService->clearCart();
         $this->cart = $this->cartService->getCart();
-        $this->dispatch('cartUpdated');
+        $title=__('messages.clear_cart.title');
+        $success=__('messages.clear_cart.success');
+        $error=__('messages.clear_cart.error');
+        $this->handleActionResult($result,'cartUpdated',$title,$success,$error);
     }
 
     private function findCartItem($cart, string $cartItemId): ?CartItem
@@ -67,7 +90,10 @@ class CartPage extends Component
         });
     }
 
-    private function updateQuantity(Cart $cart,CartItem $cartItem, int $newQuantity): void
+    /**
+     * @throws \Throwable
+     */
+    private function updateQuantity(Cart $cart, CartItem $cartItem, int $newQuantity): void
     {
         $attributes = $cartItem->attributes ?? [];
         $cartItemId = $cartItem->id ?? $cartItem->id_from_cookie;
@@ -78,8 +104,33 @@ class CartPage extends Component
             $newQuantity,
             $attributes
         );
-        $this->cartService->updateItemsQuantity($cart,[$updateDto]);
+        $result=$this->cartService->updateItemsQuantity($cart,[$updateDto]);
         $this->cart = $this->cartService->getCart();
+        $title=__('messages.update_quantity.title');
+        $success=__('messages.update_quantity.success');
+        $error=__('messages.update_quantity.error');
+        $this->handleActionResult($result,null,$title,$success,$error);
+    }
+
+    protected function handleActionResult(bool $result,string|null $dispatchEvent,string $msgTitle,string $msgSuccess,string $msgFail):void
+    {
+        if($result){
+            if($dispatchEvent){
+                $this->dispatch($dispatchEvent);
+            }
+            $this->uiService->showMessage(
+                MessageSeverityEnum::SUCCESS,
+                $msgTitle,
+                $msgSuccess
+            );
+        }
+        else{
+            $this->uiService->showMessage(
+                MessageSeverityEnum::ERROR,
+                $msgTitle,
+                $msgFail
+            );
+        }
     }
 
     public function render()

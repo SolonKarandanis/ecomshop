@@ -225,59 +225,72 @@ class CartService
     /**
      * @param Cart $cart
      * @param UpdateCartItemsDTO[] $updateCartItemRequests
+     * @throws \Throwable
      */
-    public function updateItemsQuantity(Cart $cart,array $updateCartItemRequests):void{
+    public function updateItemsQuantity(Cart $cart,array $updateCartItemRequests):bool{
         if(Auth::check()){
-            $this->updateCartItemsInDatabase($cart,$updateCartItemRequests);
+            return $this->updateCartItemsInDatabase($cart,$updateCartItemRequests);
         }
         else{
-            $this->updateCartItemsInCookies($cart,$updateCartItemRequests);
+            return $this->updateCartItemsInCookies($cart,$updateCartItemRequests);
         }
     }
 
     /**
      * @param Cart $cart
      * @param UpdateCartItemsDTO[] $updateCartItemRequests
+     * @throws \Throwable
      */
-    protected function updateCartItemsInDatabase(Cart $cart,array $updateCartItemRequests): void
+    protected function updateCartItemsInDatabase(Cart $cart,array $updateCartItemRequests): bool
     {
         Log::debug('Attempting to update cart items in the database.');
-        $cartItems = $cart->cartItems;
-        $updates = [];
-        $idsToUpdate = [];
-        foreach ($updateCartItemRequests as $request) {
-            $cartItemId = $request->getCartItemId();
-            $quantity = $request->getQuantity();
-            $attributes = $request->getAttributes();
-            ksort($attributes);
-            $existingCartItem = $this->findExistingCartItemForUpdate($cartItems, $cartItemId);
-            if ($existingCartItem !== null) {
-                $totalPrice = $quantity * $existingCartItem->unit_price;
-                $updates[] = [
-                    'id' => $existingCartItem->id,
-                    'quantity' => $quantity,
-                    'total_price' => $totalPrice,
-                    'attributes' => $attributes,
-                ];
-                $idsToUpdate[] = $existingCartItem->id;
+        DB::beginTransaction();
+        try{
+            $cartItems = $cart->cartItems;
+            $updates = [];
+            $idsToUpdate = [];
+            foreach ($updateCartItemRequests as $request) {
+                $cartItemId = $request->getCartItemId();
+                $quantity = $request->getQuantity();
+                $attributes = $request->getAttributes();
+                ksort($attributes);
+                $existingCartItem = $this->findExistingCartItemForUpdate($cartItems, $cartItemId);
+                if ($existingCartItem !== null) {
+                    $totalPrice = $quantity * $existingCartItem->unit_price;
+                    $updates[] = [
+                        'id' => $existingCartItem->id,
+                        'quantity' => $quantity,
+                        'total_price' => $totalPrice,
+                        'attributes' => $attributes,
+                    ];
+                    $idsToUpdate[] = $existingCartItem->id;
 
-                $existingCartItem->quantity = $quantity;
-                $existingCartItem->total_price = $totalPrice;
-                $existingCartItem->attributes = $attributes;
+                    $existingCartItem->quantity = $quantity;
+                    $existingCartItem->total_price = $totalPrice;
+                    $existingCartItem->attributes = $attributes;
+                }
             }
+            if (empty($updates)) {
+                DB::rollBack();
+                return true;
+            }
+            $this->cartRepository->batchUpdateCartItems($updates, $idsToUpdate);
+            $this->recalculateCartTotalPrice($cart);
+            DB::commit();
+            return true;
         }
-        if (empty($updates)) {
-            return;
+        catch (\Exception $exception){
+            Log::error($exception);
+            DB::rollBack();
+            return false;
         }
-        $this->cartRepository->batchUpdateCartItems($updates, $idsToUpdate);
-        $this->recalculateCartTotalPrice($cart);
     }
 
     /**
      * @param Cart $cart
      * @param UpdateCartItemsDTO[] $updateCartItemRequests
      */
-    protected function updateCartItemsInCookies(Cart $cart,array $updateCartItemRequests):void{
+    protected function updateCartItemsInCookies(Cart $cart,array $updateCartItemRequests):bool{
         $cartItems = $cart->cartItems;
         $cartItemsForCookie = [];
         foreach ($cartItems as $item) {
@@ -330,23 +343,40 @@ class CartService
         }
         $cart->setRelation('cartItems', collect($updatedCartItems));
         $this->recalculateCartTotalPrice($cart);
+        return true;
     }
 
-    public function removeItemsFromCart(array $cartItemIds):void{
+    /**
+     * @throws \Throwable
+     */
+    public function removeItemsFromCart(array $cartItemIds):bool{
         if(Auth::check()){
-            $this->deleteItemsFromDatabase($cartItemIds);
+            return $this->deleteItemsFromDatabase($cartItemIds);
         }else{
-            $this->deleteItemsFromCookies($cartItemIds);
+            return $this->deleteItemsFromCookies($cartItemIds);
         }
     }
 
-    protected function deleteItemsFromDatabase(array $cartItemIds):void{
-        $cartId=$this->cartRepository->getCartId(Auth::id());
-        $this->cartRepository->deleteCartItems($cartId,$cartItemIds);
-        $this->recalculateCartTotalPrice();
+    /**
+     * @throws \Throwable
+     */
+    protected function deleteItemsFromDatabase(array $cartItemIds):bool{
+        DB::beginTransaction();
+        try{
+            $cartId=$this->cartRepository->getCartId(Auth::id());
+            $this->cartRepository->deleteCartItems($cartId,$cartItemIds);
+            $this->recalculateCartTotalPrice();
+            DB::commit();
+            return true;
+        }
+        catch (\Exception $exception){
+            Log::error($exception);
+            DB::rollBack();
+            return false;
+        }
     }
 
-    protected function deleteItemsFromCookies(array $cartItemIds):void{
+    protected function deleteItemsFromCookies(array $cartItemIds):bool{
         $cart = $this->getCart();
 
         $itemsToKeep = $cart->cartItems->reject(function ($item) use ($cartItemIds) {
@@ -362,26 +392,47 @@ class CartService
         Log::debug('Remaining cart items after delete: ', [$cartItemsForCookie]);
         $this->putItemsToCookies($cartItemsForCookie);
         $this->recalculateCartTotalPrice($cart);
+        return true;
     }
 
-    public function clearCart():void{
+    /**
+     * @throws \Throwable
+     */
+    public function clearCart():bool{
+        $result=false;
         if(Auth::check()){
-            $this->clearCartFromDatabase();
+            $result=$this->clearCartFromDatabase();
         }else{
-            $this->clearCartFromCookies();
+            $result=$this->clearCartFromCookies();
         }
         $this->cachedCart = null;
+        return $result;
     }
 
-    protected function clearCartFromDatabase():void{
-        $cartId=$this->cartRepository->getCartId(Auth::id());
-        $this->cartRepository->clearCart($cartId);
-        $this->recalculateCartTotalPrice();
+    /**
+     * @throws \Throwable
+     */
+    protected function clearCartFromDatabase():bool{
+        DB::beginTransaction();
+        try{
+            $cartId=$this->cartRepository->getCartId(Auth::id());
+            $this->cartRepository->clearCart($cartId);
+            $this->recalculateCartTotalPrice();
+            DB::commit();
+            return true;
+        }
+        catch (\Exception $exception){
+            Log::error($exception);
+            DB::rollBack();
+            return false;
+        }
+
     }
 
-    protected function clearCartFromCookies():void{
+    protected function clearCartFromCookies():bool{
         Cookie::queue(Cookie::forget(self::COOKIE_CART_NAME));
         Cookie::queue(Cookie::forget(self::COOKIE_CART_ITEMS_NAME));
+        return true;
     }
 
     public function getCartItemsCount(): int
