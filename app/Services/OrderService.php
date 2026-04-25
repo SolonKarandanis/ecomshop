@@ -103,7 +103,11 @@ class OrderService
             $this->cartService->clearCart();
             DB::commit();
             $order = $this->getUsersLatestOrder(auth()->user()->id);
-            Mail::to(request()->user())->send(new OrderPlaced($order));
+            try {
+                Mail::to(request()->user())->send(new OrderPlaced($order));
+            } catch (\Exception $e) {
+                Log::error('OrderService mail sending failed: ' . $e->getMessage());
+            }
             return $redirect_url;
         }
         catch (\Exception $exception){
