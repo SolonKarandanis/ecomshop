@@ -14,5 +14,10 @@ return [
             'paid'=>'Paid',
             'failed'=>'Failed',
         ]
+    ],
+    'shipping'=>[
+        'method'=>[
+            'none'=>'None'
+        ]
     ]
 ];
