@@ -11,9 +11,9 @@ enum PaymentMethodEnum:string
     public static function labels(): array
     {
         return [
-            self::CASH_ON_DELIVERY->value => __('payment.method.cod'),
-            self::STRIPE->value => __('payment.method.stripe'),
-            self::PAYPAL->value => __('payment.method.paypal'),
+            self::CASH_ON_DELIVERY->value => __('payment-methods.payment.method.cod'),
+            self::STRIPE->value => __('payment-methods.payment.method.stripe'),
+            self::PAYPAL->value => __('payment-methods.payment.method.paypal'),
         ];
     }
 }
