@@ -10,8 +10,8 @@ enum AttributeValueMethodEnum:string
     public static function labels(): array
     {
         return [
-            self::FIXED->value => __('Fixed'),
-            self::PERCENT->value => __('Percent'),
+            self::FIXED->value => __('attribute.value.method.fixed'),
+            self::PERCENT->value => __('attribute.value.method.percent'),
         ];
     }
 }
