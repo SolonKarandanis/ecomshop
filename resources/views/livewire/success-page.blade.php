@@ -17,7 +17,7 @@
                                 <p class="text-sm leading-4 text-gray-600 dark:text-gray-400">
                                     {{$order->address->city}}, {{$order->address->country}}, {{$order->address->postal_code}}
                                 </p>
-                                <p class="text-sm leading-4 cursor-pointer dark:text-gray-400">Phone: {{$order->address->phone}}</p>
+                                <p class="text-sm leading-4 cursor-pointer dark:text-gray-400">{{__('success-page.address.phone')}}: {{$order->address->phone}}</p>
                             </div>
                         </div>
                     </div>
@@ -103,7 +103,7 @@
                                     </div>
                                     <div class="flex flex-col items-center justify-start">
                                         <p class="text-lg font-semibold leading-6 text-gray-800 dark:text-gray-400">
-                                            {{__('success-page.shipping.delivery')}}<br><span class="text-sm font-normal">Delivery with 24 Hours</span>
+                                            {{__('success-page.shipping.delivery')}}<br><span class="text-sm font-normal">{{__('success-page.shipping.delivery_time')}}</span>
                                         </p>
                                     </div>
                                 </div>
