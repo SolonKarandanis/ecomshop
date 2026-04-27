@@ -1,6 +1,7 @@
+@use('App\Enums\OrderStatusEnum','OrderStatus')
+@use('App\Enums\OrderPaymentStatusEnum','OrderPaymentStatus')
 <div class="w-full max-w-340 py-10 px-4 sm:px-6 lg:px-8 mx-auto">
-    <h1 class="text-4xl font-bold text-slate-500 dark:text-slate-400">Order Details</h1>
-
+    <h1 class="text-4xl font-bold text-slate-500 dark:text-slate-400">{{__('order-page.title')}}</h1>
     <!-- Grid -->
     <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mt-5">
         <!-- Card -->
@@ -18,7 +19,7 @@
                 <div class="grow min-w-0">
                     <div class="flex items-center gap-x-2">
                         <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 truncate">
-                            Customer
+                            {{__('order-page.customer')}}
                         </p>
                     </div>
                     <div class="mt-1 flex items-center gap-x-2 text-gray-800 dark:text-gray-200">
@@ -44,7 +45,7 @@
                 <div class="grow min-w-0">
                     <div class="flex items-center gap-x-2">
                         <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 truncate">
-                            Order Date
+                            {{__('order-page.order_date')}}
                         </p>
                     </div>
                     <div class="mt-1 flex items-center gap-x-2">
@@ -70,12 +71,12 @@
                 <div class="grow min-w-0">
                     <div class="flex items-center gap-x-2">
                         <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 truncate">
-                            Order Status
+                            {{__('order-page.order_status')}}
                         </p>
                     </div>
                     <div class="mt-1 flex items-center gap-x-2">
                         <span class="{{$this->getOrderStatusClass($order->order_status)}} py-1 px-3 rounded text-white shadow text-sm truncate">
-                            {{$order->order_status}}
+                            {{OrderStatus::labels()[$order->order_status]}}
                         </span>
                     </div>
                 </div>
@@ -98,12 +99,12 @@
                 <div class="grow min-w-0">
                     <div class="flex items-center gap-x-2">
                         <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 truncate">
-                            Payment Status
+                            {{__('order-page.payment_status')}}
                         </p>
                     </div>
                     <div class="mt-1 flex items-center gap-x-2">
                         <span class="{{$this->getPaymentStatusClass($order->payment_status)}} py-1 px-3 rounded text-white shadow text-sm truncate">
-                            {{$order->payment_status}}
+                            {{OrderPaymentStatus::labels()[$order->payment_status]}}
                         </span>
                     </div>
                 </div>
@@ -119,10 +120,10 @@
                 <table class="w-full">
                     <thead>
                     <tr>
-                        <th class="text-left font-semibold">Product</th>
-                        <th class="text-left font-semibold">Price</th>
-                        <th class="text-left font-semibold">Quantity</th>
-                        <th class="text-left font-semibold">Total</th>
+                        <th class="text-left font-semibold">{{__('order-page.columns.product')}}</th>
+                        <th class="text-left font-semibold">{{__('order-page.columns.price')}}</th>
+                        <th class="text-left font-semibold">{{__('order-page.columns.quantity')}}</th>
+                        <th class="text-left font-semibold">{{__('order-page.columns.total')}}</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -146,7 +147,7 @@
             </div>
 
             <div class="bg-white overflow-x-auto rounded-lg shadow-md p-6 mb-4">
-                <h1 class="font-3xl font-bold text-slate-500 mb-3">Shipping Address</h1>
+                <h1 class="font-3xl font-bold text-slate-500 mb-3">{{__('order-page.shipping.address')}}</h1>
                 <div class="flex justify-between items-center">
                     <div>
                         <p>
@@ -154,7 +155,7 @@
                         </p>
                     </div>
                     <div>
-                        <p class="font-semibold">Phone:</p>
+                        <p class="font-semibold">{{__('order-page.shipping.phone')}}:</p>
                         <p>{{$order->address->phone}}</p>
                     </div>
                 </div>
@@ -163,22 +164,22 @@
         </div>
         <div class="md:w-1/4">
             <div class="bg-white rounded-lg shadow-md p-6">
-                <h2 class="text-lg font-semibold mb-4">Summary</h2>
+                <h2 class="text-lg font-semibold mb-4">{{__('order-page.summary.title')}}</h2>
                 <div class="flex justify-between mb-2">
-                    <span>Subtotal</span>
+                    <span>{{__('order-page.summary.sub_total')}}</span>
                     <span>{{Number::currency($order->grand_total ?? 0,'eur')}}</span>
                 </div>
                 <div class="flex justify-between mb-2">
-                    <span>Taxes</span>
+                    <span>{{__('order-page.summary.taxes')}}</span>
                     <span>0</span>
                 </div>
                 <div class="flex justify-between mb-2">
-                    <span>Shipping</span>
+                    <span>{{__('order-page.summary.shipping')}}</span>
                     <span>{{Number::currency($order->shipping_amount ?? 0,'eur')}}</span>
                 </div>
                 <hr class="my-2">
                 <div class="flex justify-between mb-2">
-                    <span class="font-semibold">Grand Total</span>
+                    <span class="font-semibold">{{__('order-page.summary.total')}}</span>
                     <span class="font-semibold">{{Number::currency($order->grand_total ?? 0,'eur')}}</span>
                 </div>
 
