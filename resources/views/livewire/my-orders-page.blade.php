@@ -1,5 +1,7 @@
+@use('App\Enums\OrderStatusEnum','OrderStatus')
+@use('App\Enums\OrderPaymentStatusEnum','OrderPaymentStatus')
 <div class="w-full max-w-7xl py-10 px-4 sm:px-6 lg:px-8 mx-auto">
-    <h1 class="text-4xl font-bold text-slate-500 dark:text-slate-400">My Orders</h1>
+    <h1 class="text-4xl font-bold text-slate-500 dark:text-slate-400">{{__('my-orders.title')}}</h1>
     <div class="flex flex-col bg-white p-5 rounded mt-4 shadow-lg">
         <div class="-m-1.5 overflow-x-auto">
             <div class="p-1.5 min-w-full inline-block align-middle">
@@ -7,12 +9,24 @@
                     <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                         <thead>
                         <tr>
-                            <th scope="col" class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">Order</th>
-                            <th scope="col" class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">Date</th>
-                            <th scope="col" class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">Order Status</th>
-                            <th scope="col" class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">Payment Status</th>
-                            <th scope="col" class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">Order Amount</th>
-                            <th scope="col" class="px-8 py-3 text-end text-xs font-medium text-gray-500 uppercase">Action</th>
+                            <th scope="col" class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">
+                                {{__('my-orders.columns.order')}}
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">
+                                {{__('my-orders.columns.date')}}
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">
+                                {{__('my-orders.columns.order_status')}}
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">
+                                {{__('my-orders.columns.payment_status')}}
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">
+                                {{__('my-orders.columns.amount')}}
+                            </th>
+                            <th scope="col" class="px-8 py-3 text-end text-xs font-medium text-gray-500 uppercase">
+                                {{__('my-orders.columns.action')}}
+                            </th>
                         </tr>
                         </thead>
                         <tbody>
@@ -26,12 +40,12 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">
                                         <span class="{{$this->getOrderStatusClass($order->order_status)}} py-1 px-3 rounded text-white shadow">
-                                            {{$order->order_status}}
+                                             {{OrderStatus::labels()[$order->order_status]}}
                                         </span>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">
                                         <span class="{{$this->getPaymentStatusClass($order->payment_status)}} py-1 px-3 rounded text-white shadow">
-                                            {{$order->payment_status}}
+                                            {{OrderPaymentStatus::labels()[$order->payment_status]}}
                                         </span>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">
@@ -40,7 +54,7 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-end text-sm font-medium">
                                         <a href="{{ route('my-orders.detail',$order->id) }}" wire:navigate class="bg-slate-600 text-white py-2
                                         px-4 rounded-md hover:bg-slate-500">
-                                            View Details
+                                            {{__('my-orders.buttons.view')}}
                                         </a>
                                     </td>
                                 </tr>
