@@ -110,8 +110,8 @@
                         @endforeach
                     </div>
 
-                    <div class="flex justify-end mt-6">
-                        {{$products->links()}}
+                    <div class="mt-6">
+                        {{$products->links('pagination::tailwind', data: ['scrollTo' => false])}}
                     </div>
 
                 </div>
