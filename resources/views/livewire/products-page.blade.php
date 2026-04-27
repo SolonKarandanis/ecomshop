@@ -109,11 +109,9 @@
                             </div>
                         @endforeach
                     </div>
-
                     <div class="mt-6">
-                        {{$products->links('pagination::tailwind', data: ['scrollTo' => false])}}
+                        {{$products->links('vendor.pagination.livewire-tailwind', data: ['scrollTo' => false])}}
                     </div>
-
                 </div>
             </div>
         </div>

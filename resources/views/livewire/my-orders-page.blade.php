@@ -62,7 +62,7 @@
                         </tbody>
                     </table>
                     <div class="flex justify-end mt-6">
-                        {{$orders->links('pagination::tailwind', data: ['scrollTo' => false])}}
+                        {{$orders->links('vendor.pagination.livewire-tailwind', data: ['scrollTo' => false])}}
                     </div>
                 </div>
             </div>
