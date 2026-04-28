@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Orders\Tables;
 use App\Enums\OrderPaymentStatusEnum;
 use App\Enums\OrderStatusEnum;
 use App\Enums\PaymentMethodEnum;
+use App\Enums\ShippingMethodEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -44,6 +45,7 @@ class OrdersTable
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('shipping_method')
+                    ->formatStateUsing(fn ($state) => ShippingMethodEnum::labels()[$state] ?? $state)
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('created_at')

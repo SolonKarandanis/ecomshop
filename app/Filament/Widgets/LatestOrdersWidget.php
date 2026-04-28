@@ -2,6 +2,10 @@
 
 namespace App\Filament\Widgets;
 
+use App\Enums\OrderPaymentStatusEnum;
+use App\Enums\OrderStatusEnum;
+use App\Enums\PaymentMethodEnum;
+use App\Enums\ShippingMethodEnum;
 use App\Filament\Resources\Orders\OrderResource;
 use App\Models\Order;
 use Filament\Actions\Action;
@@ -37,24 +41,26 @@ class LatestOrdersWidget extends TableWidget
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('payment_status')
+                    ->formatStateUsing(fn ($state) => OrderPaymentStatusEnum::labels()[$state] ?? $state)
                     ->badge()
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('order_status')
+                    ->formatStateUsing(fn ($state) => OrderStatusEnum::labels()[$state] ?? $state)
                     ->badge()
                     ->color(fn(string $state):string=> match($state){
-                        'order.status.draft' => 'info',
-                        'order.status.paid' => 'info',
-                        'order.status.shipped' => 'warning',
-                        'order.status.delivered' => 'success',
-                        'order.status.cancelled' => 'danger',
+                        OrderStatusEnum::Draft->value => 'info',
+                        OrderStatusEnum::Paid->value => 'warning',
+                        OrderStatusEnum::Shipped->value => 'success',
+                        OrderStatusEnum::Delivered->value => 'success',
+                        OrderStatusEnum::Cancelled->value => 'danger',
                     })
                     ->icon(fn(string $state):string=>match($state){
-                        'order.status.draft' => 'heroicon-m-sparkles',
-                        'order.status.paid' => 'heroicon-m-arrow-path',
-                        'order.status.shipped' => 'heroicon-m-truck',
-                        'order.status.delivered' => 'heroicon-m-check-badge',
-                        'order.status.cancelled' => 'heroicon-m-x-circle',
+                        OrderStatusEnum::Draft->value => 'heroicon-m-sparkles',
+                        OrderStatusEnum::Paid->value => 'heroicon-m-arrow-path',
+                        OrderStatusEnum::Shipped->value => 'heroicon-m-truck',
+                        OrderStatusEnum::Delivered->value => 'heroicon-m-check-badge',
+                        OrderStatusEnum::Cancelled->value => 'heroicon-m-x-circle',
                     })
                     ->searchable()
                     ->sortable(),
@@ -62,6 +68,7 @@ class LatestOrdersWidget extends TableWidget
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('shipping_method')
+                    ->formatStateUsing(fn ($state) => ShippingMethodEnum::labels()[$state] ?? $state)
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('created_at')

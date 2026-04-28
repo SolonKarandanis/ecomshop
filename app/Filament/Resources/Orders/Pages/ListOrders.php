@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Orders\Pages;
 
+use App\Enums\OrderStatusEnum;
 use App\Filament\Resources\Orders\OrderResource;
 use App\Filament\Resources\Orders\Widgets\OrderBuyerStatsWidget;
 use App\Filament\Resources\Orders\Widgets\OrderStatsWidget;
@@ -37,11 +38,16 @@ class ListOrders extends ListRecords
     public function getTabs(): array{
         return [
             null=>Tab::make('All'),
-            'new'=>Tab::make('New')->query(fn($query)=>$query->where('order_status', 'new')),
-            'processing'=>Tab::make('Processing')->query(fn($query)=>$query->where('order_status', 'processing')),
-            'shipped'=>Tab::make('Shipped')->query(fn($query)=>$query->where('order_status', 'shipped')),
-            'delivered'=>Tab::make('Delivered')->query(fn($query)=>$query->where('order_status', 'delivered')),
-            'cancelled'=>Tab::make('Cancelled')->query(fn($query)=>$query->where('order_status', 'cancelled')),
+            'draft'=>Tab::make(OrderStatusEnum::labels()[OrderStatusEnum::Draft->value])
+                ->query(fn($query)=>$query->where('order_status', OrderStatusEnum::Draft->value)),
+            'paid'=>Tab::make(OrderStatusEnum::labels()[OrderStatusEnum::Paid->value])
+                ->query(fn($query)=>$query->where('order_status', OrderStatusEnum::Paid->value)),
+            'shipped'=>Tab::make(OrderStatusEnum::labels()[OrderStatusEnum::Shipped->value])
+                ->query(fn($query)=>$query->where('order_status',OrderStatusEnum::Shipped->value)),
+            'delivered'=>Tab::make(OrderStatusEnum::labels()[OrderStatusEnum::Delivered->value])
+                ->query(fn($query)=>$query->where('order_status',OrderStatusEnum::Delivered->value)),
+            'cancelled'=>Tab::make(OrderStatusEnum::labels()[OrderStatusEnum::Cancelled->value])
+                ->query(fn($query)=>$query->where('order_status', OrderStatusEnum::Cancelled->value)),
         ];
     }
 }

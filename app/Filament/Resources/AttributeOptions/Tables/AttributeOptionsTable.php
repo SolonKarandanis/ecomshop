@@ -15,9 +15,11 @@ class AttributeOptionsTable
         return $table
             ->columns([
                 TextColumn::make('attribute.name')
+                    ->formatStateUsing(fn (string $state): string => __("product-attributes.{$state}"))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('option_name')
+                    ->formatStateUsing(fn (string $state): string => __("product-attributes.{$state}"))
                     ->searchable()
                     ->sortable(),
             ])
