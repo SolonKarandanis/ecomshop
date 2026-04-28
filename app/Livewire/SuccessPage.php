@@ -36,31 +36,15 @@ class SuccessPage extends Component
         $latestOrder = $this->orderService->getUsersLatestOrder($userId);
         if(!empty($this->session_id)) {
             $latestOrder = $this->orderService->successOrFailStripeOrder($this->session_id,$latestOrder);
+            $title=__('messages.order_paid.title');
+            $success=__('messages.order_paid.success');
+            $error=__('messages.order_paid.error');
             if(is_null($latestOrder)) {
+                $this->uiService->showMessage(MessageSeverityEnum::ERROR, $title, $error);
                 return redirect()->route('cancel');
             }
+            $this->uiService->showMessage(MessageSeverityEnum::SUCCESS, $title, $success);
         }
         return view('livewire.success-page',['order'=>$latestOrder]);
-    }
-
-    protected function handleActionResult(bool $result,string|null $dispatchEvent,string $msgTitle,string $msgSuccess,string $msgFail):void
-    {
-        if($result){
-            if($dispatchEvent){
-                $this->dispatch($dispatchEvent);
-            }
-            $this->uiService->showMessage(
-                MessageSeverityEnum::SUCCESS,
-                $msgTitle,
-                $msgSuccess
-            );
-        }
-        else{
-            $this->uiService->showMessage(
-                MessageSeverityEnum::ERROR,
-                $msgTitle,
-                $msgFail
-            );
-        }
     }
 }

@@ -21,4 +21,9 @@ return [
         'success'=>'Cart cleared successfully!',
         'error'=>'Failed to clear cart!',
     ],
+    'order_paid'=>[
+        'title'=>'Order Paid',
+        'success'=>'Order paid successfully!',
+        'error'=>'Failed to pay order!',
+    ]
 ];
