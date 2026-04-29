@@ -5,6 +5,7 @@ return [
         'title'=>'Add To Cart',
         'success'=>'Product added to cart successfully!',
         'error'=>'Failed to add product to cart!',
+        'unauthorized'=>'Only buyers can add products to cart!',
     ],
     'update_quantity'=>[
         'title'=>'Update Quantity',

@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
+use Throwable;
 
 class CartService
 {
@@ -96,7 +97,7 @@ class CartService
 
     /**
      * @param AddToCartDto[] $addToCartRequests
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function addItemsToCart(array $addToCartRequests):bool{
         if(Auth::check()){
@@ -109,7 +110,7 @@ class CartService
 
     /**
      * @param AddToCartDto[] $addToCartRequests
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function saveCartToDatabase(array $addToCartRequests): bool
     {
@@ -225,7 +226,8 @@ class CartService
     /**
      * @param Cart $cart
      * @param UpdateCartItemsDTO[] $updateCartItemRequests
-     * @throws \Throwable
+     * @return bool
+     * @throws Throwable
      */
     public function updateItemsQuantity(Cart $cart,array $updateCartItemRequests):bool{
         if(Auth::check()){
@@ -239,7 +241,8 @@ class CartService
     /**
      * @param Cart $cart
      * @param UpdateCartItemsDTO[] $updateCartItemRequests
-     * @throws \Throwable
+     * @return bool
+     * @throws Throwable
      */
     protected function updateCartItemsInDatabase(Cart $cart,array $updateCartItemRequests): bool
     {
@@ -289,6 +292,7 @@ class CartService
     /**
      * @param Cart $cart
      * @param UpdateCartItemsDTO[] $updateCartItemRequests
+     * @return bool
      */
     protected function updateCartItemsInCookies(Cart $cart,array $updateCartItemRequests):bool{
         $cartItems = $cart->cartItems;
@@ -347,7 +351,7 @@ class CartService
     }
 
     /**
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function removeItemsFromCart(array $cartItemIds):bool{
         if(Auth::check()){
@@ -358,7 +362,7 @@ class CartService
     }
 
     /**
-     * @throws \Throwable
+     * @throws Throwable
      */
     protected function deleteItemsFromDatabase(array $cartItemIds):bool{
         DB::beginTransaction();
@@ -396,7 +400,7 @@ class CartService
     }
 
     /**
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function clearCart():bool{
         $result=false;
@@ -410,7 +414,7 @@ class CartService
     }
 
     /**
-     * @throws \Throwable
+     * @throws Throwable
      */
     protected function clearCartFromDatabase():bool{
         DB::beginTransaction();

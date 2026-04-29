@@ -35,6 +35,10 @@ class CheckoutPage extends Component
 
     public function mount(): void
     {
+        if (auth()->check() && auth()->user()->isBuyer()) {
+            $this->redirect(route('home'));
+            return;
+        }
         $this->cart = $this->cartService->getCart();
     }
 

@@ -4,15 +4,13 @@ namespace App\Listeners;
 
 use App\Services\CartService;
 use Illuminate\Auth\Events\Login;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
 
-class TransferGuestCartToUser
+readonly class TransferGuestCartToUser
 {
     /**
      * Create the event listener.
      */
-    public function __construct(private readonly CartService $cartService)
+    public function __construct(private CartService $cartService)
     {
         //
     }
@@ -22,6 +20,8 @@ class TransferGuestCartToUser
      */
     public function handle(Login $event): void
     {
-        $this->cartService->moveCartItemsToDatabase();
+        if ($event->user->isBuyer()) {
+            $this->cartService->moveCartItemsToDatabase();
+        }
     }
 }

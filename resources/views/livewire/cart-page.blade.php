@@ -83,11 +83,17 @@
                     </div>
                     @if($cart->cartItems->count() > 0)
                         @auth
-                            <a href="{{ route('checkout') }}" wire:navigate>
-                                <x-button variant="primary" :full-width="true" class="mt-4 py-2 px-4">
-                                    {{__('cart.buttons.checkout')}}
-                                </x-button>
-                            </a>
+                            @if(auth()->user()->isBuyer())
+                                <a href="{{ route('checkout') }}" wire:navigate>
+                                    <x-button variant="primary" :full-width="true" class="mt-4 py-2 px-4">
+                                        {{__('cart.buttons.checkout')}}
+                                    </x-button>
+                                </a>
+                            @else
+                                <div class="mt-4 p-2 bg-red-100 text-red-700 text-sm rounded text-center">
+                                    {{__('messages.add_to_cart.unauthorized')}}
+                                </div>
+                            @endif
                         @endauth
                         <x-button
                             variant="danger"

@@ -64,6 +64,15 @@ class ProductsPage extends Component
      */
     public function addToCart(int $productId): void
     {
+        if (auth()->check() && auth()->user()->isBuyer()) {
+            $this->uiService->showMessage(
+                MessageSeverityEnum::ERROR,
+                __('messages.add_to_cart.title'),
+                __('messages.add_to_cart.unauthorized')
+            );
+            return;
+        }
+
         $product = $this->productRepository->getProductById($productId);
         $addToCartDto = new AddToCartDto(
             $product->id,

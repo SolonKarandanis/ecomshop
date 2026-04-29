@@ -29,6 +29,15 @@ class ProductDetailPage extends Component
      * @throws \Throwable
      */
     public function addToCart(int $productId, int $quantity, array $attributes): void{
+        if (auth()->check() && auth()->user()->isBuyer()) {
+            $this->uiService->showMessage(
+                MessageSeverityEnum::ERROR,
+                __('messages.add_to_cart.title'),
+                __('messages.add_to_cart.unauthorized')
+            );
+            return;
+        }
+
         $product = $this->productRepository->getProductById($productId);
         $addToCartDto = AddToCartDto::withAttributes(
             $product->id,
@@ -46,15 +55,15 @@ class ProductDetailPage extends Component
             $this->dispatch('cartUpdated');
             $this->uiService->showMessage(
                 MessageSeverityEnum::SUCCESS,
-                __('products.messages.add_to_cart.title'),
-                __('products.messages.add_to_cart.success')
+                __('messages.add_to_cart.title'),
+                __('messages.add_to_cart.success')
             );
         }
         else{
             $this->uiService->showMessage(
                 MessageSeverityEnum::ERROR,
-                __('products.messages.add_to_cart.title'),
-                __('products.messages.add_to_cart.error')
+                __('messages.add_to_cart.title'),
+                __('messages.add_to_cart.error')
             );
         }
     }
