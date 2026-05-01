@@ -34,9 +34,7 @@ class CartPage extends Component
      */
     public function increaseQuantity(string|int $cartItemId): void
     {
-        $this->cart = $this->cartService->getCart();
-        $cartItem = $this->findCartItem($this->cart, $cartItemId);
-
+        $cartItem = $this->getCartItem($cartItemId);
         if ($cartItem) {
             $newQuantity = $cartItem->quantity + 1;
             $this->updateQuantity($this->cart,$cartItem, $newQuantity);
@@ -48,9 +46,7 @@ class CartPage extends Component
      */
     public function decreaseQuantity(string|int $cartItemId): void
     {
-        $this->cart = $this->cartService->getCart();
-        $cartItem = $this->findCartItem($this->cart, $cartItemId);
-
+        $cartItem = $this->getCartItem($cartItemId);
         if ($cartItem && $cartItem->quantity > 1) {
             $newQuantity = $cartItem->quantity - 1;
             $this->updateQuantity($this->cart,$cartItem, $newQuantity);
@@ -80,6 +76,11 @@ class CartPage extends Component
         $success=__('messages.clear_cart.success');
         $error=__('messages.clear_cart.error');
         $this->handleActionResult($result,'cartUpdated',$title,$success,$error);
+    }
+
+    private function getCartItem(string|int $cartItemId):CartItem|null{
+        $this->cart = $this->cartService->getCart();
+       return $this->findCartItem($this->cart, $cartItemId);
     }
 
     private function findCartItem($cart, string $cartItemId): ?CartItem
