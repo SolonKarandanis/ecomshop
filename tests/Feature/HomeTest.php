@@ -4,6 +4,7 @@ use function Pest\Livewire\livewire;
 
 it('renders the home page', function () {
     $this->get('/')
+        ->assertSeeLivewire(HomePage::class)
         ->assertStatus(200)
         ->assertSee(__('home.title'))
         ->assertSee(__('home.description'))
