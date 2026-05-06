@@ -86,8 +86,8 @@
                                     </div>
                                     <div class="p-3 ">
                                         <div class="flex items-center justify-between gap-2 mb-2">
-                                            <h3 class="text-xl font-medium dark:text-gray-400 line-clamp-3">
-                                                {!!Str::markdown($product->description)!!}
+                                            <h3 class="text-xl font-medium dark:text-gray-400">
+                                                {{ $product->name }}
                                             </h3>
                                         </div>
                                         <p class="text-lg ">
