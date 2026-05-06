@@ -29,6 +29,15 @@ jobs:
           php-version: "8.3"
           tools: composer
 
+      - name: Install PHP deps (with dev)
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Run Tests
+        run: |
+          cp .env.example .env.testing
+          php artisan key:generate --env=testing
+          php vendor/bin/pest
+
       - name: Install PHP deps (no-dev)
         run: composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
 
