@@ -17,7 +17,7 @@ trait WithCartActions
      */
     public function addToCart(int $productId, int $quantity = 1, array $attributes = []): void
     {
-        if (!auth()->check() || (auth()->check() && !auth()->user()->isBuyer())) {
+        if (auth()->check() && !auth()->user()->isBuyer()) {
             $this->uiService->addToCartError();
             return;
         }

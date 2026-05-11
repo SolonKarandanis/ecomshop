@@ -1,9 +1,22 @@
 <?php
 
+use App\Enums\RolesEnum;
 use App\Livewire\ProductsPage;
 use App\Models\Product;
+use App\Models\User;
+use App\Services\UiService;
 use Illuminate\Support\Number;
+use Mockery\MockInterface;
+use Spatie\Permission\Models\Role;
+use function Pest\Laravel\actingAs;
 use function Pest\Livewire\livewire;
+
+beforeEach(function () {
+    $this->mock(UiService::class, function (MockInterface $mock) {
+        $mock->shouldReceive('showMessage')->andReturn();
+        $mock->shouldReceive('addToCartError')->andReturn();
+    });
+});
 
 it('renders the products page', function () {
     $this->get('/products')
@@ -68,10 +81,32 @@ it('can sort products by oldest', function () {
         ->assertSeeInOrder([$oldProduct->name, $newProduct->name]);
 });
 
-it('can add product to cart', function () {
+it('can add product to cart for buyer', function () {
+    $role = Role::firstOrCreate(['name' => RolesEnum::ROLE_BUYER->value]);
+    $user = User::factory()->create();
+    $user->assignRole($role);
+    actingAs($user);
     $product = Product::factory()->create(['is_active' => true]);
 
     livewire(ProductsPage::class)
         ->call('addToCart', $product->id)
         ->assertDispatched('cartUpdated');
+});
+
+it('can add product to cart for guest', function () {
+    $product = Product::factory()->create(['is_active' => true]);
+
+    livewire(ProductsPage::class)
+        ->call('addToCart', $product->id)
+        ->assertDispatched('cartUpdated');
+});
+
+it('blocks non-buyer users from adding to cart', function () {
+    $user = User::factory()->create();
+    actingAs($user);
+
+    $product = Product::factory()->create(['is_active' => true]);
+    livewire(ProductsPage::class)
+        ->call('addToCart', $product->id)
+        ->assertNotDispatched('cartUpdated');
 });
