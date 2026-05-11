@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Exceptions\PaymentException;
 use Stripe\Checkout\Session;
 use Stripe\Exception\ApiErrorException;
 use Stripe\Stripe;
@@ -14,25 +15,33 @@ class StripeService
     }
 
     /**
-     * @throws ApiErrorException
+     * @throws PaymentException
      */
     public function createSession(array $line_items):Session{
-        /** @var array[] $line_items */
-        return Session::create([
-            'payment_method_types' => ['card'],
-            'customer_email' => (string) auth()->user()->email,
-            'line_items'=>$line_items,
-            'mode'=>'payment',
-            'success_url'=>route('success').'?session_id={CHECKOUT_SESSION_ID}',
-            'cancel_url'=>route('cancel'),
-        ]);
+        try {
+            /** @var array[] $line_items */
+            return Session::create([
+                'payment_method_types' => ['card'],
+                'customer_email' => (string) auth()->user()->email,
+                'line_items'=>$line_items,
+                'mode'=>'payment',
+                'success_url'=>route('success').'?session_id={CHECKOUT_SESSION_ID}',
+                'cancel_url'=>route('cancel'),
+            ]);
+        } catch (ApiErrorException $e) {
+            throw new PaymentException('Failed to create Stripe session: ' . $e->getMessage(), 0, $e);
+        }
     }
 
 
     /**
-     * @throws ApiErrorException
+     * @throws PaymentException
      */
     public function retrieveSession(string $sessionId):Session{
-        return Session::retrieve($sessionId);
+        try {
+            return Session::retrieve($sessionId);
+        } catch (ApiErrorException $e) {
+            throw new PaymentException('Failed to retrieve Stripe session: ' . $e->getMessage(), 0, $e);
+        }
     }
 }

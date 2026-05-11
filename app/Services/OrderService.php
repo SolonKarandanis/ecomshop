@@ -7,6 +7,9 @@ use App\Dtos\CreateOrderDTO;
 use App\Enums\OrderPaymentStatusEnum;
 use App\Enums\PaymentMethodEnum;
 use App\Enums\StripePaymentStatusEnum;
+use App\Exceptions\EmptyCartException;
+use App\Exceptions\OrderException;
+use App\Exceptions\PaymentException;
 use App\Mail\OrderPlaced;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -20,6 +23,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Stripe\Exception\ApiErrorException;
 use Stripe\Stripe;
+use Throwable;
 
 class OrderService
 {
@@ -45,7 +49,8 @@ class OrderService
     }
 
     /**
-     * @throws \Throwable
+     * @throws OrderException
+     * @throws EmptyCartException|PaymentException
      */
     public function checkout(CheckoutDTO $dto):string{
         $line_items=[];
@@ -55,8 +60,8 @@ class OrderService
         try{
             $cart = $this->cartService->getCart();
             Log::debug('OrderService checkout cartItems count: ', [$cart->cartItems->count()]);
-            if (empty($cart->cartItems)) {
-                throw new \Exception('Cart is empty');
+            if ($cart->cartItems->isEmpty()) {
+                throw new EmptyCartException('Cart is empty');
             }
             foreach ($cart->cartItems as $cartItem){
                 $line_item=[
@@ -83,7 +88,6 @@ class OrderService
             $redirect_url = '';
             if($paymentMethod==PaymentMethodEnum::STRIPE->value){
                 Log::debug('OrderService paymentMethod: Stripe');
-                Stripe::setApiKey(config('app.stripe_secret_key'));
                 $sessionCheckout = $this->stripeService->createSession($line_items);
                 Log::debug('OrderService $sessionCheckout:',[$sessionCheckout->id]);
                 $this->stripeOrderDetailRepository->createStripeOrderDetail($order->id,$sessionCheckout->id);
@@ -110,27 +114,34 @@ class OrderService
             }
             return $redirect_url;
         }
-        catch (\Exception $exception){
+        catch (EmptyCartException|PaymentException $exception){
+            DB::rollBack();
+            throw $exception;
+        }
+        catch (Throwable $exception){
             Log::error($exception);
             DB::rollBack();
-            return back()->with('error',$exception->getMessage()? :'Something went wrong!');
+            throw new OrderException('Something went wrong during checkout!', 0, $exception);
         }
     }
 
     /**
-     * @throws \Throwable
+     * @throws OrderException
      */
     protected function createNewOrder(int $totalPrice, int $paymentMethodId, array $orderItems): Order
     {
-        $createOrderDto = new CreateOrderDTO($totalPrice,$paymentMethodId,$orderItems);
-        return $this->orderRepository->createOrder($createOrderDto);
+        try {
+            $createOrderDto = new CreateOrderDTO($totalPrice,$paymentMethodId,$orderItems);
+            return $this->orderRepository->createOrder($createOrderDto);
+        } catch (Throwable $e) {
+            throw new OrderException('Failed to create new order: ' . $e->getMessage(), 0, $e);
+        }
     }
 
     /**
-     * @throws ApiErrorException
-     * @throws \Throwable
+     * @throws OrderException
      */
-    public function successOrFailStripeOrder(string $sessionId, Order $latestOrder): ?Order{
+    public function successOrFailStripeOrder(string $sessionId, Order $latestOrder): Order{
         DB::beginTransaction();
         try{
             $sessionInfo = $this->stripeService->retrieveSession($sessionId);
@@ -144,10 +155,10 @@ class OrderService
             DB::commit();
             return $latestOrder;
         }
-        catch (\Exception $exception){
+        catch (Throwable $exception){
             Log::error($exception);
             DB::rollBack();
-            return null;
+            throw new OrderException('Something went wrong during stripe order processing!', 0, $exception);
         }
     }
 }

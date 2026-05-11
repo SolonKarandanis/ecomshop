@@ -4,11 +4,14 @@ namespace App\Livewire;
 
 use App\Dtos\UpdateCartItemsDTO;
 use App\Enums\MessageSeverityEnum;
+use App\Exceptions\CartException;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Services\CartService;
 use App\Services\UiService;
+use Illuminate\Support\Facades\Log;
 use Livewire\Component;
+use Throwable;
 
 class CartPage extends Component
 {
@@ -29,9 +32,6 @@ class CartPage extends Component
         $this->cart = $this->cartService->getCart();
     }
 
-    /**
-     * @throws \Throwable
-     */
     public function increaseQuantity(string|int $cartItemId): void
     {
         $cartItem = $this->getCartItem($cartItemId);
@@ -41,9 +41,6 @@ class CartPage extends Component
         }
     }
 
-    /**
-     * @throws \Throwable
-     */
     public function decreaseQuantity(string|int $cartItemId): void
     {
         $cartItem = $this->getCartItem($cartItemId);
@@ -53,29 +50,31 @@ class CartPage extends Component
         }
     }
 
-    /**
-     * @throws \Throwable
-     */
     public function removeItem(string|int $cartItemId ):void{
         $cartIds[]=$cartItemId;
-        $result=$this->cartService->removeItemsFromCart($cartIds);
-        $this->cart = $this->cartService->getCart();
         $title=__('messages.remove_from_cart.title');
         $success=__('messages.remove_from_cart.success');
         $error=__('messages.remove_from_cart.error');
-        $this->handleActionResult($result,'cartUpdated',$title,$success,$error);
+        try {
+            $this->cartService->removeItemsFromCart($cartIds);
+            $this->handleSuccess('cartUpdated', $title, $success);
+        } catch (CartException $e) {
+            $this->handleError($title, $error, $e);
+        }
+        $this->cart = $this->cartService->getCart();
     }
 
-    /**
-     * @throws \Throwable
-     */
     public function clearCart():void{
-        $result=$this->cartService->clearCart();
-        $this->cart = $this->cartService->getCart();
         $title=__('messages.clear_cart.title');
         $success=__('messages.clear_cart.success');
         $error=__('messages.clear_cart.error');
-        $this->handleActionResult($result,'cartUpdated',$title,$success,$error);
+        try {
+            $this->cartService->clearCart();
+            $this->handleSuccess('cartUpdated', $title, $success);
+        } catch (CartException $e) {
+            $this->handleError($title, $error, $e);
+        }
+        $this->cart = $this->cartService->getCart();
     }
 
     private function getCartItem(string|int $cartItemId):CartItem|null{
@@ -91,9 +90,6 @@ class CartPage extends Component
         });
     }
 
-    /**
-     * @throws \Throwable
-     */
     private function updateQuantity(Cart $cart, CartItem $cartItem, int $newQuantity): void
     {
         $attributes = $cartItem->attributes ?? [];
@@ -105,33 +101,38 @@ class CartPage extends Component
             $newQuantity,
             $attributes
         );
-        $result=$this->cartService->updateItemsQuantity($cart,[$updateDto]);
-        $this->cart = $this->cartService->getCart();
         $title=__('messages.update_quantity.title');
         $success=__('messages.update_quantity.success');
         $error=__('messages.update_quantity.error');
-        $this->handleActionResult($result,null,$title,$success,$error);
+        try {
+            $this->cartService->updateItemsQuantity($cart, [$updateDto]);
+            $this->handleSuccess(null, $title, $success);
+        } catch (CartException $e) {
+            $this->handleError($title, $error, $e);
+        }
+        $this->cart = $this->cartService->getCart();
     }
 
-    protected function handleActionResult(bool $result,string|null $dispatchEvent,string $msgTitle,string $msgSuccess,string $msgFail):void
+    protected function handleSuccess(string|null $dispatchEvent,string $msgTitle,string $msgSuccess):void
     {
-        if($result){
-            if($dispatchEvent){
-                $this->dispatch($dispatchEvent);
-            }
-            $this->uiService->showMessage(
-                MessageSeverityEnum::SUCCESS,
-                $msgTitle,
-                $msgSuccess
-            );
+        if($dispatchEvent){
+            $this->dispatch($dispatchEvent);
         }
-        else{
-            $this->uiService->showMessage(
-                MessageSeverityEnum::ERROR,
-                $msgTitle,
-                $msgFail
-            );
-        }
+        $this->uiService->showMessage(
+            MessageSeverityEnum::SUCCESS,
+            $msgTitle,
+            $msgSuccess
+        );
+    }
+
+    protected function handleError(string $msgTitle, string $msgFail, Throwable $e): void
+    {
+        Log::error($e->getMessage());
+        $this->uiService->showMessage(
+            MessageSeverityEnum::ERROR,
+            $msgTitle,
+            $msgFail
+        );
     }
 
     public function render()

@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Dtos\AddToCartDto;
 use App\Dtos\UpdateCartItemsDTO;
+use App\Exceptions\CartException;
+use App\Exceptions\ProductNotFoundException;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Product;
@@ -97,7 +99,8 @@ class CartService
 
     /**
      * @param AddToCartDto[] $addToCartRequests
-     * @throws Throwable
+     * @throws CartException
+     * @throws ProductNotFoundException
      */
     public function addItemsToCart(array $addToCartRequests):bool{
         if(Auth::check()){
@@ -110,7 +113,8 @@ class CartService
 
     /**
      * @param AddToCartDto[] $addToCartRequests
-     * @throws Throwable
+     * @throws CartException
+     * @throws ProductNotFoundException
      */
     public function saveCartToDatabase(array $addToCartRequests): bool
     {
@@ -121,6 +125,10 @@ class CartService
             $productsToBeAdded = $this->fetchProductsToBeAdded($addToCartRequests);
             $newCartItems = [];
             foreach ($addToCartRequests as $request) {
+                $product = $productsToBeAdded->find($request->getProductId());
+                if (!$product) {
+                    throw new ProductNotFoundException("Product with ID {$request->getProductId()} not found.");
+                }
                 $this->setAttributesIfEmptyToRequest($request, $productsToBeAdded);
                 $attributes = $request->getAttributes();
                 ksort($attributes);
@@ -146,7 +154,6 @@ class CartService
                 if ($alreadyInNewItems) {
                     continue;
                 }
-                $product = $productsToBeAdded->find($request->getProductId());
                 $price = $this->calculatePriceWithAttributes($product, $attributes);
                 $request->setPrice($price);
                 if ($existingItem) {
@@ -164,21 +171,30 @@ class CartService
             DB::commit();
             return true;
         }
-        catch (\Exception $exception){
+        catch (ProductNotFoundException $e) {
+            DB::rollBack();
+            throw $e;
+        }
+        catch (Throwable $exception){
             Log::error($exception);
             DB::rollBack();
-            return false;
+            throw new CartException('Failed to save cart to database: ' . $exception->getMessage(), 0, $exception);
         }
     }
 
     /**
      * @param AddToCartDto[] $addToCartRequests
+     * @throws ProductNotFoundException
      */
     public function saveCartToCookies(array $addToCartRequests): bool
     {
         $cart = $this->getCart();
         $productsToBeAdded = $this->fetchProductsToBeAdded($addToCartRequests);
         foreach ($addToCartRequests as $request) {
+            $product = $productsToBeAdded->find($request->getProductId());
+            if (!$product) {
+                throw new ProductNotFoundException("Product with ID {$request->getProductId()} not found.");
+            }
             $this->setAttributesIfEmptyToRequest($request, $productsToBeAdded);
             $attributes = $request->getAttributes();
             ksort($attributes);
@@ -190,7 +206,6 @@ class CartService
                 ksort($itemAttributes);
                 return (int)$item->product_id === (int)$request->getProductId() && $itemAttributes === $attributes;
             });
-            $product = $productsToBeAdded->find($request->getProductId());
             $price = $this->calculatePriceWithAttributes($product, $attributes);
             if ($existingItem) {
                 $existingItem->quantity += $request->getQuantity();
@@ -227,7 +242,7 @@ class CartService
      * @param Cart $cart
      * @param UpdateCartItemsDTO[] $updateCartItemRequests
      * @return bool
-     * @throws Throwable
+     * @throws CartException
      */
     public function updateItemsQuantity(Cart $cart,array $updateCartItemRequests):bool{
         if(Auth::check()){
@@ -242,7 +257,7 @@ class CartService
      * @param Cart $cart
      * @param UpdateCartItemsDTO[] $updateCartItemRequests
      * @return bool
-     * @throws Throwable
+     * @throws CartException
      */
     protected function updateCartItemsInDatabase(Cart $cart,array $updateCartItemRequests): bool
     {
@@ -282,10 +297,10 @@ class CartService
             DB::commit();
             return true;
         }
-        catch (\Exception $exception){
+        catch (Throwable $exception){
             Log::error($exception);
             DB::rollBack();
-            return false;
+            throw new CartException('Failed to update cart items in database: ' . $exception->getMessage(), 0, $exception);
         }
     }
 
@@ -351,7 +366,7 @@ class CartService
     }
 
     /**
-     * @throws Throwable
+     * @throws CartException
      */
     public function removeItemsFromCart(array $cartItemIds):bool{
         if(Auth::check()){
@@ -362,7 +377,7 @@ class CartService
     }
 
     /**
-     * @throws Throwable
+     * @throws CartException
      */
     protected function deleteItemsFromDatabase(array $cartItemIds):bool{
         DB::beginTransaction();
@@ -373,10 +388,10 @@ class CartService
             DB::commit();
             return true;
         }
-        catch (\Exception $exception){
+        catch (Throwable $exception){
             Log::error($exception);
             DB::rollBack();
-            return false;
+            throw new CartException('Failed to delete cart items from database: ' . $exception->getMessage(), 0, $exception);
         }
     }
 
@@ -400,7 +415,7 @@ class CartService
     }
 
     /**
-     * @throws Throwable
+     * @throws CartException
      */
     public function clearCart():bool{
         $result=false;
@@ -414,7 +429,7 @@ class CartService
     }
 
     /**
-     * @throws Throwable
+     * @throws CartException
      */
     protected function clearCartFromDatabase():bool{
         DB::beginTransaction();
@@ -425,10 +440,10 @@ class CartService
             DB::commit();
             return true;
         }
-        catch (\Exception $exception){
+        catch (Throwable $exception){
             Log::error($exception);
             DB::rollBack();
-            return false;
+            throw new CartException('Failed to clear cart from database: ' . $exception->getMessage(), 0, $exception);
         }
 
     }
