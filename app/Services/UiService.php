@@ -8,6 +8,14 @@ use Jantinnerezo\LivewireAlert\Facades\LivewireAlert;
 
 class UiService
 {
+    public function addToCartError(): void
+    {
+        $this->showMessage(
+            MessageSeverityEnum::ERROR,
+            __('messages.add_to_cart.title'),
+            __('messages.add_to_cart.unauthorized')
+        );
+    }
     public function showMessage(MessageSeverityEnum $messageSeverity,string $title,string|array $text): void
     {
         if(!is_array($text)){

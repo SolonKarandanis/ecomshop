@@ -3,8 +3,7 @@
 namespace App\Livewire;
 
 use App\Dtos\ProductSearchFilterDto;
-use App\Dtos\AddToCartDto;
-use App\Enums\MessageSeverityEnum;
+use App\Livewire\Traits\WithCartActions;
 use App\Repositories\ProductRepository;
 use App\Services\CartService;
 use App\Services\UiService;
@@ -18,6 +17,7 @@ use Livewire\WithPagination;
 class ProductsPage extends Component
 {
     use WithPagination;
+    use WithCartActions;
 
     #[Url('categories')]
     public $selected_categories=[];
@@ -57,49 +57,6 @@ class ProductsPage extends Component
     {
         $this->selected_brands = $brands;
         $this->resetPage();
-    }
-
-    /**
-     * @throws \Throwable
-     */
-    public function addToCart(int $productId): void
-    {
-        if (auth()->check() && auth()->user()->isBuyer()) {
-            $this->uiService->showMessage(
-                MessageSeverityEnum::ERROR,
-                __('messages.add_to_cart.title'),
-                __('messages.add_to_cart.unauthorized')
-            );
-            return;
-        }
-
-        $product = $this->productRepository->getProductById($productId);
-        $addToCartDto = new AddToCartDto(
-            $product->id,
-            1,
-            $product->price
-        );
-        $result= $this->cartService->addItemsToCart([$addToCartDto]);
-        $this->handleActionResult($result);
-    }
-
-    protected function handleActionResult(bool $result):void
-    {
-        if($result){
-            $this->dispatch('cartUpdated');
-            $this->uiService->showMessage(
-                MessageSeverityEnum::SUCCESS,
-                __('messages.add_to_cart.title'),
-                __('messages.add_to_cart.success')
-            );
-        }
-        else{
-            $this->uiService->showMessage(
-                MessageSeverityEnum::ERROR,
-                __('messages.add_to_cart.title'),
-                __('messages.add_to_cart.error')
-            );
-        }
     }
 
     public function boot(

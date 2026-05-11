@@ -3,12 +3,19 @@
 namespace App\Livewire;
 
 use App\Dtos\CheckoutDTO;
+use App\Enums\MessageSeverityEnum;
+use App\Exceptions\EmptyCartException;
+use App\Exceptions\OrderException;
+use App\Exceptions\PaymentException;
 use App\Http\Requests\CheckoutRequest;
 use App\Models\Cart;
 use App\Services\CartService;
 use App\Services\OrderService;
+use App\Services\UiService;
+use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\Title;
 use Livewire\Component;
+use Throwable;
 
 #[Title('Checkout')]
 class CheckoutPage extends Component
@@ -23,34 +30,58 @@ class CheckoutPage extends Component
     public string $paymentMethod = '';
     protected OrderService $orderService;
     protected CartService $cartService;
+    protected UiService $uiService;
     public ?Cart $cart = null;
 
     public function boot(
         OrderService $orderService,
-        CartService $cartService
+        CartService $cartService,
+        UiService $uiService,
     ): void{
         $this->orderService = $orderService;
         $this->cartService = $cartService;
+        $this->uiService = $uiService;
     }
 
     public function mount(): void
     {
-        if (auth()->check() && auth()->user()->isBuyer()) {
+        if (auth()->check() && !auth()->user()->isBuyer()) {
             $this->redirect(route('home'));
             return;
         }
         $this->cart = $this->cartService->getCart();
     }
 
-    /**
-     * @throws \Throwable
-     */
     public function save(){
         $validated = $this->validate((new CheckoutRequest())->rules());
         $dto = CheckoutDTO::fromArray($validated);
-        $redirect_url = $this->orderService->checkout($dto);
-        return redirect($redirect_url);
+        $title = __('messages.checkout.title');
+        $error = __('messages.checkout.error');
+        try {
+            $redirect_url = $this->orderService->checkout($dto);
+            return redirect($redirect_url);
+        } catch (EmptyCartException $e) {
+            $this->handleError($title, __('messages.checkout.empty_cart'), $e);
+            return redirect()->route('cart');
+        } catch (OrderException|PaymentException $e) {
+            $this->handleError($title, $error, $e);
+            return redirect()->route('cart');
+        } catch (Throwable $e) {
+            $this->handleError($title, $error, $e);
+            return redirect()->route('cart');
+        }
     }
+
+    protected function handleError(string $msgTitle, string $msgFail, Throwable $e): void
+    {
+        Log::error($e->getMessage());
+        $this->uiService->showMessage(
+            MessageSeverityEnum::ERROR,
+            $msgTitle,
+            $msgFail
+        );
+    }
+
     public function render()
     {
         return view('livewire.checkout-page');
