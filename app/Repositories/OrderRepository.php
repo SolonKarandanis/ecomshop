@@ -6,6 +6,7 @@ use App\Dtos\CreateOrderDTO;
 use App\Models\Order;
 use App\Models\OrderItem;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 
@@ -80,5 +81,10 @@ class OrderRepository
     public function updateOrder(Order $order): bool
     {
         return $order->save();
+    }
+
+    public function getOrders(): Collection|Builder
+    {
+        return $this->modelQuery()->get();
     }
 }

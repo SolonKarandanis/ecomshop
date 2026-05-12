@@ -7,6 +7,7 @@ use App\Traits\HasStatusClasses;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithPagination;
+use PhpOffice\PhpSpreadsheet\Exception;
 
 #[Title('My Orders')]
 class MyOrdersPage extends Component
@@ -25,7 +26,12 @@ class MyOrdersPage extends Component
         return view('livewire.my-orders-page',['orders'=>$result]);
     }
 
-    public function exportOrders(){
-
+    /**
+     * @throws Exception
+     * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
+     */
+    public function exportOrders(): void
+    {
+        $this->orderService->exportOrders();
     }
 }

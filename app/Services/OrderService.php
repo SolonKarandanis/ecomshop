@@ -10,6 +10,7 @@ use App\Enums\StripePaymentStatusEnum;
 use App\Exceptions\EmptyCartException;
 use App\Exceptions\OrderException;
 use App\Exceptions\PaymentException;
+use App\Exports\OrdersExport;
 use App\Mail\OrderPlaced;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -21,8 +22,9 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
-use Stripe\Exception\ApiErrorException;
-use Stripe\Stripe;
+use Maatwebsite\Excel\Facades\Excel;
+use PhpOffice\PhpSpreadsheet\Exception;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Throwable;
 
 class OrderService
@@ -33,7 +35,7 @@ class OrderService
         private readonly PaymentMethodRepository $paymentMethodRepository,
         private readonly StripeOrderDetailRepository $stripeOrderDetailRepository,
         private readonly CartService $cartService,
-        private readonly StripeService $stripeService
+        private readonly StripeService $stripeService,
     ){}
 
     public function getOrderById(int $orderId):Order{
@@ -160,5 +162,15 @@ class OrderService
             DB::rollBack();
             throw new OrderException('Something went wrong during stripe order processing!', 0, $exception);
         }
+    }
+
+
+    /**
+     * @throws Exception
+     * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
+     */
+    public function exportOrders(): BinaryFileResponse
+    {
+        return Excel::download(new OrdersExport($this->orderRepository), 'orders.xlsx');
     }
 }
