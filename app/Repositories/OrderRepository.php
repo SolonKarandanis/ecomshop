@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Dtos\CreateOrderDTO;
+use App\Dtos\OrderSearchRequestDTO;
 use App\Models\Order;
 use App\Models\OrderItem;
 use Illuminate\Database\Eloquent\Builder;
@@ -71,11 +72,36 @@ class OrderRepository
             ->first();
     }
 
-    public function getUsersOrders(int $userId,?int $perPage): LengthAwarePaginator|array{
-        return $this->modelQuery()
-            ->where('user_id', $userId)
+    public function getUsersOrders(OrderSearchRequestDTO $dto): LengthAwarePaginator|array{
+        $orderQuery =$this->modelQuery()->where('user_id', $dto->getUserId());
+
+        $orderQuery->when(!empty($dto->getOrderStatus()),function($query) use ($dto){
+            $query->where('order_status', $dto->getOrderStatus());
+        });
+
+        $orderQuery->when(!empty($dto->getPaymentStatus()),function($query) use ($dto){
+            $query->where('payment_status', $dto->getPaymentStatus());
+        });
+
+        $orderQuery->when(!empty($dto->getFromDate()), function($query) use ($dto) {
+            $query->whereDate('created_at', '>=', $dto->getFromDate());
+        });
+
+        $orderQuery->when(!empty($dto->getToDate()), function($query) use ($dto) {
+            $query->whereDate('created_at', '<=', $dto->getToDate());
+        });
+
+        $orderQuery->when(!empty($dto->getMinPrice()), function($query) use ($dto) {
+            $query->where('grand_total', '>=', $dto->getMinPrice());
+        });
+
+        $orderQuery->when(!empty($dto->getMaxPrice()), function($query) use ($dto) {
+            $query->where('grand_total', '<=', $dto->getMaxPrice());
+        });
+
+        return $orderQuery
             ->orderBy('created_at', 'desc')
-            ->paginate($perPage??10);
+            ->paginate($dto->getPerPage());
     }
 
     public function updateOrder(Order $order): bool

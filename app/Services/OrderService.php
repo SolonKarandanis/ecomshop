@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Dtos\CheckoutDTO;
 use App\Dtos\CreateOrderDTO;
+use App\Dtos\OrderSearchRequestDTO;
 use App\Enums\OrderPaymentStatusEnum;
 use App\Enums\PaymentMethodEnum;
 use App\Enums\StripePaymentStatusEnum;
@@ -46,8 +47,17 @@ class OrderService
         return $this->orderRepository->getLatestOrder($userId);
     }
 
-    public function getUsersOrders(int $userId,?int $perPage): LengthAwarePaginator|array{
-        return $this->orderRepository->getUsersOrders($userId, $perPage);
+    public function getUsersOrders(OrderSearchRequestDTO $dto): LengthAwarePaginator|array{
+        return $this->orderRepository->getUsersOrders($dto);
+    }
+
+    /**
+     * @throws Exception
+     * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
+     */
+    public function exportOrders(): BinaryFileResponse
+    {
+        return Excel::download(new OrdersExport($this->orderRepository), 'orders.xlsx');
     }
 
     /**
@@ -164,13 +174,4 @@ class OrderService
         }
     }
 
-
-    /**
-     * @throws Exception
-     * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
-     */
-    public function exportOrders(): BinaryFileResponse
-    {
-        return Excel::download(new OrdersExport($this->orderRepository), 'orders.xlsx');
-    }
 }

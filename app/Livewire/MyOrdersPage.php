@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Dtos\OrderSearchRequestDTO;
 use App\Http\Requests\OrderSearchRequest;
 use App\Services\OrderService;
 use App\Traits\HasStatusClasses;
@@ -35,13 +36,14 @@ class MyOrdersPage extends Component
     public function render()
     {
         $validated = $this->validate((new OrderSearchRequest())->rules());
-        $result = $this->orderService->getUsersOrders(auth()->user()->id,5);
+        $dto = OrderSearchRequestDTO::fromArray($validated);
+        $result = $this->orderService->getUsersOrders($dto);
         return view('livewire.my-orders-page',['orders'=>$result]);
     }
 
     public function search(): void
     {
-        $validated = $this->validate((new OrderSearchRequest())->rules());
+        $this->validate((new OrderSearchRequest())->rules());
         $this->resetPage();
     }
 

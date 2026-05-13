@@ -21,48 +21,54 @@ class OrderSearchRequestDTO
 
     public static function fromArray(array $data): self{
         $instance = new self();
-        $instance->withOrderStatus($data['order_status'] ?? null);
-        $instance->withPaymentStatus($data['payment_status'] ?? null);
-        $instance->withMinPrice($data['min_price'] ?? null);
-        $instance->withMaxPrice($data['max_price'] ?? null);
-        $instance->withFromDate($data['from_date'] ?? null);
-        $instance->withToDate($data['to_date'] ?? null);
+        $instance->withOrderStatus($data['orderStatus'] ?? null);
+        $instance->withPaymentStatus($data['paymentStatus'] ?? null);
+        $instance->withMinPrice($data['minPrice'] ?? null);
+        $instance->withMaxPrice($data['maxPrice'] ?? null);
+        $instance->withFromDate($data['fromDate'] ?? null);
+        $instance->withToDate($data['toDate'] ?? null);
         return $instance;
     }
 
-    public function withOrderStatus(string $orderStatus): self
+    public function withOrderStatus(string|null $orderStatus): self
     {
         $this->orderStatus = $orderStatus;
         return $this;
     }
 
-    public function withPaymentStatus(string $paymentStatus): self
+    public function withPaymentStatus(string|null $paymentStatus): self
     {
         $this->paymentStatus = $paymentStatus;
         return $this;
     }
 
-    public function withFromDate(string $fromDate): self
+    public function withFromDate(string|null $fromDate): self
     {
         $this->fromDate = $fromDate;
         return $this;
     }
 
-    public function withToDate(string $toDate): self
+    public function withToDate(string|null $toDate): self
     {
         $this->toDate = $toDate;
         return $this;
     }
 
-    public function withMinPrice(float $minPrice): self
+    public function withMinPrice(float|null $minPrice): self
     {
         $this->minPrice = $minPrice;
         return $this;
     }
 
-    public function withMaxPrice(float $maxPrice): self
+    public function withMaxPrice(float|null $maxPrice): self
     {
         $this->maxPrice = $maxPrice;
+        return $this;
+    }
+
+    public function withPerPage(int $perPage): self
+    {
+        $this->perPage = $perPage;
         return $this;
     }
 

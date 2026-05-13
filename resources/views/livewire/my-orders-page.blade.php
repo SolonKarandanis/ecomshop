@@ -28,10 +28,10 @@
                         </select>
                     </div>
 
-                    <x-input name="fromDate" label="From Date" type="date" wire:model="fromDate" />
-                    <x-input name="toDate" label="To Date" type="date" wire:model="toDate" />
-                    <x-input name="minPrice" label="Min Amount" type="number" step="0.01" wire:model="minPrice" />
-                    <x-input name="maxPrice" label="Max Amount" type="number" step="0.01" wire:model="maxPrice" />
+                    <x-input name="fromDate" label="From Date" type="date" wire:model.live="fromDate" :max="$toDate" />
+                    <x-input name="toDate" label="To Date" type="date" wire:model.live="toDate" :min="$fromDate" />
+                    <x-input name="minPrice" label="Min Amount" type="number" step="0.01" wire:model.live="minPrice" :max="$maxPrice" />
+                    <x-input name="maxPrice" label="Max Amount" type="number" step="0.01" wire:model.live="maxPrice" :min="$minPrice" />
                 </div>
 
                 <div class="mt-4 flex justify-between gap-2">
