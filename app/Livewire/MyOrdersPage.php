@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Dtos\OrderSearchRequestDTO;
+use App\Enums\MessageSeverityEnum;
 use App\Exceptions\OrderCountException;
 use App\Http\Requests\OrderSearchRequest;
 use App\Services\OrderService;
@@ -74,7 +75,7 @@ class MyOrdersPage extends Component
 
         if ($countOrders > 10000) {
             $this->uiService->showMessage(
-                \App\Enums\MessageSeverityEnum::ERROR,
+                MessageSeverityEnum::ERROR,
                 'Export Failed',
                 "You cannot export more than 10,000 orders at once. Current results: " . number_format($countOrders)
             );

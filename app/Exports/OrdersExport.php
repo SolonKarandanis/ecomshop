@@ -13,11 +13,11 @@ use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 
-class OrdersExport implements FromCollection, WithHeadings, WithMapping
+readonly class OrdersExport implements FromCollection, WithHeadings, WithMapping
 {
     public function __construct(
-        private readonly OrderRepository $orderRepository,
-        private readonly OrderSearchRequestDTO $dto
+        private OrderRepository       $orderRepository,
+        private OrderSearchRequestDTO $dto
     ){}
 
     /**
