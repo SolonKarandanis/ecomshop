@@ -9,11 +9,25 @@ class OrderSearchRequestDTO
     private ?string $paymentStatus = null;
     private ?string $fromDate = null;
     private ?string $toDate = null;
+    private ?float $minPrice = null;
+
+    private ?float $maxPrice = null;
     private int $perPage = 5;
 
     public function __construct()
     {
         $this->userId = auth()->user()->id;
+    }
+
+    public static function fromArray(array $data): self{
+        $instance = new self();
+        $instance->withOrderStatus($data['order_status'] ?? null);
+        $instance->withPaymentStatus($data['payment_status'] ?? null);
+        $instance->withMinPrice($data['min_price'] ?? null);
+        $instance->withMaxPrice($data['max_price'] ?? null);
+        $instance->withFromDate($data['from_date'] ?? null);
+        $instance->withToDate($data['to_date'] ?? null);
+        return $instance;
     }
 
     public function withOrderStatus(string $orderStatus): self
@@ -37,6 +51,18 @@ class OrderSearchRequestDTO
     public function withToDate(string $toDate): self
     {
         $this->toDate = $toDate;
+        return $this;
+    }
+
+    public function withMinPrice(float $minPrice): self
+    {
+        $this->minPrice = $minPrice;
+        return $this;
+    }
+
+    public function withMaxPrice(float $maxPrice): self
+    {
+        $this->maxPrice = $maxPrice;
         return $this;
     }
 
@@ -68,5 +94,15 @@ class OrderSearchRequestDTO
     public function getPerPage(): int
     {
         return $this->perPage;
+    }
+
+    public function getMinPrice(): ?float
+    {
+        return $this->minPrice;
+    }
+
+    public function getMaxPrice(): ?float
+    {
+        return $this->maxPrice;
     }
 }
