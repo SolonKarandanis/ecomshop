@@ -69,27 +69,18 @@ class MyOrdersPage extends Component
      */
     public function exportOrders()
     {
-        try {
-            $dto = $this->validateAndReturnDto();
-            $countOrders = $this->orderService->countOrders($dto);
+        $dto = $this->validateAndReturnDto();
+        $countOrders = $this->orderService->countOrders($dto);
 
-            if ($countOrders > 10000) {
-                throw new OrderCountException("You cannot export more than 10,000 orders at once. Current results: " . number_format($countOrders));
-            }
-
-            return $this->orderService->exportOrders($dto);
-        } catch (OrderCountException $e) {
+        if ($countOrders > 10000) {
             $this->uiService->showMessage(
                 \App\Enums\MessageSeverityEnum::ERROR,
                 'Export Failed',
-                $e->getMessage()
+                "You cannot export more than 10,000 orders at once. Current results: " . number_format($countOrders)
             );
-        } catch (\Throwable $e) {
-            $this->uiService->showMessage(
-                \App\Enums\MessageSeverityEnum::ERROR,
-                'Error',
-                'Something went wrong during export.'
-            );
+            return;
         }
+
+        return $this->orderService->exportOrders($dto);
     }
 }
