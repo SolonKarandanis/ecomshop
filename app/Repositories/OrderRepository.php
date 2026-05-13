@@ -73,35 +73,52 @@ class OrderRepository
     }
 
     public function getUsersOrders(OrderSearchRequestDTO $dto): LengthAwarePaginator|array{
-        $orderQuery =$this->modelQuery()->where('user_id', $dto->getUserId());
-
-        $orderQuery->when(!empty($dto->getOrderStatus()),function($query) use ($dto){
-            $query->where('order_status', $dto->getOrderStatus());
-        });
-
-        $orderQuery->when(!empty($dto->getPaymentStatus()),function($query) use ($dto){
-            $query->where('payment_status', $dto->getPaymentStatus());
-        });
-
-        $orderQuery->when(!empty($dto->getFromDate()), function($query) use ($dto) {
-            $query->whereDate('created_at', '>=', $dto->getFromDate());
-        });
-
-        $orderQuery->when(!empty($dto->getToDate()), function($query) use ($dto) {
-            $query->whereDate('created_at', '<=', $dto->getToDate());
-        });
-
-        $orderQuery->when(!empty($dto->getMinPrice()), function($query) use ($dto) {
-            $query->where('grand_total', '>=', $dto->getMinPrice());
-        });
-
-        $orderQuery->when(!empty($dto->getMaxPrice()), function($query) use ($dto) {
-            $query->where('grand_total', '<=', $dto->getMaxPrice());
-        });
+        $orderQuery = $this->applySearchFilters($dto);
 
         return $orderQuery
             ->orderBy('created_at', 'desc')
             ->paginate($dto->getPerPage());
+    }
+
+    public function getUsersOrdersForExport(OrderSearchRequestDTO $dto): Builder
+    {
+        return $this->applySearchFilters($dto)->orderBy('created_at', 'desc');
+    }
+
+    public function countOrders(OrderSearchRequestDTO $dto): int
+    {
+        return $this->applySearchFilters($dto)->count();
+    }
+
+    private function applySearchFilters(OrderSearchRequestDTO $dto): Builder
+    {
+        $orderQuery = $this->modelQuery()->where('user_id', $dto->getUserId());
+
+        $orderQuery->when(!empty($dto->getOrderStatus()), function ($query) use ($dto) {
+            $query->where('order_status', $dto->getOrderStatus());
+        });
+
+        $orderQuery->when(!empty($dto->getPaymentStatus()), function ($query) use ($dto) {
+            $query->where('payment_status', $dto->getPaymentStatus());
+        });
+
+        $orderQuery->when(!empty($dto->getFromDate()), function ($query) use ($dto) {
+            $query->whereDate('created_at', '>=', $dto->getFromDate());
+        });
+
+        $orderQuery->when(!empty($dto->getToDate()), function ($query) use ($dto) {
+            $query->whereDate('created_at', '<=', $dto->getToDate());
+        });
+
+        $orderQuery->when(!empty($dto->getMinPrice()), function ($query) use ($dto) {
+            $query->where('grand_total', '>=', $dto->getMinPrice());
+        });
+
+        $orderQuery->when(!empty($dto->getMaxPrice()), function ($query) use ($dto) {
+            $query->where('grand_total', '<=', $dto->getMaxPrice());
+        });
+
+        return $orderQuery;
     }
 
     public function updateOrder(Order $order): bool

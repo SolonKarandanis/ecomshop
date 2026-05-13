@@ -3,8 +3,10 @@
 namespace App\Livewire;
 
 use App\Dtos\OrderSearchRequestDTO;
+use App\Exceptions\OrderCountException;
 use App\Http\Requests\OrderSearchRequest;
 use App\Services\OrderService;
+use App\Services\UiService;
 use App\Traits\HasStatusClasses;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -24,21 +26,29 @@ class MyOrdersPage extends Component
     public ?float $maxPrice = null;
 
     protected OrderService $orderService;
+    protected UiService $uiService;
 
 
 
     public function boot(
         OrderService $orderService,
+        UiService $uiService,
     ): void{
         $this->orderService = $orderService;
+        $this->uiService = $uiService;
     }
 
     public function render()
     {
-        $validated = $this->validate((new OrderSearchRequest())->rules());
-        $dto = OrderSearchRequestDTO::fromArray($validated);
+        $dto = $this->validateAndReturnDto();
         $result = $this->orderService->getUsersOrders($dto);
         return view('livewire.my-orders-page',['orders'=>$result]);
+    }
+
+    private function validateAndReturnDto(): OrderSearchRequestDTO
+    {
+        $validated = $this->validate((new OrderSearchRequest())->rules());
+        return OrderSearchRequestDTO::fromArray($validated);
     }
 
     public function search(): void
@@ -57,8 +67,29 @@ class MyOrdersPage extends Component
      * @throws Exception
      * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
      */
-    public function exportOrders(): void
+    public function exportOrders()
     {
-        $this->orderService->exportOrders();
+        try {
+            $dto = $this->validateAndReturnDto();
+            $countOrders = $this->orderService->countOrders($dto);
+
+            if ($countOrders > 10000) {
+                throw new OrderCountException("You cannot export more than 10,000 orders at once. Current results: " . number_format($countOrders));
+            }
+
+            return $this->orderService->exportOrders($dto);
+        } catch (OrderCountException $e) {
+            $this->uiService->showMessage(
+                \App\Enums\MessageSeverityEnum::ERROR,
+                'Export Failed',
+                $e->getMessage()
+            );
+        } catch (\Throwable $e) {
+            $this->uiService->showMessage(
+                \App\Enums\MessageSeverityEnum::ERROR,
+                'Error',
+                'Something went wrong during export.'
+            );
+        }
     }
 }

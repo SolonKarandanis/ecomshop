@@ -51,13 +51,18 @@ class OrderService
         return $this->orderRepository->getUsersOrders($dto);
     }
 
+    public function countOrders(OrderSearchRequestDTO $dto): int
+    {
+        return $this->orderRepository->countOrders($dto);
+    }
+
     /**
      * @throws Exception
      * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
      */
-    public function exportOrders(): BinaryFileResponse
+    public function exportOrders(OrderSearchRequestDTO $dto): BinaryFileResponse
     {
-        return Excel::download(new OrdersExport($this->orderRepository), 'orders.xlsx');
+        return Excel::download(new OrdersExport($this->orderRepository, $dto), 'orders.xlsx');
     }
 
     /**
