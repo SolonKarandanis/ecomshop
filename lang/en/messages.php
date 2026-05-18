@@ -26,5 +26,9 @@ return [
         'title'=>'Order Paid',
         'success'=>'Order paid successfully!',
         'error'=>'Failed to pay order!',
-    ]
+    ],
+    'export_orders'=>[
+        'title'=>'Export Failed',
+        'limit_error'=>'You cannot export more than 10,000 orders at once. Current results: :count',
+    ],
 ];

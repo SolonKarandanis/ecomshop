@@ -5,11 +5,11 @@
 
     <div class="bg-white border border-gray-200 rounded-xl shadow-sm dark:bg-gray-800 dark:border-gray-700 mt-4">
         <div class="p-4 sm:p-7">
-            <h2 class="block text-xl font-bold text-gray-800 dark:text-white mb-4">Search Orders</h2>
+            <h2 class="block text-xl font-bold text-gray-800 dark:text-white mb-4">{{__('my-orders.search.title')}}</h2>
             <form wire:submit.prevent="search">
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                     <div>
-                        <label for="orderStatus" class="block text-sm mb-2 dark:text-white">Order Status</label>
+                        <label for="orderStatus" class="block text-sm mb-2 dark:text-white">{{__('my-orders.search.fields.order_status')}}</label>
                         <select wire:model="orderStatus" id="orderStatus" class="py-3 px-4 block w-full border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400 dark:focus:ring-gray-600">
                             <option value="">All</option>
                             @foreach(OrderStatus::labels() as $value => $label)
@@ -19,7 +19,7 @@
                     </div>
 
                     <div>
-                        <label for="paymentStatus" class="block text-sm mb-2 dark:text-white">Payment Status</label>
+                        <label for="paymentStatus" class="block text-sm mb-2 dark:text-white">{{__('my-orders.search.fields.payment_status')}}</label>
                         <select wire:model="paymentStatus" id="paymentStatus" class="py-3 px-4 block w-full border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400 dark:focus:ring-gray-600">
                             <option value="">All</option>
                             @foreach(OrderPaymentStatus::labels() as $value => $label)
@@ -28,18 +28,18 @@
                         </select>
                     </div>
 
-                    <x-input name="fromDate" label="From Date" type="date" wire:model.live="fromDate" :max="$toDate" />
-                    <x-input name="toDate" label="To Date" type="date" wire:model.live="toDate" :min="$fromDate" />
-                    <x-input name="minPrice" label="Min Amount" type="number" step="0.01" wire:model.live="minPrice" :max="$maxPrice" />
-                    <x-input name="maxPrice" label="Max Amount" type="number" step="0.01" wire:model.live="maxPrice" :min="$minPrice" />
+                    <x-input name="fromDate" :label="__('my-orders.search.fields.from_date')" type="date" wire:model.live="fromDate" :max="$toDate" />
+                    <x-input name="toDate" :label="__('my-orders.search.fields.to_date')" type="date" wire:model.live="toDate" :min="$fromDate" />
+                    <x-input name="minPrice" :label="__('my-orders.search.fields.min_amount')" type="number" step="0.01" wire:model.live="minPrice" :max="$maxPrice" />
+                    <x-input name="maxPrice" :label="__('my-orders.search.fields.max_amount')" type="number" step="0.01" wire:model.live="maxPrice" :min="$minPrice" />
                 </div>
 
                 <div class="mt-4 flex justify-between gap-2">
                     <x-button type="submit" variant="primary" :loading="true" :wire-target="'search'">
-                        Search
+                        {{__('my-orders.buttons.search')}}
                     </x-button>
                     <x-button type="button" variant="danger" wire:click="resetSearch" :loading="true" :wire-target="'resetSearch'">
-                        Reset
+                        {{__('my-orders.buttons.reset')}}
                     </x-button>
                 </div>
             </form>
@@ -113,7 +113,7 @@
                             icon="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"
                             class="mt-4 py-2 px-4"
                         >
-                            Export
+                            {{__('my-orders.buttons.export')}}
                         </x-button>
                         {{$orders->links('vendor.pagination.livewire-tailwind', data: ['scrollTo' => false])}}
                     </div>

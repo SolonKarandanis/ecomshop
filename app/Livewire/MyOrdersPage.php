@@ -76,8 +76,8 @@ class MyOrdersPage extends Component
         if ($countOrders > 10000) {
             $this->uiService->showMessage(
                 MessageSeverityEnum::ERROR,
-                'Export Failed',
-                "You cannot export more than 10,000 orders at once. Current results: " . number_format($countOrders)
+                __('messages.export_orders.title'),
+                __('messages.export_orders.limit_error', ['count' => number_format($countOrders)])
             );
             return;
         }
