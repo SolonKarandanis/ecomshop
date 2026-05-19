@@ -61,6 +61,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property-read mixed $ram_attribute_values
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, Media> $media
  * @property-read int|null $media_count
+ * @method static \Database\Factories\ProductFactory factory($count = null, $state = [])
  * @mixin \Eloquent
  */
 class Product extends Model implements HasMedia

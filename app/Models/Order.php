@@ -43,6 +43,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property-read \App\Models\User $user
  * @property-read \App\Models\PaymentMethod $paymentMethod
  * @property-read \App\Models\StripeOrderDetail|null $stripeOrderDetail
+ * @property-read mixed $created_at_diff
  * @mixin \Eloquent
  */
 class Order extends Model
