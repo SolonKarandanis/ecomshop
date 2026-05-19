@@ -14,6 +14,7 @@ use App\Livewire\OrderDetailsPage;
 use App\Livewire\ProductDetailPage;
 use App\Livewire\ProductsPage;
 use App\Livewire\SuccessPage;
+use App\Http\Middleware\CheckUserStatus;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomePage::class)->name('home');
@@ -29,7 +30,7 @@ Route::middleware('guest')->group(function () {
     Route::get('/reset-password/{token}', ResetPasswordPage::class)->name('password.reset');
 });
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', CheckUserStatus::class])->group(function () {
     Route::get('/logout', function () {
         auth()->logout();
         return redirect('/');
