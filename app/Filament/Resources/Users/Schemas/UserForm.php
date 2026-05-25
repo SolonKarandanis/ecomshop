@@ -2,7 +2,9 @@
 
 namespace App\Filament\Resources\Users\Schemas;
 
+use App\Enums\UserStatusEnum;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Pages\Page;
 use Filament\Resources\Pages\CreateRecord;
@@ -19,6 +21,9 @@ class UserForm
                 TextInput::make('email')
                     ->label('Email address')
                     ->email()
+                    ->required(),
+                Select::make('status')
+                    ->options(UserStatusEnum::labels())
                     ->required(),
                 DateTimePicker::make('email_verified_at'),
                 TextInput::make('password')

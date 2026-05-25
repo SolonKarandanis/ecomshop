@@ -31,4 +31,14 @@ return [
         'title'=>'Export Failed',
         'limit_error'=>'You cannot export more than 10,000 orders at once. Current results: :count',
     ],
+    'update_profile'=>[
+        'title'=>'Update Profile',
+        'success'=>'Profile updated successfully!',
+        'email_taken'=>'This email address is already in use by another account.',
+    ],
+    'change_password'=>[
+        'title'=>'Change Password',
+        'success'=>'Password changed successfully!',
+        'wrong_current'=>'The current password you entered is incorrect.',
+    ],
 ];

@@ -2,8 +2,12 @@
 
 namespace App\Services;
 
+use App\Dtos\ChangePasswordDto;
 use App\Dtos\CreateUserDTO;
 use App\Dtos\ResetPasswordDTO;
+use App\Dtos\UpdateProfileDto;
+use App\Enums\UserStatusEnum;
+use App\Exceptions\ProfileException;
 use App\Models\User;
 use App\Repositories\RoleRepository;
 use App\Repositories\UserRepository;
@@ -32,6 +36,37 @@ class UserService
         $buyerRole=$this->roleRepository->getBuyerRole();
         $user->assignRole($buyerRole);
         return $user;
+    }
+
+    public function updateProfile(User $user, UpdateProfileDto $dto): void
+    {
+        if (User::where('email', $dto->getEmail())->where('id', '!=', $user->id)->exists()) {
+            throw new ProfileException(__('messages.update_profile.email_taken'));
+        }
+        $user->name  = $dto->getName();
+        $user->email = $dto->getEmail();
+        $this->userRepository->saveUser($user);
+    }
+
+    public function changePassword(User $user, ChangePasswordDto $dto): void
+    {
+        if (!Hash::check($dto->getCurrentPassword(), $user->password)) {
+            throw new ProfileException(__('messages.change_password.wrong_current'));
+        }
+        $user->password = Hash::make($dto->getNewPassword());
+        $this->userRepository->saveUser($user);
+    }
+
+    public function activateUser(User $user): void
+    {
+        $user->status = UserStatusEnum::ACTIVE;
+        $this->userRepository->saveUser($user);
+    }
+
+    public function deactivateUser(User $user): void
+    {
+        $user->status = UserStatusEnum::INACTIVE;
+        $this->userRepository->saveUser($user);
     }
 
     public function getUsersWithOrderedItems(): Collection{

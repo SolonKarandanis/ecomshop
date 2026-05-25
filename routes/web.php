@@ -13,6 +13,7 @@ use App\Livewire\MyOrdersPage;
 use App\Livewire\OrderDetailsPage;
 use App\Livewire\ProductDetailPage;
 use App\Livewire\ProductsPage;
+use App\Livewire\ProfilePage;
 use App\Livewire\SuccessPage;
 use App\Http\Middleware\CheckUserStatus;
 use Illuminate\Support\Facades\Route;
@@ -40,4 +41,5 @@ Route::middleware(['auth', CheckUserStatus::class])->group(function () {
     Route::get('/my-orders/{id}', OrderDetailsPage::class)->name('my-orders.detail');
     Route::get('/success', SuccessPage::class)->name('success');
     Route::get('/cancel', CancelPage::class)->name('cancel');
+    Route::get('/profile', ProfilePage::class)->name('profile');
 });
