@@ -73,3 +73,19 @@ it('user addresses relationship returns only that user\'s addresses', function (
 
     expect($user->addresses)->toHaveCount(0);
 });
+
+it('activateUser sets status to active and persists', function () {
+    $user = User::factory()->create(['status' => UserStatusEnum::INACTIVE->value]);
+
+    app(UserService::class)->activateUser($user);
+
+    expect($user->fresh()->status)->toBe(UserStatusEnum::ACTIVE);
+});
+
+it('deactivateUser sets status to inactive and persists', function () {
+    $user = User::factory()->create();
+
+    app(UserService::class)->deactivateUser($user);
+
+    expect($user->fresh()->status)->toBe(UserStatusEnum::INACTIVE);
+});

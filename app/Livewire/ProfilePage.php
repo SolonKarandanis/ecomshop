@@ -6,7 +6,6 @@ use App\Dtos\ChangePasswordDto;
 use App\Dtos\UpdateProfileDto;
 use App\Enums\MessageSeverityEnum;
 use App\Exceptions\ProfileException;
-use App\Repositories\UserRepository;
 use App\Services\UiService;
 use App\Services\UserService;
 use Illuminate\View\View;
@@ -25,16 +24,13 @@ class ProfilePage extends Component
 
     protected UserService    $userService;
     protected UiService      $uiService;
-    protected UserRepository $userRepository;
 
     public function boot(
         UserService    $userService,
         UiService      $uiService,
-        UserRepository $userRepository,
     ): void {
         $this->userService    = $userService;
         $this->uiService      = $uiService;
-        $this->userRepository = $userRepository;
     }
 
     public function mount(): void
@@ -102,7 +98,7 @@ class ProfilePage extends Component
 
     public function render(): View
     {
-        $user = $this->userRepository->getUserWithAddresses(auth()->id());
+        $user = $this->userService->getUserWithAddresses(auth()->id());
         return view('livewire.profile-page', compact('user'));
     }
 }
