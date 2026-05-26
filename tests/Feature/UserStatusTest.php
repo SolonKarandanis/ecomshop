@@ -1,13 +1,17 @@
 <?php
 
+use App\Dtos\ChangePasswordDto;
+use App\Dtos\CreateUserDTO;
+use App\Dtos\UpdateProfileDto;
 use App\Enums\RolesEnum;
 use App\Enums\UserStatusEnum;
+use App\Exceptions\ProfileException;
 use App\Models\Address;
 use App\Models\Order;
 use App\Models\PaymentMethod;
 use App\Models\User;
 use App\Services\UserService;
-use App\Dtos\CreateUserDTO;
+use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
 
 function makeOrderForUser(User $user): Order
@@ -88,4 +92,48 @@ it('deactivateUser sets status to inactive and persists', function () {
     app(UserService::class)->deactivateUser($user);
 
     expect($user->fresh()->status)->toBe(UserStatusEnum::INACTIVE);
+});
+
+it('updateProfile updates name and email', function () {
+    $user = User::factory()->create(['name' => 'Old Name', 'email' => 'old@example.com']);
+    $dto  = UpdateProfileDto::fromArray(['name' => 'New Name', 'email' => 'new@example.com']);
+
+    app(UserService::class)->updateProfile($user, $dto);
+
+    expect($user->fresh()->name)->toBe('New Name')
+        ->and($user->fresh()->email)->toBe('new@example.com');
+});
+
+it('updateProfile throws ProfileException when email belongs to another account', function () {
+    User::factory()->create(['email' => 'taken@example.com']);
+    $user = User::factory()->create(['email' => 'mine@example.com']);
+    $dto  = UpdateProfileDto::fromArray(['name' => $user->name, 'email' => 'taken@example.com']);
+
+    expect(fn () => app(UserService::class)->updateProfile($user, $dto))
+        ->toThrow(ProfileException::class);
+});
+
+it('changePassword updates password when current password is correct', function () {
+    $user = User::factory()->create(['password' => bcrypt('oldpassword')]);
+    $dto  = ChangePasswordDto::fromArray([
+        'currentPassword'         => 'oldpassword',
+        'newPassword'             => 'newpassword123',
+        'newPasswordConfirmation' => 'newpassword123',
+    ]);
+
+    app(UserService::class)->changePassword($user, $dto);
+
+    expect(Hash::check('newpassword123', $user->fresh()->password))->toBeTrue();
+});
+
+it('changePassword throws ProfileException when current password is wrong', function () {
+    $user = User::factory()->create(['password' => bcrypt('correctpassword')]);
+    $dto  = ChangePasswordDto::fromArray([
+        'currentPassword'         => 'wrongpassword',
+        'newPassword'             => 'newpassword123',
+        'newPasswordConfirmation' => 'newpassword123',
+    ]);
+
+    expect(fn () => app(UserService::class)->changePassword($user, $dto))
+        ->toThrow(ProfileException::class);
 });
