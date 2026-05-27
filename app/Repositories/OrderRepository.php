@@ -76,7 +76,7 @@ class OrderRepository
         $orderQuery = $this->applySearchFilters($dto);
 
         return $orderQuery
-            ->orderBy('created_at', 'desc')
+            ->orderBy($dto->getSortColumn(), $dto->getSortDirection())
             ->paginate($dto->getPerPage());
     }
 

@@ -53,24 +53,12 @@
                     <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                         <thead>
                         <tr>
-                            <th scope="col" class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">
-                                {{__('my-orders.columns.order')}}
-                            </th>
-                            <th scope="col" class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">
-                                {{__('my-orders.columns.date')}}
-                            </th>
-                            <th scope="col" class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">
-                                {{__('my-orders.columns.order_status')}}
-                            </th>
-                            <th scope="col" class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">
-                                {{__('my-orders.columns.payment_status')}}
-                            </th>
-                            <th scope="col" class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">
-                                {{__('my-orders.columns.amount')}}
-                            </th>
-                            <th scope="col" class="px-8 py-3 text-end text-xs font-medium text-gray-500 uppercase">
-                                {{__('my-orders.columns.action')}}
-                            </th>
+                            <x-column-header columnName="id" :sortColumn="$sortColumn" :sortDirection="$sortDirection">{{__('my-orders.columns.order')}}</x-column-header>
+                            <x-column-header columnName="created_at" :sortColumn="$sortColumn" :sortDirection="$sortDirection">{{__('my-orders.columns.date')}}</x-column-header>
+                            <x-column-header columnName="order_status" :sortColumn="$sortColumn" :sortDirection="$sortDirection">{{__('my-orders.columns.order_status')}}</x-column-header>
+                            <x-column-header columnName="payment_status" :sortColumn="$sortColumn" :sortDirection="$sortDirection">{{__('my-orders.columns.payment_status')}}</x-column-header>
+                            <x-column-header columnName="grand_total" :sortColumn="$sortColumn" :sortDirection="$sortDirection">{{__('my-orders.columns.amount')}}</x-column-header>
+                            <x-column-header>{{__('my-orders.columns.action')}}</x-column-header>
                         </tr>
                         </thead>
                         <tbody>

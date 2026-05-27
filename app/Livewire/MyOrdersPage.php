@@ -25,6 +25,10 @@ class MyOrdersPage extends Component
     public ?string $toDate = null;
     public ?float $minPrice = null;
     public ?float $maxPrice = null;
+    public string $sortColumn = 'created_at';
+    public string $sortDirection = 'desc';
+
+    private const SORTABLE_COLUMNS = ['id', 'created_at', 'order_status', 'payment_status', 'grand_total'];
 
     protected OrderService $orderService;
     protected UiService $uiService;
@@ -46,10 +50,26 @@ class MyOrdersPage extends Component
         return view('livewire.my-orders-page',['orders'=>$result]);
     }
 
+    public function sort(string $column): void
+    {
+        if (!in_array($column, self::SORTABLE_COLUMNS, true)) {
+            return;
+        }
+        if ($this->sortColumn === $column) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortColumn = $column;
+            $this->sortDirection = 'asc';
+        }
+        $this->resetPage();
+    }
+
     private function validateAndReturnDto(): OrderSearchRequestDTO
     {
         $validated = $this->validate((new OrderSearchRequest())->rules());
-        return OrderSearchRequestDTO::fromArray($validated);
+        return OrderSearchRequestDTO::fromArray($validated)
+            ->withSortColumn($this->sortColumn)
+            ->withSortDirection($this->sortDirection);
     }
 
     public function search(): void

@@ -13,6 +13,8 @@ class OrderSearchRequestDTO
 
     private ?float $maxPrice = null;
     private int $perPage = 5;
+    private string $sortColumn = 'created_at';
+    private string $sortDirection = 'desc';
 
     public function __construct()
     {
@@ -72,6 +74,18 @@ class OrderSearchRequestDTO
         return $this;
     }
 
+    public function withSortColumn(string $sortColumn): self
+    {
+        $this->sortColumn = $sortColumn;
+        return $this;
+    }
+
+    public function withSortDirection(string $sortDirection): self
+    {
+        $this->sortDirection = $sortDirection;
+        return $this;
+    }
+
     public function getUserId(): int
     {
         return $this->userId;
@@ -110,5 +124,15 @@ class OrderSearchRequestDTO
     public function getMaxPrice(): ?float
     {
         return $this->maxPrice;
+    }
+
+    public function getSortColumn(): string
+    {
+        return $this->sortColumn;
+    }
+
+    public function getSortDirection(): string
+    {
+        return $this->sortDirection;
     }
 }
