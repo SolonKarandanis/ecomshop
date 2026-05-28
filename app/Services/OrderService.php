@@ -73,42 +73,42 @@ class OrderService
         $order_items=[];
         $paymentMethod=$dto->getPaymentMethod();
         DB::beginTransaction();
-        try{
-            $cart = $this->cartService->getCart();
-            Log::debug('OrderService checkout cartItems count: ', [$cart->cartItems->count()]);
-            if ($cart->cartItems->isEmpty()) {
-                throw new EmptyCartException('Cart is empty');
-            }
-            foreach ($cart->cartItems as $cartItem){
-                $line_item=[
-                    'price_data'=>[
-                        'currency'=>config('app.currency'),
-                        'unit_amount'=>$cartItem->unit_price * 100, //stripe wants unit amount in cents
-                        'product_data'=>[
-                            'name'=>$cartItem->product->name,
-                        ]
-                    ],
-                    'quantity'=>$cartItem->quantity,
-                ];
-                $line_items[] = $line_item;
-                $orderItem = new OrderItem($cartItem);
-                $order_items[]=$orderItem->attributesToArray();
-            }
+            try{
+                $cart = $this->cartService->getCart();
+                Log::debug('OrderService checkout cartItems count: ', [$cart->cartItems->count()]);
+                if ($cart->cartItems->isEmpty()) {
+                    throw new EmptyCartException('Cart is empty');
+                }
+                foreach ($cart->cartItems as $cartItem){
+                    $line_item=[
+                        'price_data'=>[
+                            'currency'=>config('app.currency'),
+                            'unit_amount'=>$cartItem->unit_price * 100, //stripe wants unit amount in cents
+                            'product_data'=>[
+                                'name'=>$cartItem->product->name,
+                            ]
+                        ],
+                        'quantity'=>$cartItem->quantity,
+                    ];
+                    $line_items[] = $line_item;
+                    $orderItem = new OrderItem($cartItem);
+                    $order_items[]=$orderItem->attributesToArray();
+                }
 
-            $paymentMethods = $this->paymentMethodRepository->findAll()->pluck('id', 'resource_key');
-            $paymentMethodId=$paymentMethods->get($paymentMethod);
-            Log::debug('OrderService creating order');
-            $order = $this->createNewOrder($cart->total_price,$paymentMethodId,$order_items);
-            Log::debug('OrderService created order ',[$order->id]);
+                $paymentMethods = $this->paymentMethodRepository->findAll()->pluck('id', 'resource_key');
+                $paymentMethodId=$paymentMethods->get($paymentMethod);
+                Log::debug('OrderService creating order');
+                $order = $this->createNewOrder($cart->total_price,$paymentMethodId,$order_items);
+                Log::debug('OrderService created order ',[$order->id]);
 
-            $redirect_url = $this->paymentHandlerFactory->make($paymentMethod)->process($order, $line_items);
+                $redirect_url = $this->paymentHandlerFactory->make($paymentMethod)->process($order, $line_items);
 
-            Log::debug('OrderService creating address');
-            $this->addressRepository->create($order->id,$dto);
-            Log::debug('OrderService created address');
+                Log::debug('OrderService creating address');
+                $this->addressRepository->create($order->id,$dto);
+                Log::debug('OrderService created address');
 
-            Log::debug('OrderService clearing cart');
-            $this->cartService->clearCart();
+                Log::debug('OrderService clearing cart');
+                $this->cartService->clearCart();
             DB::commit();
             $order = $this->getUsersLatestOrder(auth()->user()->id);
             try {
