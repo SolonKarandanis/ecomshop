@@ -6,8 +6,8 @@ use App\Dtos\CheckoutDTO;
 use App\Dtos\CreateOrderDTO;
 use App\Dtos\OrderSearchRequestDTO;
 use App\Enums\OrderPaymentStatusEnum;
-use App\Enums\PaymentMethodEnum;
 use App\Enums\StripePaymentStatusEnum;
+use App\Payments\PaymentHandlerFactory;
 use App\Exceptions\EmptyCartException;
 use App\Exceptions\OrderException;
 use App\Exceptions\PaymentException;
@@ -18,7 +18,6 @@ use App\Models\OrderItem;
 use App\Repositories\AddressRepository;
 use App\Repositories\OrderRepository;
 use App\Repositories\PaymentMethodRepository;
-use App\Repositories\StripeOrderDetailRepository;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -34,9 +33,9 @@ class OrderService
         private readonly OrderRepository $orderRepository,
         private readonly AddressRepository $addressRepository,
         private readonly PaymentMethodRepository $paymentMethodRepository,
-        private readonly StripeOrderDetailRepository $stripeOrderDetailRepository,
         private readonly CartService $cartService,
         private readonly StripeService $stripeService,
+        private readonly PaymentHandlerFactory $paymentHandlerFactory,
     ){}
 
     public function getOrderById(int $orderId):Order{
@@ -102,19 +101,7 @@ class OrderService
             $order = $this->createNewOrder($cart->total_price,$paymentMethodId,$order_items);
             Log::debug('OrderService created order ',[$order->id]);
 
-            $redirect_url = '';
-            if($paymentMethod==PaymentMethodEnum::STRIPE->value){
-                Log::debug('OrderService paymentMethod: Stripe');
-                $sessionCheckout = $this->stripeService->createSession($line_items);
-                Log::debug('OrderService $sessionCheckout:',[$sessionCheckout->id]);
-                $this->stripeOrderDetailRepository->createStripeOrderDetail($order->id,$sessionCheckout->id);
-                $redirect_url=$sessionCheckout->url;
-            }
-
-            if($paymentMethod==PaymentMethodEnum::CASH_ON_DELIVERY->value){
-                Log::debug('OrderService paymentMethod: Cash on delivery');
-                $redirect_url=route('success');
-            }
+            $redirect_url = $this->paymentHandlerFactory->make($paymentMethod)->process($order, $line_items);
 
             Log::debug('OrderService creating address');
             $this->addressRepository->create($order->id,$dto);

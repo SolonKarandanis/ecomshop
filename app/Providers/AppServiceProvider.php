@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Payments\PaymentHandlerFactory;
+use App\Payments\StripePaymentHandler;
 use App\Repositories\AddressRepository;
 use App\Repositories\CartRepository;
 use App\Repositories\OrderRepository;
@@ -43,14 +45,18 @@ class AppServiceProvider extends ServiceProvider
             return new StripeService();
         });
 
+        $this->app->singleton(StripePaymentHandler::class, function ($app) {
+            return new StripePaymentHandler($app->make(StripeService::class), $app->make(StripeOrderDetailRepository::class));
+        });
+
         $this->app->singleton(OrderService::class, function ($app) {
             return new OrderService(
                 $app->make(OrderRepository::class),
                 $app->make(AddressRepository::class),
                 $app->make(PaymentMethodRepository::class),
-                $app->make(StripeOrderDetailRepository::class),
                 $app->make(CartService::class),
-                $app->make(StripeService::class)
+                $app->make(StripeService::class),
+                $app->make(PaymentHandlerFactory::class),
             );
         });
     }
