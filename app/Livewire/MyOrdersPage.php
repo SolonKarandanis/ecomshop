@@ -28,7 +28,7 @@ class MyOrdersPage extends Component
     public string $sortColumn = 'created_at';
     public string $sortDirection = 'desc';
 
-    private const SORTABLE_COLUMNS = ['id', 'created_at', 'order_status', 'payment_status', 'grand_total'];
+    private const array SORTABLE_COLUMNS = ['id', 'created_at', 'order_status', 'payment_status', 'grand_total'];
 
     protected OrderService $orderService;
     protected UiService $uiService;

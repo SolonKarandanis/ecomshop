@@ -135,9 +135,9 @@ class CartRepository
      */
     public function updateCartItemsQuantity(array $cartItems): void
     {
-        foreach ($cartItems as $item) {
-            $this->itemModelQuery()->where('id', $item['id'])->increment('quantity', $item['quantity']);
-        }
+        collect($cartItems)->each(
+            fn($item) => $this->itemModelQuery()->where('id', $item['id'])->increment('quantity', $item['quantity'])
+        );
     }
 
     public function updateCartItem(CartItem $cartItem): void{
@@ -151,33 +151,23 @@ class CartRepository
         }
 
         $table = (new CartItem())->getTable();
-        $params = [];
 
-        $quantityCase = "quantity = CASE id ";
-        $totalPriceCase = "total_price = CASE id ";
-        $attributesCase = "attributes = CASE id ";
+        $whenThen = str_repeat('WHEN ? THEN ? ', count($updates));
+        $quantityCase   = "quantity = CASE id {$whenThen}END";
+        $totalPriceCase = "total_price = CASE id {$whenThen}END";
+        $attributesCase = "attributes = CASE id {$whenThen}END";
 
-        foreach ($updates as $update) {
-            $quantityCase .= "WHEN ? THEN ? ";
-            $totalPriceCase .= "WHEN ? THEN ? ";
-            $attributesCase .= "WHEN ? THEN ? ";
-            $params[] = $update['id'];
-            $params[] = $update['quantity'];
-            $params[] = $update['id'];
-            $params[] = $update['total_price'];
-            $params[] = $update['id'];
-            $params[] = is_array($update['attributes']) ? json_encode($update['attributes']) : $update['attributes'];
-        }
-
-        $quantityCase .= "END";
-        $totalPriceCase .= "END";
-        $attributesCase .= "END";
+        $params = collect($updates)->flatMap(fn($update) => [
+            $update['id'], $update['quantity'],
+            $update['id'], $update['total_price'],
+            $update['id'], is_array($update['attributes']) ? json_encode($update['attributes']) : $update['attributes'],
+        ])->all();
 
         $ids = implode(',', array_fill(0, count($idsToUpdate), '?'));
 
         $sql = "UPDATE {$table} SET {$quantityCase}, {$totalPriceCase}, {$attributesCase} WHERE id IN ({$ids})";
 
-        $bindings = array_merge($params, $idsToUpdate);
+        $bindings = collect($params)->concat($idsToUpdate)->all();
 
         DB::update($sql, $bindings);
     }

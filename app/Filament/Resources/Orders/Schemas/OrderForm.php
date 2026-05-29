@@ -122,13 +122,10 @@ class OrderForm
                         TextEntry::make('grand_total_placeholder')
                             ->label('GranD Total')
                             ->state(function(Get $get, Set $set){
-                                $total = 0;
                                 if (!$repeaters = $get('items')){
-                                    return $total;
+                                    return 0;
                                 }
-                                foreach ($repeaters as $key => $repeater){
-                                    $total += $get("items.{$key}.total_amount");
-                                }
+                                $total = collect($repeaters)->keys()->sum(fn($key) => $get("items.{$key}.total_amount"));
                                 $set('grand_total', $total);
                                 return Number::currency($total,'eur');
                             }),

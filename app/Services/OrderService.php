@@ -69,8 +69,6 @@ class OrderService
      * @throws EmptyCartException|PaymentException
      */
     public function checkout(CheckoutDTO $dto):string{
-        $line_items=[];
-        $order_items=[];
         $paymentMethod=$dto->getPaymentMethod();
         DB::beginTransaction();
             try{
@@ -79,21 +77,19 @@ class OrderService
                 if ($cart->cartItems->isEmpty()) {
                     throw new EmptyCartException('Cart is empty');
                 }
-                foreach ($cart->cartItems as $cartItem){
-                    $line_item=[
-                        'price_data'=>[
-                            'currency'=>config('app.currency'),
-                            'unit_amount'=>$cartItem->unit_price * 100, //stripe wants unit amount in cents
-                            'product_data'=>[
-                                'name'=>$cartItem->product->name,
-                            ]
-                        ],
-                        'quantity'=>$cartItem->quantity,
-                    ];
-                    $line_items[] = $line_item;
-                    $orderItem = new OrderItem($cartItem);
-                    $order_items[]=$orderItem->attributesToArray();
-                }
+
+                $line_items = $cart->cartItems->map(fn($cartItem) => [
+                    'price_data' => [
+                        'currency'     => config('app.currency'),
+                        'unit_amount'  => $cartItem->unit_price * 100, // stripe wants cents
+                        'product_data' => ['name' => $cartItem->product->name],
+                    ],
+                    'quantity' => $cartItem->quantity,
+                ])->values()->all();
+
+                $order_items = $cart->cartItems->map(
+                    fn($cartItem) => (new OrderItem($cartItem))->attributesToArray()
+                )->values()->all();
 
                 $paymentMethods = $this->paymentMethodRepository->findAll()->pluck('id', 'resource_key');
                 $paymentMethodId=$paymentMethods->get($paymentMethod);

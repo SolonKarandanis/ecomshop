@@ -25,22 +25,15 @@ class UiService
             ->timer(2000)
             ->toast()
             ->position(Position::TopEnd);
-        foreach($text as $textItem){
+        collect($text)->each(function ($textItem) use ($alert, $messageSeverity) {
             $alert->text($textItem);
-            switch ($messageSeverity){
-                case MessageSeverityEnum::INFO:
-                    $alert->info();
-                    break;
-                case MessageSeverityEnum::SUCCESS:
-                    $alert->success();
-                    break;
-                case MessageSeverityEnum::WARNING:
-                    $alert->warning();
-                    break;
-                case MessageSeverityEnum::ERROR:
-                    $alert->error();
-            }
-        }
+            match ($messageSeverity) {
+                MessageSeverityEnum::INFO    => $alert->info(),
+                MessageSeverityEnum::SUCCESS => $alert->success(),
+                MessageSeverityEnum::WARNING => $alert->warning(),
+                MessageSeverityEnum::ERROR   => $alert->error(),
+            };
+        });
         $alert->show();
     }
 }

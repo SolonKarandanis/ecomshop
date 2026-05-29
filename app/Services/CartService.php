@@ -351,7 +351,7 @@ class CartService
             $updatedCartItems[] = $cartItem;
         }
         // Eager load the product relationships for the updated cart items
-        $productIds = array_column($updatedCartItems, 'product_id');
+        $productIds = collect($updatedCartItems)->pluck('product_id')->all();
         if (!empty($productIds)) {
             $products = $this->productRepository->findProductsByIds($productIds)->keyBy('id');
             foreach ($updatedCartItems as $cartItem) {
@@ -404,10 +404,10 @@ class CartService
 
         $cart->setRelation('cartItems', $itemsToKeep);
 
-        $cartItemsForCookie = [];
-        foreach ($itemsToKeep as $item) {
-            $cartItemsForCookie = array_merge($cartItemsForCookie, $this->getCartItemsForCookies($item));
-        }
+        $cartItemsForCookie = collect($itemsToKeep)
+            ->flatMap(fn($item) => $this->getCartItemsForCookies($item))
+            ->all();
+        $cartItemsForCookie = array_merge($cartItemsForCookie, $cartItemsForCookie);
         Log::debug('Remaining cart items after delete: ', [$cartItemsForCookie]);
         $this->putItemsToCookies($cartItemsForCookie);
         $this->recalculateCartTotalPrice($cart);
@@ -540,7 +540,7 @@ class CartService
      * @param AddToCartDto[] $addToCartRequests
      */
     protected function fetchProductsToBeAdded(array $addToCartRequests):Collection{
-        $productIds= array_map(fn($request):int => $request->getProductId(),$addToCartRequests);
+        $productIds= collect($addToCartRequests)->map(fn($request):int => $request->getProductId())->all();
         return $this->productRepository->findProductsByIds($productIds);
     }
 
