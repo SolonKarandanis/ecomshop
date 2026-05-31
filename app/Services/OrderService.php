@@ -7,6 +7,7 @@ use App\Dtos\CreateOrderDTO;
 use App\Dtos\OrderSearchRequestDTO;
 use App\Enums\OrderPaymentStatusEnum;
 use App\Enums\StripePaymentStatusEnum;
+use App\Models\CartItem;
 use App\Payments\PaymentHandlerFactory;
 use App\Exceptions\EmptyCartException;
 use App\Exceptions\OrderException;
@@ -18,6 +19,7 @@ use App\Models\OrderItem;
 use App\Repositories\AddressRepository;
 use App\Repositories\OrderRepository;
 use App\Repositories\PaymentMethodRepository;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -77,32 +79,17 @@ class OrderService
                 if ($cart->cartItems->isEmpty()) {
                     throw new EmptyCartException('Cart is empty');
                 }
-
-                $line_items = $cart->cartItems->map(fn($cartItem) => [
-                    'price_data' => [
-                        'currency'     => config('app.currency'),
-                        'unit_amount'  => $cartItem->unit_price * 100, // stripe wants cents
-                        'product_data' => ['name' => $cartItem->product->name],
-                    ],
-                    'quantity' => $cartItem->quantity,
-                ])->values()->all();
-
-                $order_items = $cart->cartItems->map(
-                    fn($cartItem) => (new OrderItem($cartItem))->attributesToArray()
-                )->values()->all();
-
+                $line_items = $this->createLineItems($cart->cartItems);
+                $order_items = $this->createOrderItems($cart->cartItems);
                 $paymentMethods = $this->paymentMethodRepository->findAll()->pluck('id', 'resource_key');
                 $paymentMethodId=$paymentMethods->get($paymentMethod);
                 Log::debug('OrderService creating order');
                 $order = $this->createNewOrder($cart->total_price,$paymentMethodId,$order_items);
                 Log::debug('OrderService created order ',[$order->id]);
-
                 $redirect_url = $this->paymentHandlerFactory->make($paymentMethod)->process($order, $line_items);
-
                 Log::debug('OrderService creating address');
                 $this->addressRepository->create($order->id,$dto);
                 Log::debug('OrderService created address');
-
                 Log::debug('OrderService clearing cart');
                 $this->cartService->clearCart();
             DB::commit();
@@ -123,6 +110,29 @@ class OrderService
             DB::rollBack();
             throw new OrderException('Something went wrong during checkout!', 0, $exception);
         }
+    }
+
+    /**
+     * @param Collection<int, CartItem> $cartItems
+     * @return array
+     */
+    protected function createLineItems(Collection $cartItems):array{
+        return $cartItems->map(fn(CartItem $cartItem) => [
+            'price_data' => [
+                'currency'     => config('app.currency'),
+                'unit_amount'  => $cartItem->unit_price * 100, // stripe wants cents
+                'product_data' => ['name' => $cartItem->product->name],
+            ],
+            'quantity' => $cartItem->quantity,
+        ])->values()->all();
+    }
+
+    /**
+     * @param Collection<int, CartItem> $cartItems
+     * @return array
+     */
+    protected function createOrderItems(Collection $cartItems):array{
+        return $cartItems->map(fn(CartItem $cartItem) => (new OrderItem($cartItem))->attributesToArray())->values()->all();
     }
 
     /**
