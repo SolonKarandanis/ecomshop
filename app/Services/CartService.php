@@ -205,12 +205,12 @@ class CartService
     }
 
     /**
-     * @param \Illuminate\Database\Eloquent\Collection<int, CartItem> $cartItems
+     * @param Collection<int, CartItem> $cartItems
      * @param int $productId
      * @param array $attributes
      * @return CartItem|null
      */
-    protected function findExistingCartItem(\Illuminate\Database\Eloquent\Collection $cartItems,int $productId, array $attributes):?CartItem{
+    protected function findExistingCartItem(Collection $cartItems,int $productId, array $attributes):?CartItem{
         return $cartItems->first(function (CartItem $item) use ($productId, $attributes) {
             $itemAttributes = $item->attributes ?? [];
             if (is_string($itemAttributes)) {
