@@ -68,7 +68,7 @@ class OrderService
 
     /**
      * @throws OrderException
-     * @throws EmptyCartException|PaymentException
+     * @throws EmptyCartException|PaymentException|Throwable
      */
     public function checkout(CheckoutDTO $dto):string{
         $paymentMethod=$dto->getPaymentMethod();
@@ -76,9 +76,7 @@ class OrderService
             try{
                 $cart = $this->cartService->getCart();
                 Log::debug('OrderService checkout cartItems count: ', [$cart->cartItems->count()]);
-                if ($cart->cartItems->isEmpty()) {
-                    throw new EmptyCartException('Cart is empty');
-                }
+                $this->handleEmptyCart($cart->cartItems);
                 $line_items = $this->createLineItems($cart->cartItems);
                 $order_items = $this->createOrderItems($cart->cartItems);
                 $paymentMethods = $this->paymentMethodRepository->findAll()->pluck('id', 'resource_key');
@@ -109,6 +107,16 @@ class OrderService
             Log::error($exception);
             DB::rollBack();
             throw new OrderException('Something went wrong during checkout!', 0, $exception);
+        }
+    }
+
+    /**
+     * @param Collection<int, CartItem> $cartItems
+     * @throws EmptyCartException
+     */
+    protected function handleEmptyCart(Collection $cartItems):void{
+        if ($cartItems->isEmpty()) {
+            throw new EmptyCartException('Cart is empty');
         }
     }
 

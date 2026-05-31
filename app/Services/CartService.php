@@ -126,9 +126,7 @@ class CartService
             $newCartItems = [];
             foreach ($addToCartRequests as $request) {
                 $product = $productsToBeAdded->find($request->getProductId());
-                if (!$product) {
-                    throw new ProductNotFoundException("Product with ID {$request->getProductId()} not found.");
-                }
+                $this->handleProductNotFound($request, $product);
                 $this->setAttributesIfEmptyToRequest($request, $productsToBeAdded);
                 $attributes = $request->getAttributes();
                 ksort($attributes);
@@ -139,18 +137,7 @@ class CartService
                     $attributes
                 );
                 // Check if the item is already in $newCartItems to be added
-                $alreadyInNewItems = false;
-                foreach ($newCartItems as $newItemDto) {
-                    if ($newItemDto->getProductId() === $request->getProductId()) {
-                        $newItemAttributes = $newItemDto->getAttributes();
-                        ksort($newItemAttributes);
-                        if ($newItemAttributes === $attributes) {
-                            $newItemDto->setQuantity($newItemDto->getQuantity() + $request->getQuantity());
-                            $alreadyInNewItems = true;
-                            break;
-                        }
-                    }
-                }
+                $alreadyInNewItems = $this->checkIfItemIsAlreadyInNewItems($newCartItems, $request, $attributes);
                 if ($alreadyInNewItems) {
                     continue;
                 }
@@ -183,6 +170,41 @@ class CartService
     }
 
     /**
+     * @param array $newCartItems
+     * @param AddToCartDto $request
+     * @param array $attributes
+     * @return bool
+     */
+    public function checkIfItemIsAlreadyInNewItems(array $newCartItems, AddToCartDto $request, array $attributes): bool
+    {
+        $alreadyInNewItems =false;
+        foreach ($newCartItems as $newItemDto) {
+            if ($newItemDto->getProductId() === $request->getProductId()) {
+                $newItemAttributes = $newItemDto->getAttributes();
+                ksort($newItemAttributes);
+                if ($newItemAttributes === $attributes) {
+                    $newItemDto->setQuantity($newItemDto->getQuantity() + $request->getQuantity());
+                    $alreadyInNewItems = true;
+                    break;
+                }
+            }
+        }
+        return $alreadyInNewItems;
+    }
+
+
+    /**
+     * @param AddToCartDto $request
+     * @param Product $product
+     * @throws ProductNotFoundException
+     */
+    protected function handleProductNotFound(AddToCartDto $request,Product $product):void{
+        if (!$product) {
+            throw new ProductNotFoundException("Product with ID {$request->getProductId()} not found.");
+        }
+    }
+
+    /**
      * @param AddToCartDto[] $addToCartRequests
      * @throws ProductNotFoundException
      */
@@ -192,9 +214,7 @@ class CartService
         $productsToBeAdded = $this->fetchProductsToBeAdded($addToCartRequests);
         foreach ($addToCartRequests as $request) {
             $product = $productsToBeAdded->find($request->getProductId());
-            if (!$product) {
-                throw new ProductNotFoundException("Product with ID {$request->getProductId()} not found.");
-            }
+            $this->handleProductNotFound($request, $product);
             $this->setAttributesIfEmptyToRequest($request, $productsToBeAdded);
             $attributes = $request->getAttributes();
             ksort($attributes);
