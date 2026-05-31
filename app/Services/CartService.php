@@ -195,13 +195,30 @@ class CartService
 
     /**
      * @param AddToCartDto $request
-     * @param Product $product
+     * @param Product|null $product
      * @throws ProductNotFoundException
      */
-    protected function handleProductNotFound(AddToCartDto $request,Product $product):void{
+    protected function handleProductNotFound(AddToCartDto $request,Product|null $product):void{
         if (!$product) {
             throw new ProductNotFoundException("Product with ID {$request->getProductId()} not found.");
         }
+    }
+
+    /**
+     * @param \Illuminate\Database\Eloquent\Collection<int, CartItem> $cartItems
+     * @param int $productId
+     * @param array $attributes
+     * @return CartItem|null
+     */
+    protected function findExistingCartItem(\Illuminate\Database\Eloquent\Collection $cartItems,int $productId, array $attributes):?CartItem{
+        return $cartItems->first(function (CartItem $item) use ($productId, $attributes) {
+            $itemAttributes = $item->attributes ?? [];
+            if (is_string($itemAttributes)) {
+                $itemAttributes = json_decode($itemAttributes, true) ?? [];
+            }
+            ksort($itemAttributes);
+            return (int)$item->product_id === (int)$productId && $itemAttributes === $attributes;
+        });
     }
 
     /**
@@ -218,14 +235,7 @@ class CartService
             $this->setAttributesIfEmptyToRequest($request, $productsToBeAdded);
             $attributes = $request->getAttributes();
             ksort($attributes);
-            $existingItem = $cart->cartItems->first(function (CartItem $item) use ($request, $attributes) {
-                $itemAttributes = $item->attributes ?? [];
-                if (is_string($itemAttributes)) {
-                    $itemAttributes = json_decode($itemAttributes, true) ?? [];
-                }
-                ksort($itemAttributes);
-                return (int)$item->product_id === (int)$request->getProductId() && $itemAttributes === $attributes;
-            });
+            $existingItem = $this->findExistingCartItem($cart->cartItems, $request->getProductId(), $attributes);
             $price = $this->calculatePriceWithAttributes($product, $attributes);
             if ($existingItem) {
                 $existingItem->quantity += $request->getQuantity();
@@ -497,15 +507,7 @@ class CartService
         foreach ($cookieCart->cartItems as $cookieItem) {
             $attributes = $cookieItem->attributes ?? [];
             ksort($attributes);
-            $existingItem = $dbCartItems->first(function (CartItem $dbItem) use ($cookieItem, $attributes) {
-                $dbAttributes = $dbItem->attributes ?? [];
-                if (is_string($dbAttributes)) {
-                    $dbAttributes = json_decode($dbAttributes, true) ?? [];
-                }
-                ksort($dbAttributes);
-                return (int)$dbItem->product_id === (int)$cookieItem->product_id &&
-                       $dbAttributes === $attributes;
-            });
+            $existingItem = $this->findExistingCartItem($dbCartItems, $cookieItem->product_id, $attributes);
             if ($existingItem) {
                 $newQuantity = $existingItem->quantity + $cookieItem->quantity;
                 $totalPrice = $newQuantity * $existingItem->unit_price;
