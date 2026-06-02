@@ -19,6 +19,7 @@ use App\Services\UserService;
 use Filament\Support\Assets\Js;
 use Filament\Support\Facades\FilamentAsset;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
@@ -69,6 +70,13 @@ class AppServiceProvider extends ServiceProvider
         Schema::defaultStringLength(191);
 
         Paginator::useTailwind();
+
+        if (config('database.default') === 'sqlite') {
+            DB::statement('PRAGMA journal_mode=WAL');
+            DB::statement('PRAGMA synchronous=NORMAL');
+            DB::statement('PRAGMA cache_size=10000');
+            DB::statement('PRAGMA temp_store=MEMORY');
+        }
 
         if (! $this->app->runningInConsole()) {
             FilamentAsset::register([

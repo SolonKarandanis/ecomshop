@@ -27,13 +27,18 @@ class ProductRepository
     }
 
     public function getProductBySlug($slug): Product{
-        return $this->modelQuery()
+        $product = $this->modelQuery()
             ->with([
                 'productAttributeValues.attribute',
                 'productAttributeValues.attributeOption',
-                'productAttributeValues.media',
             ])
             ->where('slug', '=', $slug)->firstOrFail();
+
+        $product->productAttributeValues
+            ->filter(fn ($pav) => $pav->attribute->name === 'attribute.color')
+            ->load('media');
+
+        return $product;
     }
 
     public function searchProducts(ProductSearchFilterDto $dto): LengthAwarePaginator|array
