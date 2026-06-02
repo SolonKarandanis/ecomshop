@@ -71,7 +71,8 @@ class AppServiceProvider extends ServiceProvider
 
         Paginator::useTailwind();
 
-        if (config('database.default') === 'sqlite') {
+        if (config('database.default') === 'sqlite' &&
+            file_exists(config('database.connections.sqlite.database'))) {
             DB::statement('PRAGMA journal_mode=WAL');
             DB::statement('PRAGMA synchronous=NORMAL');
             DB::statement('PRAGMA cache_size=10000');
