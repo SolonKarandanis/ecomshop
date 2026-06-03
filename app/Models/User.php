@@ -108,7 +108,7 @@ class User extends Authenticatable implements FilamentUser
     public function canAccessPanel(Panel $panel): bool
     {
         return $this->can('view-admin-panel', User::class)
-            && $this->status === UserStatusEnum::ACTIVE;
+            && $this->status == UserStatusEnum::ACTIVE;
     }
 
     public function isAdmin(): bool{
