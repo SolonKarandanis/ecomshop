@@ -2,6 +2,8 @@
 
 namespace App\Dtos;
 
+use App\Http\Requests\OrderSearchRequest;
+
 class OrderSearchRequestDTO
 {
     private int $userId;
@@ -19,6 +21,18 @@ class OrderSearchRequestDTO
     public function __construct()
     {
         $this->userId = auth()->user()->id;
+    }
+
+    public static function fromRequest(OrderSearchRequest $request): self
+    {
+        $instance = new self();
+        $instance->withOrderStatus($request->input('orderStatus'));
+        $instance->withPaymentStatus($request->input('paymentStatus'));
+        $instance->withFromDate($request->input('fromDate'));
+        $instance->withToDate($request->input('toDate'));
+        $instance->withMinPrice($request->filled('minPrice') ? (float) $request->input('minPrice') : null);
+        $instance->withMaxPrice($request->filled('maxPrice') ? (float) $request->input('maxPrice') : null);
+        return $instance;
     }
 
     public static function fromArray(array $data): self{

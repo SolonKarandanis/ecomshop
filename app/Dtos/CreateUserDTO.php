@@ -2,6 +2,8 @@
 
 namespace App\Dtos;
 
+use App\Http\Requests\Auth\RegisterUserRequest;
+
 class CreateUserDTO
 {
     private string $name;
@@ -13,6 +15,15 @@ class CreateUserDTO
         $instance->setName($data['name']);
         $instance->setEmail($data['email']);
         $instance->setPassword($data['password']);
+        return $instance;
+    }
+
+    public static function fromRequest(RegisterUserRequest $request): self
+    {
+        $instance = new self();
+        $instance->setName($request->input('name'));
+        $instance->setEmail($request->input('email'));
+        $instance->setPassword($request->input('password'));
         return $instance;
     }
 

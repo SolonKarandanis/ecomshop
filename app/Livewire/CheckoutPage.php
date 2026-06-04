@@ -53,8 +53,19 @@ class CheckoutPage extends Component
     }
 
     public function save(){
-        $validated = $this->validate((new CheckoutRequest())->rules());
-        $dto = CheckoutDTO::fromArray($validated);
+        $request = new CheckoutRequest();
+        $request->merge([
+            'firstName'     => $this->firstName,
+            'lastName'      => $this->lastName,
+            'phone'         => $this->phone,
+            'address'       => $this->address,
+            'city'          => $this->city,
+            'country'       => $this->country,
+            'zipCode'       => $this->zipCode,
+            'paymentMethod' => $this->paymentMethod,
+        ]);
+        $this->validate($request->rules());
+        $dto = CheckoutDTO::fromRequest($request);
         $title = __('messages.checkout.title');
         $error = __('messages.checkout.error');
         try {

@@ -17,7 +17,7 @@ class ResetPasswordPage extends Component
     public string $password = '';
     public string $password_confirmation = '';
     #[Url]
-    public string $email;
+    public string $email = '';
     public string $token = '';
 
     protected UserService $userService;
@@ -31,8 +31,15 @@ class ResetPasswordPage extends Component
         $this->token = $token;
     }
     public function submit(){
-        $validated = $this->validate((new ResetPasswordRequest())->rules());
-        $dto = ResetPasswordDTO::fromArray($validated);
+        $request = new ResetPasswordRequest();
+        $request->merge([
+            'email'                 => $this->email,
+            'password'              => $this->password,
+            'password_confirmation' => $this->password_confirmation,
+            'token'                 => $this->token,
+        ]);
+        $this->validate($request->rules());
+        $dto = ResetPasswordDTO::fromRequest($request);
         $status = $this->userService->resetPassword($dto);
         $status === Password::PASSWORD_RESET?$this->redirect(route('login')):session()->flash('error','Something went wrong, please try again');
     }

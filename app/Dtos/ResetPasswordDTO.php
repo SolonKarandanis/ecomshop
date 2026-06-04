@@ -2,12 +2,24 @@
 
 namespace App\Dtos;
 
+use App\Http\Requests\Auth\ResetPasswordRequest;
+
 class ResetPasswordDTO
 {
     private string $email;
     private string $password;
     private string $passwordConfirmation;
     private string $token;
+
+    public static function fromRequest(ResetPasswordRequest $request): self
+    {
+        $instance = new self();
+        $instance->setEmail($request->input('email'));
+        $instance->setPassword($request->input('password'));
+        $instance->setPasswordConfirmation($request->input('password_confirmation'));
+        $instance->setToken($request->input('token'));
+        return $instance;
+    }
 
     public static function fromArray(array $data): self{
         $instance = new self();

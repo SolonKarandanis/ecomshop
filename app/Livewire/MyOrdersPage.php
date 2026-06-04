@@ -65,15 +65,33 @@ class MyOrdersPage extends Component
 
     private function validateAndReturnDto(): OrderSearchRequestDTO
     {
-        $validated = $this->validate((new OrderSearchRequest())->rules());
-        return OrderSearchRequestDTO::fromArray($validated)
+        $request = new OrderSearchRequest();
+        $request->merge([
+            'orderStatus'   => $this->orderStatus,
+            'paymentStatus' => $this->paymentStatus,
+            'fromDate'      => $this->fromDate,
+            'toDate'        => $this->toDate,
+            'minPrice'      => $this->minPrice,
+            'maxPrice'      => $this->maxPrice,
+        ]);
+        $this->validate($request->rules());
+        return OrderSearchRequestDTO::fromRequest($request)
             ->withSortColumn($this->sortColumn)
             ->withSortDirection($this->sortDirection);
     }
 
     public function search(): void
     {
-        $this->validate((new OrderSearchRequest())->rules());
+        $request = new OrderSearchRequest();
+        $request->merge([
+            'orderStatus'   => $this->orderStatus,
+            'paymentStatus' => $this->paymentStatus,
+            'fromDate'      => $this->fromDate,
+            'toDate'        => $this->toDate,
+            'minPrice'      => $this->minPrice,
+            'maxPrice'      => $this->maxPrice,
+        ]);
+        $this->validate($request->rules());
         $this->resetPage();
     }
 

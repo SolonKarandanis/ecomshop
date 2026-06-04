@@ -2,10 +2,20 @@
 
 namespace App\Dtos;
 
+use App\Http\Requests\UpdateProfileRequest;
+
 class UpdateProfileDto
 {
     private string $name;
     private string $email;
+
+    public static function fromRequest(UpdateProfileRequest $request): self
+    {
+        $instance = new self();
+        $instance->setName($request->input('name'));
+        $instance->setEmail($request->input('email'));
+        return $instance;
+    }
 
     public static function fromArray(array $data): self
     {

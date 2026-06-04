@@ -5,6 +5,8 @@ namespace App\Livewire;
 use App\Dtos\ChangePasswordDto;
 use App\Dtos\UpdateProfileDto;
 use App\Enums\MessageSeverityEnum;
+use App\Http\Requests\ChangePasswordRequest;
+use App\Http\Requests\UpdateProfileRequest;
 use App\Exceptions\ProfileException;
 use App\Services\UiService;
 use App\Services\UserService;
@@ -41,16 +43,15 @@ class ProfilePage extends Component
 
     public function updateProfile(): void
     {
-        $this->validate([
-            'name'  => 'required|string|max:255',
-            'email' => 'required|email|max:255',
+        $request = new UpdateProfileRequest();
+        $request->merge([
+            'name'  => $this->name,
+            'email' => $this->email,
         ]);
+        $this->validate($request->rules());
 
         try {
-            $dto = UpdateProfileDto::fromArray([
-                'name'  => $this->name,
-                'email' => $this->email,
-            ]);
+            $dto = UpdateProfileDto::fromRequest($request);
             $this->userService->updateProfile(auth()->user(), $dto);
             $this->uiService->showMessage(
                 MessageSeverityEnum::SUCCESS,
@@ -68,18 +69,16 @@ class ProfilePage extends Component
 
     public function changePassword(): void
     {
-        $this->validate([
-            'currentPassword'         => 'required|string',
-            'newPassword'             => 'required|string|min:8|same:newPasswordConfirmation',
-            'newPasswordConfirmation' => 'required|string',
+        $request = new ChangePasswordRequest();
+        $request->merge([
+            'currentPassword'         => $this->currentPassword,
+            'newPassword'             => $this->newPassword,
+            'newPasswordConfirmation' => $this->newPasswordConfirmation,
         ]);
+        $this->validate($request->rules());
 
         try {
-            $dto = ChangePasswordDto::fromArray([
-                'currentPassword'         => $this->currentPassword,
-                'newPassword'             => $this->newPassword,
-                'newPasswordConfirmation' => $this->newPasswordConfirmation,
-            ]);
+            $dto = ChangePasswordDto::fromRequest($request);
             $this->userService->changePassword(auth()->user(), $dto);
             $this->reset(['currentPassword', 'newPassword', 'newPasswordConfirmation']);
             $this->uiService->showMessage(

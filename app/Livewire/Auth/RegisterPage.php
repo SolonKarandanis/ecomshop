@@ -25,8 +25,14 @@ class RegisterPage extends Component
 
     public function save()
     {
-        $validated = $this->validate((new RegisterUserRequest())->rules());
-        $dto = CreateUserDTO::fromArray($validated);
+        $request = new RegisterUserRequest();
+        $request->merge([
+            'name' => $this->name,
+            'email' => $this->email,
+            'password' => $this->password,
+        ]);
+        $this->validate($request->rules());
+        $dto = CreateUserDTO::fromRequest($request);
         $user = $this->userService->createBuyer($dto);
         auth()->login($user);
         return redirect()->intended('/');

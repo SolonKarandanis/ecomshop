@@ -2,6 +2,8 @@
 
 namespace App\Dtos;
 
+use App\Http\Requests\CheckoutRequest;
+
 class CheckoutDTO
 {
     private string $firstName;
@@ -19,6 +21,20 @@ class CheckoutDTO
     private string $zipCode;
 
     private string $paymentMethod;
+
+    public static function fromRequest(CheckoutRequest $request): self
+    {
+        $instance = new self();
+        $instance->setFirstName($request->input('firstName'));
+        $instance->setLastName($request->input('lastName'));
+        $instance->setPhone($request->input('phone'));
+        $instance->setAddress($request->input('address'));
+        $instance->setCity($request->input('city'));
+        $instance->setCountry($request->input('country'));
+        $instance->setZipCode($request->input('zipCode'));
+        $instance->setPaymentMethod($request->input('paymentMethod'));
+        return $instance;
+    }
 
     public static function fromArray(array $data): self{
         $instance = new self();
