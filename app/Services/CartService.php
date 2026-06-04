@@ -165,7 +165,7 @@ class CartService
         catch (Throwable $exception){
             Log::error($exception);
             DB::rollBack();
-            throw new CartException('Failed to save cart to database: ' . $exception->getMessage(), 0, $exception);
+            throw CartException::saveCart();
         }
     }
 

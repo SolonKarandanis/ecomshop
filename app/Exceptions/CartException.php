@@ -4,6 +4,10 @@ namespace App\Exceptions;
 
 class CartException extends \Exception
 {
+    public static function saveCart(): CartException
+    {
+        return new self('Failed to save cart', 400);
+    }
     public static function updateItems(): CartException
     {
         return new self('Failed to update cart items', 400);
