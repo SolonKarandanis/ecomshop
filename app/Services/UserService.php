@@ -41,7 +41,7 @@ class UserService
     public function updateProfile(User $user, UpdateProfileDto $dto): void
     {
         if (User::where('email', $dto->getEmail())->where('id', '!=', $user->id)->exists()) {
-            throw new ProfileException(__('messages.update_profile.email_taken'));
+            throw ProfileException::emailTaken();
         }
         $user->name  = $dto->getName();
         $user->email = $dto->getEmail();
@@ -51,7 +51,7 @@ class UserService
     public function changePassword(User $user, ChangePasswordDto $dto): void
     {
         if (!Hash::check($dto->getCurrentPassword(), $user->password)) {
-            throw new ProfileException(__('messages.change_password.wrong_current'));
+            throw ProfileException::wrongCurrentPassword();
         }
         $user->password = Hash::make($dto->getNewPassword());
         $this->userRepository->saveUser($user);

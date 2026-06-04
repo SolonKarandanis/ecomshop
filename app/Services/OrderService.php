@@ -106,7 +106,7 @@ class OrderService
         catch (Throwable $exception){
             Log::error($exception);
             DB::rollBack();
-            throw new OrderException('Something went wrong during checkout!', 0, $exception);
+            throw OrderException::checkout();
         }
     }
 
@@ -116,7 +116,7 @@ class OrderService
      */
     protected function handleEmptyCart(Collection $cartItems):void{
         if ($cartItems->isEmpty()) {
-            throw new EmptyCartException('Cart is empty');
+            throw EmptyCartException::emptyCart();
         }
     }
 
@@ -152,7 +152,7 @@ class OrderService
             $createOrderDto = new CreateOrderDTO($totalPrice,$paymentMethodId,$orderItems);
             return $this->orderRepository->createOrder($createOrderDto);
         } catch (Throwable $e) {
-            throw new OrderException('Failed to create new order: ' . $e->getMessage(), 0, $e);
+            throw OrderException::createOrder();
         }
     }
 
@@ -176,7 +176,7 @@ class OrderService
         catch (Throwable $exception){
             Log::error($exception);
             DB::rollBack();
-            throw new OrderException('Something went wrong during stripe order processing!', 0, $exception);
+            throw OrderException::stripeProcessing();
         }
     }
 

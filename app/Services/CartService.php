@@ -200,7 +200,7 @@ class CartService
      */
     protected function handleProductNotFound(AddToCartDto $request,Product|null $product):void{
         if (!$product) {
-            throw new ProductNotFoundException("Product with ID {$request->getProductId()} not found.");
+            throw ProductNotFoundException::productNotFound($request->getProductId());
         }
     }
 
@@ -330,7 +330,7 @@ class CartService
         catch (Throwable $exception){
             Log::error($exception);
             DB::rollBack();
-            throw new CartException('Failed to update cart items in database: ' . $exception->getMessage(), 0, $exception);
+            throw CartException::updateItems();
         }
     }
 
@@ -421,7 +421,7 @@ class CartService
         catch (Throwable $exception){
             Log::error($exception);
             DB::rollBack();
-            throw new CartException('Failed to delete cart items from database: ' . $exception->getMessage(), 0, $exception);
+            throw CartException::deleteItems();
         }
     }
 
@@ -473,7 +473,7 @@ class CartService
         catch (Throwable $exception){
             Log::error($exception);
             DB::rollBack();
-            throw new CartException('Failed to clear cart from database: ' . $exception->getMessage(), 0, $exception);
+            throw CartException::clearCart();
         }
 
     }

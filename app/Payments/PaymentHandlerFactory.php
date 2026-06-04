@@ -14,7 +14,7 @@ class PaymentHandlerFactory
         return match($paymentMethod) {
             PaymentMethodEnum::STRIPE->value         => app(StripePaymentHandler::class),
             PaymentMethodEnum::CASH_ON_DELIVERY->value => app(CashOnDeliveryPaymentHandler::class),
-            default => throw new PaymentException("Unsupported payment method: $paymentMethod"),
+            default => throw PaymentException::unsupportedPaymentMethod($paymentMethod),
         };
     }
 }

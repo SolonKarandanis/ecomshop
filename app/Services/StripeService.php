@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Exceptions\PaymentException;
+use Illuminate\Support\Facades\Log;
 use Stripe\Checkout\Session;
 use Stripe\Exception\ApiErrorException;
 use Stripe\Stripe;
@@ -29,7 +30,8 @@ class StripeService
                 'cancel_url'=>route('cancel'),
             ]);
         } catch (ApiErrorException $e) {
-            throw new PaymentException('Failed to create Stripe session: ' . $e->getMessage(), 0, $e);
+            Log::error($e);
+            throw PaymentException::createStipeSession();
         }
     }
 
@@ -41,7 +43,8 @@ class StripeService
         try {
             return Session::retrieve($sessionId);
         } catch (ApiErrorException $e) {
-            throw new PaymentException('Failed to retrieve Stripe session: ' . $e->getMessage(), 0, $e);
+            Log::error($e);
+            throw PaymentException::retrieveStipeSession();
         }
     }
 }

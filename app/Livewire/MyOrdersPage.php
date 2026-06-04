@@ -4,7 +4,6 @@ namespace App\Livewire;
 
 use App\Dtos\OrderSearchRequestDTO;
 use App\Enums\MessageSeverityEnum;
-use App\Exceptions\OrderCountException;
 use App\Http\Requests\OrderSearchRequest;
 use App\Services\OrderService;
 use App\Services\UiService;
