@@ -18,8 +18,10 @@ use App\Services\StripeService;
 use App\Services\UserService;
 use Filament\Support\Assets\Js;
 use Filament\Support\Facades\FilamentAsset;
+use App\Models\User;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
@@ -67,6 +69,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Gate::define('buyer-action', function (?User $user) {
+            return $user === null || $user->isBuyer();
+        });
+
         Schema::defaultStringLength(191);
 
         Paginator::useTailwind();

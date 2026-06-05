@@ -12,6 +12,7 @@ use App\Models\Cart;
 use App\Services\CartService;
 use App\Services\OrderService;
 use App\Services\UiService;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -45,7 +46,7 @@ class CheckoutPage extends Component
 
     public function mount(): void
     {
-        if (auth()->check() && !auth()->user()->isBuyer()) {
+        if (Gate::denies('buyer-action')) {
             $this->redirect(route('home'));
             return;
         }

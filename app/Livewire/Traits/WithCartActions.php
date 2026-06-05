@@ -6,6 +6,7 @@ use App\Dtos\AddToCartDto;
 use App\Enums\MessageSeverityEnum;
 use App\Exceptions\CartException;
 use App\Exceptions\ProductNotFoundException;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
@@ -17,7 +18,7 @@ trait WithCartActions
      */
     public function addToCart(int $productId, int $quantity = 1, array $attributes = []): void
     {
-        if (auth()->check() && !auth()->user()->isBuyer()) {
+        if (Gate::denies('buyer-action')) {
             $this->uiService->addToCartError();
             return;
         }
