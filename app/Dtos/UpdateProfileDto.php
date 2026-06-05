@@ -3,10 +3,15 @@
 namespace App\Dtos;
 
 use App\Http\Requests\UpdateProfileRequest;
+use App\Validation\Concerns\ValidatesAttributes;
+use App\Validation\Rules\Required;
 
 class UpdateProfileDto
 {
+    use ValidatesAttributes;
+    #[Required]
     private string $name;
+    #[Required]
     private string $email;
 
     public static function fromRequest(UpdateProfileRequest $request): self
@@ -14,6 +19,7 @@ class UpdateProfileDto
         $instance = new self();
         $instance->setName($request->input('name'));
         $instance->setEmail($request->input('email'));
+        $instance->validate();
         return $instance;
     }
 
@@ -22,6 +28,7 @@ class UpdateProfileDto
         $instance = new self();
         $instance->setName($data['name']);
         $instance->setEmail($data['email']);
+        $instance->validate();
         return $instance;
     }
 
