@@ -8,6 +8,6 @@ class EmptyCartException extends \Exception
 {
     public static function emptyCart(): EmptyCartException
     {
-        return new self('Cart is empty',HttpStatusCodeEnum::BAD_REQUEST);
+        return new self('Cart is empty', HttpStatusCodeEnum::BAD_REQUEST->value);
     }
 }

@@ -8,16 +8,16 @@ class PaymentException extends \Exception
 {
     public static function createStipeSession(): PaymentException
     {
-        return new self('Failed to create Stripe session', HttpStatusCodeEnum::BAD_GATEWAY);
+        return new self('Failed to create Stripe session', HttpStatusCodeEnum::BAD_GATEWAY->value);
     }
 
     public static function retrieveStipeSession(): PaymentException
     {
-        return new self('Failed to retrieve Stripe session', HttpStatusCodeEnum::BAD_GATEWAY);
+        return new self('Failed to retrieve Stripe session', HttpStatusCodeEnum::BAD_GATEWAY->value);
     }
 
     public static function unsupportedPaymentMethod(string $paymentMethod): PaymentException
     {
-        return new self("Unsupported payment method: $paymentMethod", HttpStatusCodeEnum::BAD_REQUEST);
+        return new self("Unsupported payment method: $paymentMethod", HttpStatusCodeEnum::BAD_REQUEST->value);
     }
 }
