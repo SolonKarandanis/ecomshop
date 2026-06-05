@@ -2,24 +2,26 @@
 
 namespace App\Exceptions;
 
+use App\Enums\HttpStatusCodeEnum;
+
 class CartException extends \Exception
 {
     public static function saveCart(): CartException
     {
-        return new self('Failed to save cart', 400);
+        return new self('Failed to save cart', HttpStatusCodeEnum::BAD_REQUEST);
     }
     public static function updateItems(): CartException
     {
-        return new self('Failed to update cart items', 400);
+        return new self('Failed to update cart items', HttpStatusCodeEnum::BAD_REQUEST);
     }
 
     public static function deleteItems(): CartException
     {
-        return new self('Failed to delete cart items', 400);
+        return new self('Failed to delete cart items', HttpStatusCodeEnum::BAD_REQUEST);
     }
 
     public static function clearCart(): CartException
     {
-        return new self('Failed to clear cart', 400);
+        return new self('Failed to clear cart', HttpStatusCodeEnum::BAD_REQUEST);
     }
 }
