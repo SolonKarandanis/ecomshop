@@ -451,10 +451,17 @@ class CartService
         $result=false;
         if(Auth::check()){
             $result=$this->clearCartFromDatabase();
+            $this->cachedCart = null;
         }else{
             $result=$this->clearCartFromCookies();
+            // Cookie::forget is queued and only takes effect when the response is sent,
+            // so the cookies are still readable within this request. Seed the cache with
+            // an empty cart so any subsequent getCart() call in the same request doesn't
+            // re-read the stale cookies.
+            $empty = new Cart(['total_price' => 0]);
+            $empty->setRelation('cartItems', collect());
+            $this->cachedCart = $empty;
         }
-        $this->cachedCart = null;
         return $result;
     }
 
