@@ -2,23 +2,26 @@
 
 namespace App\Livewire\Traits;
 
+use App\Attributes\PreAuthorize;
 use App\Dtos\AddToCartDto;
 use App\Enums\MessageSeverityEnum;
 use App\Exceptions\CartException;
 use App\Exceptions\ProductNotFoundException;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
 trait WithCartActions
 {
+    use WithPreAuthorize;
+
     /**
      * @throws ProductNotFoundException
      * @throws CartException
      */
+    #[PreAuthorize('buyer-action')]
     public function addToCart(int $productId, int $quantity = 1, array $attributes = []): void
     {
-        if (Gate::denies('buyer-action')) {
+        if (!$this->isPreAuthorized(__FUNCTION__)) {
             $this->uiService->addToCartError();
             return;
         }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Validation\Rules;
+namespace App\Attributes;
 
 #[\Attribute]
 class Required

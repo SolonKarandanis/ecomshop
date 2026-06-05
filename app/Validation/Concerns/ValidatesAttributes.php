@@ -2,7 +2,7 @@
 
 namespace App\Validation\Concerns;
 
-use App\Validation\Rules\Required;
+use App\Attributes\Required;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use ReflectionClass;

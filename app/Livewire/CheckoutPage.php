@@ -12,7 +12,8 @@ use App\Models\Cart;
 use App\Services\CartService;
 use App\Services\OrderService;
 use App\Services\UiService;
-use Illuminate\Support\Facades\Gate;
+use App\Attributes\PreAuthorize;
+use App\Livewire\Traits\WithPreAuthorize;
 use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -21,6 +22,7 @@ use Throwable;
 #[Title('Checkout')]
 class CheckoutPage extends Component
 {
+    use WithPreAuthorize;
     public string $firstName = '';
     public string $lastName = '';
     public string $phone = '';
@@ -44,9 +46,10 @@ class CheckoutPage extends Component
         $this->uiService = $uiService;
     }
 
+    #[PreAuthorize('buyer-action')]
     public function mount(): void
     {
-        if (Gate::denies('buyer-action')) {
+        if (!$this->isPreAuthorized(__FUNCTION__)) {
             $this->redirect(route('home'));
             return;
         }

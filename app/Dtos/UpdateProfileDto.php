@@ -2,9 +2,9 @@
 
 namespace App\Dtos;
 
+use App\Attributes\Required;
 use App\Http\Requests\UpdateProfileRequest;
 use App\Validation\Concerns\ValidatesAttributes;
-use App\Validation\Rules\Required;
 
 class UpdateProfileDto
 {
