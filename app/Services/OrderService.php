@@ -21,6 +21,7 @@ use App\Repositories\OrderRepository;
 use App\Repositories\PaymentMethodRepository;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -149,7 +150,9 @@ class OrderService
     protected function createNewOrder(int $totalPrice, int $paymentMethodId, array $orderItems): Order
     {
         try {
-            $createOrderDto = new CreateOrderDTO($totalPrice,$paymentMethodId,$orderItems);
+            /** @var \App\Models\User $user */
+            $user = Auth::user();
+            $createOrderDto = new CreateOrderDTO($user->id, $totalPrice, $paymentMethodId, $orderItems, $user->name);
             return $this->orderRepository->createOrder($createOrderDto);
         } catch (Throwable $e) {
             throw OrderException::createOrder();

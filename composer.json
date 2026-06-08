@@ -50,6 +50,7 @@
         "pestphp/pest": "^3.0",
         "pestphp/pest-plugin-laravel": "^3.0",
         "pestphp/pest-plugin-livewire": "^3.0",
+        "phpstan/phpstan": "^2.2",
         "phpunit/phpunit": "^11.5.3"
     },
     "autoload": {
@@ -80,6 +81,9 @@
         "test": [
             "@php artisan config:clear --ansi",
             "@php artisan test"
+        ],
+        "stan": [
+            "@php -d memory_limit=512M ./vendor/bin/phpstan analyse"
         ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",

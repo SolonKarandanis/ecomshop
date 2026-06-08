@@ -20,8 +20,8 @@ class CreateOrderDTO
     private array $orderItems;
 
     public function __construct(
-        int $totalPrice, int $paymentMethodId, array $orderItems){
-        $this->userId = auth()->user()->id;
+        int $userId, int $totalPrice, int $paymentMethodId, array $orderItems, string $userName){
+        $this->userId = $userId;
         $this->totalPrice = $totalPrice;
         $this->paymentMethodId = $paymentMethodId;
         $this->paymentStatus=OrderPaymentStatusEnum::PENDING->value;
@@ -29,7 +29,7 @@ class CreateOrderDTO
         $this->currency = config('app.currency');
         $this->shippingAmount = 0;
         $this->shippingMethod = ShippingMethodEnum::NONE->value;
-        $this->notes = 'Order placed'.auth()->user()->name;
+        $this->notes = 'Order placed'.$userName;
         $this->orderItems = $orderItems;
     }
 
