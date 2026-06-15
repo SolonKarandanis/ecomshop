@@ -32,10 +32,19 @@ _Avoid_: Purchase, transaction, booking
 A temporary collection of items a Buyer intends to purchase. Stored in cookies for guests and in the database for authenticated Buyers.
 _Avoid_: Basket, bag
 
+**Notification**:
+An in-app alert delivered to a Buyer when their Order changes state. Stored via Laravel's database notification driver (`notifications` table). Surfaced in the storefront Navbar via a bell-icon dropdown and on a dedicated `/notifications` page.
+_Avoid_: Alert, message, push notification
+
+**Unread Notification**:
+A Notification with a null `read_at` timestamp — not yet viewed by the Buyer. Auto-marked as read when the Buyer opens the notification dropdown.
+_Avoid_: New notification, unseen notification
+
 ## Relationships
 
 - A **User** has exactly one **User Status**
 - A **Buyer** has a **Cart** and can place one or more **Orders**
+- A **Buyer** has zero or more **Notifications**
 - An **Order** has exactly one **Address** (the shipping address at the time of purchase)
 - An **Address** belongs to one **Order** and one **User**
 - A **Profile** belongs to one **User**
