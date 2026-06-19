@@ -19,7 +19,7 @@
             </div>
 
             <div id="navbar-collapse-with-animation" class="hs-collapse hidden transition-all duration-300 basis-full grow md:block">
-                <div class="overflow-y-auto max-h-[75vh] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-slate-700 dark:[&::-webkit-scrollbar-thumb]:bg-slate-500">
+                <div class="overflow-y-auto md:overflow-visible max-h-[75vh] md:max-h-none [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-slate-700 dark:[&::-webkit-scrollbar-thumb]:bg-slate-500">
                     <div class="flex flex-col gap-x-0 mt-5 divide-y divide-dashed divide-gray-200 md:flex-row md:items-center md:justify-end md:gap-x-7 md:mt-0 md:ps-7 md:divide-y-0 md:divide-solid dark:divide-gray-700">
 
                         <x-nav-link href="{{route('home')}}" :active="request()->routeIs('home')">{{__('navbar.home')}}</x-nav-link>
@@ -112,6 +112,18 @@
                                         focus:ring-blue-500 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-300 dark:focus:outline-none
                                         dark:focus:ring-1 dark:focus:ring-gray-600" >
                                     {{__('navbar.my_orders')}}
+                                </a>
+
+                                <a href="{{ route('notifications') }}" wire:navigate
+                                   class="flex items-center justify-between gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:ring-2
+                                        focus:ring-blue-500 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-300 dark:focus:outline-none
+                                        dark:focus:ring-1 dark:focus:ring-gray-600">
+                                    Notifications
+                                    @if ($unread_notifications_count > 0)
+                                        <span class="py-0.5 px-1.5 rounded-full text-[10px] font-bold bg-red-500 text-white">
+                                            {{ $unread_notifications_count > 9 ? '9+' : $unread_notifications_count }}
+                                        </span>
+                                    @endif
                                 </a>
 
                                 <a href="{{ route('profile') }}" wire:navigate

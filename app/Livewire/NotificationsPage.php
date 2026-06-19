@@ -16,7 +16,6 @@ class NotificationsPage extends Component
             ->latest()
             ->paginate(20);
 
-        return view('livewire.notifications-page', compact('notifications'))
-            ->layout('components.layouts.app');
+        return view('livewire.notifications-page', compact('notifications'));
     }
 }
