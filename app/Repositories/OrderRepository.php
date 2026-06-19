@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
+use Throwable;
 
 class OrderRepository
 {
@@ -23,7 +24,7 @@ class OrderRepository
     }
 
     /**
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function createOrder(CreateOrderDTO $createOrderDTO): Order{
         return DB::transaction(function () use ($createOrderDTO){

@@ -3,20 +3,23 @@
 namespace App\Livewire\Partials;
 
 use App\Services\CartService;
+use App\Services\NotificationService;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
 class Navbar extends Component
 {
     protected CartService $cartService;
+    protected NotificationService $notificationService;
     public int $total_cart_items = 0;
     public int $unread_notifications_count = 0;
     public bool $dropdown_open = false;
     public array $dropdown_notifications = [];
 
-    public function boot(CartService $cartService): void
+    public function boot(CartService $cartService, NotificationService $notificationService): void
     {
         $this->cartService = $cartService;
+        $this->notificationService = $notificationService;
     }
 
     public function mount(): void

@@ -8,6 +8,7 @@ use App\Payments\PaymentHandlerFactory;
 use App\Payments\StripePaymentHandler;
 use App\Repositories\AddressRepository;
 use App\Repositories\CartRepository;
+use App\Repositories\NotificationRepository;
 use App\Repositories\OrderRepository;
 use App\Repositories\PaymentMethodRepository;
 use App\Repositories\ProductRepository;
@@ -16,6 +17,7 @@ use App\Repositories\StripeOrderDetailRepository;
 use App\Repositories\UserRepository;
 use App\Services\CartService;
 use App\Services\NotificationHandlerService;
+use App\Services\NotificationService;
 use App\Services\OrderService;
 use App\Services\StripeService;
 use App\Services\UserService;
@@ -65,6 +67,10 @@ class AppServiceProvider extends ServiceProvider
                 $app->make(PaymentHandlerFactory::class),
                 $app->make(NotificationHandlerService::class),
             );
+        });
+
+        $this->app->singleton(NotificationService::class, function ($app) {
+            return new NotificationService($app->make(NotificationRepository::class));
         });
     }
 
