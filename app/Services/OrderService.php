@@ -5,9 +5,12 @@ namespace App\Services;
 use App\Dtos\CheckoutDTO;
 use App\Dtos\CreateOrderDTO;
 use App\Dtos\OrderSearchRequestDTO;
+use App\Enums\NotificationEventTypeEnum;
 use App\Enums\OrderPaymentStatusEnum;
+use App\Enums\OrderStatusEnum;
 use App\Enums\StripePaymentStatusEnum;
 use App\Models\CartItem;
+use App\Notifications\OrderNotification;
 use App\Payments\PaymentHandlerFactory;
 use App\Exceptions\EmptyCartException;
 use App\Exceptions\OrderException;
@@ -98,6 +101,13 @@ class OrderService
             } catch (\Exception $e) {
                 Log::error('OrderService mail sending failed: ' . $e->getMessage());
             }
+            $user = auth()->user();
+            $user->notify(new OrderNotification(
+                NotificationEventTypeEnum::ORDER_CREATED,
+                $order->id,
+                "Your order #{$order->id} has been placed successfully.",
+                $user->id,
+            ));
             return $redirect_url;
         }
         catch (EmptyCartException|PaymentException $exception){
@@ -166,14 +176,31 @@ class OrderService
         DB::beginTransaction();
         try{
             $sessionInfo = $this->stripeService->retrieveSession($sessionId);
-            if($sessionInfo->payment_status != StripePaymentStatusEnum::PAID->value){
-                $latestOrder->payment_status= OrderPaymentStatusEnum::FAILED->value;
-            }
-            else if($sessionInfo->payment_status == StripePaymentStatusEnum::PAID->value){
-                $latestOrder->payment_status= OrderPaymentStatusEnum::PAID->value;
+            $isPaid = $sessionInfo->payment_status == StripePaymentStatusEnum::PAID->value;
+            if ($isPaid) {
+                $latestOrder->payment_status = OrderPaymentStatusEnum::PAID->value;
+                $latestOrder->order_status   = OrderStatusEnum::Paid->value;
+            } else {
+                $latestOrder->payment_status = OrderPaymentStatusEnum::FAILED->value;
             }
             $this->orderRepository->updateOrder($latestOrder);
             DB::commit();
+            $buyer = $latestOrder->user;
+            if ($isPaid) {
+                $buyer->notify(new OrderNotification(
+                    NotificationEventTypeEnum::ORDER_PAYMENT_CONFIRMED,
+                    $latestOrder->id,
+                    "Payment for order #{$latestOrder->id} has been confirmed.",
+                    $buyer->id,
+                ));
+            } else {
+                $buyer->notify(new OrderNotification(
+                    NotificationEventTypeEnum::ORDER_PAYMENT_FAILED,
+                    $latestOrder->id,
+                    "Payment for order #{$latestOrder->id} failed. Please check your payment details.",
+                    $buyer->id,
+                ));
+            }
             return $latestOrder;
         }
         catch (Throwable $exception){

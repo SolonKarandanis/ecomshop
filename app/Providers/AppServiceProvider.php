@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\Order;
+use App\Observers\OrderObserver;
 use App\Payments\PaymentHandlerFactory;
 use App\Payments\StripePaymentHandler;
 use App\Repositories\AddressRepository;
@@ -69,6 +71,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Order::observe(OrderObserver::class);
+
         Gate::define('buyer-action', function (?User $user) {
             return $user === null || $user->isBuyer();
         });

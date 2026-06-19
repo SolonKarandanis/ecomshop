@@ -17,6 +17,9 @@
             </style>
         @endif
         @livewireStyles
+        <script>
+            window.authUserId = @json(auth()->id());
+        </script>
     </head>
     <body class="bg-slate-200 dark:bg-slate-700">
         @livewire('partials.navbar')

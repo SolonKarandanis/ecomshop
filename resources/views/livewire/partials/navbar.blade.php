@@ -46,6 +46,58 @@
                         @endguest
 
                         @auth
+                        {{-- Notification bell --}}
+                        <div class="relative md:py-4">
+                            <button
+                                wire:click="openDropdown"
+                                type="button"
+                                class="relative flex items-center text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                                aria-label="Notifications"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
+                                </svg>
+                                @if ($unread_notifications_count > 0)
+                                    <span class="absolute -top-1 -right-1 flex items-center justify-center w-4 h-4 text-[10px] font-bold text-white bg-red-500 rounded-full">
+                                        {{ $unread_notifications_count > 9 ? '9+' : $unread_notifications_count }}
+                                    </span>
+                                @endif
+                            </button>
+
+                            @if ($dropdown_open)
+                            <div
+                                class="absolute right-0 top-full mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-70 dark:bg-gray-800 dark:border-gray-700"
+                                wire:click.outside="closeDropdown"
+                            >
+                                <div class="p-3 border-b border-gray-200 dark:border-gray-700">
+                                    <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide dark:text-gray-400">Notifications</span>
+                                </div>
+
+                                @if (count($dropdown_notifications) > 0)
+                                    <ul class="divide-y divide-gray-100 dark:divide-gray-700">
+                                        @foreach ($dropdown_notifications as $notification)
+                                            <li>
+                                                <a href="{{ $notification['order_url'] }}" wire:navigate
+                                                   class="flex items-start gap-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm text-gray-700 dark:text-gray-300">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mt-0.5 shrink-0 text-blue-500">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+                                                    </svg>
+                                                    {{ $notification['message'] }}
+                                                </a>
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                @else
+                                    <p class="px-4 py-6 text-sm text-center text-gray-400 dark:text-gray-500">No unread notifications</p>
+                                @endif
+
+                                <div class="p-2 border-t border-gray-200 dark:border-gray-700 text-center">
+                                    <a href="{{ route('notifications') }}" wire:navigate class="text-xs text-blue-600 hover:underline dark:text-blue-400">See all notifications</a>
+                                </div>
+                            </div>
+                            @endif
+                        </div>
+
                         <div class="hs-dropdown [--strategy:static] md:[--strategy:absolute] [--adaptive:none] md:[--trigger:hover] md:py-4">
                             <button type="button" class="flex items-center w-full text-gray-500 hover:text-gray-400 font-medium dark:text-gray-400 dark:hover:text-gray-500">
                                 {{auth()->user()->name}}
