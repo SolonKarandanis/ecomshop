@@ -5,18 +5,16 @@ namespace App\Services;
 use App\Dtos\CheckoutDTO;
 use App\Dtos\CreateOrderDTO;
 use App\Dtos\OrderSearchRequestDTO;
-use App\Enums\NotificationEventTypeEnum;
 use App\Enums\OrderPaymentStatusEnum;
 use App\Enums\OrderStatusEnum;
 use App\Enums\StripePaymentStatusEnum;
 use App\Models\CartItem;
-use App\Notifications\OrderNotification;
+use App\Models\User;
 use App\Payments\PaymentHandlerFactory;
 use App\Exceptions\EmptyCartException;
 use App\Exceptions\OrderException;
 use App\Exceptions\PaymentException;
 use App\Exports\OrdersExport;
-use App\Mail\OrderPlaced;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Repositories\AddressRepository;
@@ -27,7 +25,6 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 use Maatwebsite\Excel\Facades\Excel;
 use PhpOffice\PhpSpreadsheet\Exception;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -42,6 +39,7 @@ class OrderService
         private readonly CartService $cartService,
         private readonly StripeService $stripeService,
         private readonly PaymentHandlerFactory $paymentHandlerFactory,
+        private readonly NotificationService $notificationService,
     ){}
 
     public function getOrderById(int $orderId):Order{
@@ -96,18 +94,7 @@ class OrderService
                 $this->cartService->clearCart();
             DB::commit();
             $order = $this->getUsersLatestOrder(auth()->user()->id);
-            try {
-                Mail::to(request()->user())->send(new OrderPlaced($order));
-            } catch (\Exception $e) {
-                Log::error('OrderService mail sending failed: ' . $e->getMessage());
-            }
-            $user = auth()->user();
-            $user->notify(new OrderNotification(
-                NotificationEventTypeEnum::ORDER_CREATED,
-                $order->id,
-                "Your order #{$order->id} has been placed successfully.",
-                $user->id,
-            ));
+            $this->notificationService->orderCreated($order);
             return $redirect_url;
         }
         catch (EmptyCartException|PaymentException $exception){
@@ -157,10 +144,10 @@ class OrderService
     /**
      * @throws OrderException
      */
-    protected function createNewOrder(int $totalPrice, int $paymentMethodId, array $orderItems): Order
+    protected function createNewOrder(float $totalPrice, int $paymentMethodId, array $orderItems): Order
     {
         try {
-            /** @var \App\Models\User $user */
+            /** @var User $user */
             $user = Auth::user();
             $createOrderDto = new CreateOrderDTO($user->id, $totalPrice, $paymentMethodId, $orderItems, $user->name);
             return $this->orderRepository->createOrder($createOrderDto);
@@ -185,21 +172,10 @@ class OrderService
             }
             $this->orderRepository->updateOrder($latestOrder);
             DB::commit();
-            $buyer = $latestOrder->user;
             if ($isPaid) {
-                $buyer->notify(new OrderNotification(
-                    NotificationEventTypeEnum::ORDER_PAYMENT_CONFIRMED,
-                    $latestOrder->id,
-                    "Payment for order #{$latestOrder->id} has been confirmed.",
-                    $buyer->id,
-                ));
+                $this->notificationService->orderPaymentConfirmed($latestOrder);
             } else {
-                $buyer->notify(new OrderNotification(
-                    NotificationEventTypeEnum::ORDER_PAYMENT_FAILED,
-                    $latestOrder->id,
-                    "Payment for order #{$latestOrder->id} failed. Please check your payment details.",
-                    $buyer->id,
-                ));
+                $this->notificationService->orderPaymentFailed($latestOrder);
             }
             return $latestOrder;
         }

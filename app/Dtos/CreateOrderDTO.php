@@ -9,7 +9,7 @@ use App\Enums\ShippingMethodEnum;
 class CreateOrderDTO
 {
     private int $userId;
-    private int $totalPrice;
+    private float $totalPrice;
     private int $paymentMethodId;
     private string $paymentStatus;
     private string $orderStatus;
@@ -20,7 +20,7 @@ class CreateOrderDTO
     private array $orderItems;
 
     public function __construct(
-        int $userId, int $totalPrice, int $paymentMethodId, array $orderItems, string $userName){
+        int $userId, float $totalPrice, int $paymentMethodId, array $orderItems, string $userName){
         $this->userId = $userId;
         $this->totalPrice = $totalPrice;
         $this->paymentMethodId = $paymentMethodId;
@@ -38,7 +38,7 @@ class CreateOrderDTO
         return $this->userId;
     }
 
-    public function getTotalPrice(): int
+    public function getTotalPrice(): float
     {
         return $this->totalPrice;
     }

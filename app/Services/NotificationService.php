@@ -1,0 +1,49 @@
+<?php
+
+namespace App\Services;
+
+use App\Enums\NotificationEventTypeEnum;
+use App\Mail\OrderPlaced;
+use App\Models\Order;
+use App\Notifications\OrderNotification;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+
+class NotificationService
+{
+
+    public function orderCreated(Order $order):void{
+        $user = $order->user;
+        $user->notify(new OrderNotification(
+            NotificationEventTypeEnum::ORDER_CREATED,
+            $order->id,
+            "Your order #{$order->id} has been placed successfully.",
+            $user->id,
+        ));
+        try {
+            Mail::to($user)->send(new OrderPlaced($order));
+        } catch (\Exception $e) {
+            Log::error('NotificationService mail sending failed: ' . $e->getMessage());
+        }
+    }
+
+    public function orderPaymentConfirmed(Order $order):void{
+        $buyer = $order->user;
+        $order->user->notify(new OrderNotification(
+            NotificationEventTypeEnum::ORDER_PAYMENT_CONFIRMED,
+            $order->id,
+            "Payment for order #{$order->id} has been confirmed.",
+            $buyer->id,
+        ));
+    }
+
+    public function orderPaymentFailed(Order $order):void{
+        $buyer = $order->user;
+        $buyer->notify(new OrderNotification(
+            NotificationEventTypeEnum::ORDER_PAYMENT_FAILED,
+            $order->id,
+            "Payment for order #{$order->id} failed. Please check your payment details.",
+            $buyer->id,
+        ));
+    }
+}
