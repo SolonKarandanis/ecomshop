@@ -9,7 +9,7 @@ use App\Notifications\OrderNotification;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
-class NotificationService
+class NotificationHandlerService
 {
 
     public function orderCreated(Order $order):void{
@@ -23,7 +23,7 @@ class NotificationService
         try {
             Mail::to($user)->send(new OrderPlaced($order));
         } catch (\Exception $e) {
-            Log::error('NotificationService mail sending failed: ' . $e->getMessage());
+            Log::error('NotificationHandlerService mail sending failed: ' . $e->getMessage());
         }
     }
 

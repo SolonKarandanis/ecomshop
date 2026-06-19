@@ -15,7 +15,7 @@ use App\Repositories\RoleRepository;
 use App\Repositories\StripeOrderDetailRepository;
 use App\Repositories\UserRepository;
 use App\Services\CartService;
-use App\Services\NotificationService;
+use App\Services\NotificationHandlerService;
 use App\Services\OrderService;
 use App\Services\StripeService;
 use App\Services\UserService;
@@ -63,7 +63,7 @@ class AppServiceProvider extends ServiceProvider
                 $app->make(CartService::class),
                 $app->make(StripeService::class),
                 $app->make(PaymentHandlerFactory::class),
-                $app->make(NotificationService::class),
+                $app->make(NotificationHandlerService::class),
             );
         });
     }

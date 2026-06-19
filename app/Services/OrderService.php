@@ -33,13 +33,13 @@ use Throwable;
 class OrderService
 {
     public function __construct(
-        private readonly OrderRepository $orderRepository,
-        private readonly AddressRepository $addressRepository,
-        private readonly PaymentMethodRepository $paymentMethodRepository,
-        private readonly CartService $cartService,
-        private readonly StripeService $stripeService,
-        private readonly PaymentHandlerFactory $paymentHandlerFactory,
-        private readonly NotificationService $notificationService,
+        private readonly OrderRepository            $orderRepository,
+        private readonly AddressRepository          $addressRepository,
+        private readonly PaymentMethodRepository    $paymentMethodRepository,
+        private readonly CartService                $cartService,
+        private readonly StripeService              $stripeService,
+        private readonly PaymentHandlerFactory      $paymentHandlerFactory,
+        private readonly NotificationHandlerService $notificationService,
     ){}
 
     public function getOrderById(int $orderId):Order{
