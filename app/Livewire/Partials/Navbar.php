@@ -47,15 +47,15 @@ class Navbar extends Component
             return;
         }
 
-        $notifications = $user->unreadNotifications()->latest()->take(5)->get();
+        $notifications = $this->notificationService->getUsersUnreadNotifications($user->id);
         $this->dropdown_notifications = $notifications->map(fn ($n) => [
             'message'   => $n->data['message'],
             'order_url' => $n->data['order_url'],
             'id'        => $n->id,
         ])->all();
 
-        $notifications->markAsRead();
-        $this->unread_notifications_count = $user->unreadNotifications()->count();
+        $this->notificationService->markNotificationsAsRead($user->id, $notifications->pluck('id')->all());
+        $this->unread_notifications_count = $this->notificationService->getUsersUnreadNotificationsCount($user->id);
         $this->dropdown_open = true;
     }
 
@@ -69,7 +69,7 @@ class Navbar extends Component
     {
         $user = auth()->user();
         $this->unread_notifications_count = $user
-            ? $user->unreadNotifications()->count()
+            ? $this->notificationService->getUsersUnreadNotificationsCount($user->id)
             : 0;
     }
 
