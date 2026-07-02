@@ -32,6 +32,26 @@ _Avoid_: Purchase, transaction, booking
 A temporary collection of items a Buyer intends to purchase. Stored in cookies for guests and in the database for authenticated Buyers.
 _Avoid_: Basket, bag
 
+**Review**:
+Feedback a Buyer leaves on a Product: a required 1–5 star Rating plus optional written text. Eligible only for a Buyer with a **Verified Purchase** of that Product. Exactly one Review per Buyer per Product, ever. The Buyer may edit their Rating/text at any time; only an Admin can remove a Review (by hiding it — see Review Status), the Buyer cannot delete their own. Auto-published on submission.
+_Avoid_: Rating (alone), comment, feedback
+
+**Review Status**:
+A two-state flag on a Review — `published` or `hidden`. New Reviews default to `published` (no approval queue); an Admin can hide a Review after the fact for moderation reasons. Hidden Reviews are excluded from public display and from the Product's Average Rating.
+_Avoid_: Approved/pending, review state
+
+**Average Rating**:
+A Product's mean star Rating across its `published` Reviews, stored as a cached value on the Product and recalculated whenever a Review is created, edited, or its Review Status changes. Paired with a cached Review count.
+_Avoid_: Score, rank, review summary
+
+**Admin Reply**:
+A single optional public reply an Admin can attach to a Review, shown alongside it on the Product page. Not available to Buyers or Suppliers. No "helpful" voting exists on Reviews — out of scope for this iteration.
+_Avoid_: Response, comment, seller reply
+
+**Verified Purchase**:
+The condition that qualifies a Buyer to leave a Review on a Product: the Buyer has an OrderItem for that Product on an Order whose Order Status is `Delivered`.
+_Avoid_: Confirmed purchase, eligible buyer
+
 **Notification**:
 An in-app alert delivered to a Buyer when their Order changes state. Stored via Laravel's database notification driver (`notifications` table). Surfaced in the storefront Navbar via a bell-icon dropdown and on a dedicated `/notifications` page.
 _Avoid_: Alert, message, push notification
