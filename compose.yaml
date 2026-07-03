@@ -28,7 +28,7 @@ services:
             - mailpit
             - selenium
     meilisearch:
-        image: 'getmeili/meilisearch:latest'
+        image: 'getmeili/meilisearch:v1.48.3'
         ports:
             - '${FORWARD_MEILISEARCH_PORT:-7700}:7700'
         environment:
