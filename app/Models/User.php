@@ -53,7 +53,10 @@ use Spatie\Permission\Traits\HasRoles;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User withoutPermission($permissions)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User withoutRole($roles, ?string $guard = null)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User withoutTeam($teams)
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Address> $addresses
+ * @property-read int|null $addresses_count
  * @mixin \Eloquent
+ * @mixin IdeHelperUser
  */
 class User extends Authenticatable implements FilamentUser
 {

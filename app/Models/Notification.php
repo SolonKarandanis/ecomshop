@@ -17,6 +17,27 @@ use Illuminate\Notifications\DatabaseNotification as BaseNotification;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read Model $notifiable
+ * @method static \Illuminate\Notifications\DatabaseNotificationCollection<int, static> all($columns = ['*'])
+ * @method static Builder<static>|Notification forUser(\App\Models\User|string|int $user)
+ * @method static \Illuminate\Notifications\DatabaseNotificationCollection<int, static> get($columns = ['*'])
+ * @method static Builder<static>|Notification newModelQuery()
+ * @method static Builder<static>|Notification newQuery()
+ * @method static Builder<static>|Notification ofType(string $type)
+ * @method static Builder<static>|Notification onlyRead()
+ * @method static Builder<static>|Notification onlyUnread()
+ * @method static Builder<static>|Notification query()
+ * @method static Builder<static>|Notification read()
+ * @method static Builder<static>|Notification unread()
+ * @method static Builder<static>|Notification whereCreatedAt($value)
+ * @method static Builder<static>|Notification whereData($value)
+ * @method static Builder<static>|Notification whereId($value)
+ * @method static Builder<static>|Notification whereNotifiableId($value)
+ * @method static Builder<static>|Notification whereNotifiableType($value)
+ * @method static Builder<static>|Notification whereReadAt($value)
+ * @method static Builder<static>|Notification whereType($value)
+ * @method static Builder<static>|Notification whereUpdatedAt($value)
+ * @mixin \Eloquent
+ * @mixin IdeHelperNotification
  */
 class Notification extends BaseNotification
 {

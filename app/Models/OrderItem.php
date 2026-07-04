@@ -33,6 +33,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read \App\Models\Order $order
  * @property-read \App\Models\Product $product
  * @mixin \Eloquent
+ * @mixin IdeHelperOrderItem
  */
 class OrderItem extends Model
 {

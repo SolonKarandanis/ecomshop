@@ -46,7 +46,8 @@ namespace App\Models{
  * @property-read string $full_name
  * @mixin \Eloquent
  */
-	class Address extends \Eloquent {}
+	#[\AllowDynamicProperties]
+	class IdeHelperAddress {}
 }
 
 namespace App\Models{
@@ -64,7 +65,8 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Attribute whereType($value)
  * @mixin \Eloquent
  */
-	class Attribute extends \Eloquent {}
+	#[\AllowDynamicProperties]
+	class IdeHelperAttribute {}
 }
 
 namespace App\Models{
@@ -81,7 +83,8 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AttributeOptions whereOptionName($value)
  * @mixin \Eloquent
  */
-	class AttributeOptions extends \Eloquent {}
+	#[\AllowDynamicProperties]
+	class IdeHelperAttributeOptions {}
 }
 
 namespace App\Models{
@@ -107,10 +110,11 @@ namespace App\Models{
  * @property-read int|null $products_count
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, Media> $media
  * @property-read int|null $media_count
- * @mixin \Eloquent
  * @method static \Database\Factories\BrandFactory factory($count = null, $state = [])
+ * @mixin \Eloquent
  */
-	class Brand extends \Eloquent implements \Spatie\MediaLibrary\HasMedia {}
+	#[\AllowDynamicProperties]
+	class IdeHelperBrand {}
 }
 
 namespace App\Models{
@@ -133,7 +137,8 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Cart whereUserId($value)
  * @mixin \Eloquent
  */
-	class Cart extends \Eloquent {}
+	#[\AllowDynamicProperties]
+	class IdeHelperCart {}
 }
 
 namespace App\Models{
@@ -163,7 +168,8 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CartItem whereUpdatedAt($value)
  * @mixin \Eloquent
  */
-	class CartItem extends \Eloquent {}
+	#[\AllowDynamicProperties]
+	class IdeHelperCartItem {}
 }
 
 namespace App\Models{
@@ -187,10 +193,47 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Category whereUpdatedAt($value)
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, Media> $media
  * @property-read int|null $media_count
- * @mixin \Eloquent
  * @method static \Database\Factories\CategoryFactory factory($count = null, $state = [])
+ * @mixin \Eloquent
  */
-	class Category extends \Eloquent implements \Spatie\MediaLibrary\HasMedia {}
+	#[\AllowDynamicProperties]
+	class IdeHelperCategory {}
+}
+
+namespace App\Models{
+/**
+ * @property string $id
+ * @property string $type
+ * @property string $notifiable_type
+ * @property int $notifiable_id
+ * @property array $data
+ * @property Carbon|null $read_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Model $notifiable
+ * @method static \Illuminate\Notifications\DatabaseNotificationCollection<int, static> all($columns = ['*'])
+ * @method static Builder<static>|Notification forUser(\App\Models\User|string|int $user)
+ * @method static \Illuminate\Notifications\DatabaseNotificationCollection<int, static> get($columns = ['*'])
+ * @method static Builder<static>|Notification newModelQuery()
+ * @method static Builder<static>|Notification newQuery()
+ * @method static Builder<static>|Notification ofType(string $type)
+ * @method static Builder<static>|Notification onlyRead()
+ * @method static Builder<static>|Notification onlyUnread()
+ * @method static Builder<static>|Notification query()
+ * @method static Builder<static>|Notification read()
+ * @method static Builder<static>|Notification unread()
+ * @method static Builder<static>|Notification whereCreatedAt($value)
+ * @method static Builder<static>|Notification whereData($value)
+ * @method static Builder<static>|Notification whereId($value)
+ * @method static Builder<static>|Notification whereNotifiableId($value)
+ * @method static Builder<static>|Notification whereNotifiableType($value)
+ * @method static Builder<static>|Notification whereReadAt($value)
+ * @method static Builder<static>|Notification whereType($value)
+ * @method static Builder<static>|Notification whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
+	#[\AllowDynamicProperties]
+	class IdeHelperNotification {}
 }
 
 namespace App\Models{
@@ -228,10 +271,12 @@ namespace App\Models{
  * @property-read \App\Models\User $user
  * @property-read \App\Models\PaymentMethod $paymentMethod
  * @property-read \App\Models\StripeOrderDetail|null $stripeOrderDetail
- * @mixin \Eloquent
  * @property-read mixed $created_at_diff
+ * @method static \Database\Factories\OrderFactory factory($count = null, $state = [])
+ * @mixin \Eloquent
  */
-	class Order extends \Eloquent {}
+	#[\AllowDynamicProperties]
+	class IdeHelperOrder {}
 }
 
 namespace App\Models{
@@ -261,7 +306,8 @@ namespace App\Models{
  * @property-read \App\Models\Product $product
  * @mixin \Eloquent
  */
-	class OrderItem extends \Eloquent {}
+	#[\AllowDynamicProperties]
+	class IdeHelperOrderItem {}
 }
 
 namespace App\Models{
@@ -273,9 +319,11 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PaymentMethod query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PaymentMethod whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PaymentMethod whereResourceKey($value)
+ * @method static \Database\Factories\PaymentMethodFactory factory($count = null, $state = [])
  * @mixin \Eloquent
  */
-	class PaymentMethod extends \Eloquent {}
+	#[\AllowDynamicProperties]
+	class IdeHelperPaymentMethod {}
 }
 
 namespace App\Models{
@@ -328,10 +376,15 @@ namespace App\Models{
  * @property-read mixed $ram_attribute_values
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, Media> $media
  * @property-read int|null $media_count
- * @mixin \Eloquent
  * @method static \Database\Factories\ProductFactory factory($count = null, $state = [])
+ * @property numeric|null $average_rating
+ * @property int $reviews_count
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereAverageRating($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereReviewsCount($value)
+ * @mixin \Eloquent
  */
-	class Product extends \Eloquent implements \Spatie\MediaLibrary\HasMedia {}
+	#[\AllowDynamicProperties]
+	class IdeHelperProduct {}
 }
 
 namespace App\Models{
@@ -358,7 +411,35 @@ namespace App\Models{
  * @property-read int|null $media_count
  * @mixin \Eloquent
  */
-	class ProductAttributeValues extends \Eloquent implements \Spatie\MediaLibrary\HasMedia {}
+	#[\AllowDynamicProperties]
+	class IdeHelperProductAttributeValues {}
+}
+
+namespace App\Models{
+/**
+ * @property int $id
+ * @property int $user_id
+ * @property int $product_id
+ * @property int $rating
+ * @property string|null $comment
+ * @property string $status
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Review newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Review newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Review query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Review whereComment($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Review whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Review whereProductId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Review whereRating($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Review whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Review whereUserId($value)
+ * @property-read \App\Models\Product $product
+ * @property-read \App\Models\User $user
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Review hidden()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Review published()
+ * @mixin \Eloquent
+ */
+	#[\AllowDynamicProperties]
+	class IdeHelperReview {}
 }
 
 namespace App\Models{
@@ -383,7 +464,8 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|StripeOrderDetail whereUpdatedAt($value)
  * @mixin \Eloquent
  */
-	class StripeOrderDetail extends \Eloquent {}
+	#[\AllowDynamicProperties]
+	class IdeHelperStripeOrderDetail {}
 }
 
 namespace App\Models{
@@ -412,11 +494,10 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereUpdatedAt($value)
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Order> $orders
  * @property-read int|null $orders_count
- * @mixin \Eloquent
  * @property string $status User account status
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Permission\Models\Permission> $permissions
  * @property-read int|null $permissions_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Permission\Models\Role> $roles
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Role> $roles
  * @property-read int|null $roles_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Permission\Models\Permission> $teams
  * @property-read int|null $teams_count
@@ -427,7 +508,11 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User withoutPermission($permissions)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User withoutRole($roles, ?string $guard = null)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User withoutTeam($teams)
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Address> $addresses
+ * @property-read int|null $addresses_count
+ * @mixin \Eloquent
  */
-	class User extends \Eloquent implements \Filament\Models\Contracts\FilamentUser {}
+	#[\AllowDynamicProperties]
+	class IdeHelperUser {}
 }
 

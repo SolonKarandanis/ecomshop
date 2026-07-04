@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AttributeOptions whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AttributeOptions whereOptionName($value)
  * @mixin \Eloquent
+ * @mixin IdeHelperAttributeOptions
  */
 class AttributeOptions extends Model
 {

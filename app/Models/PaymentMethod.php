@@ -13,7 +13,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PaymentMethod query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PaymentMethod whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|PaymentMethod whereResourceKey($value)
+ * @method static \Database\Factories\PaymentMethodFactory factory($count = null, $state = [])
  * @mixin \Eloquent
+ * @mixin IdeHelperPaymentMethod
  */
 class PaymentMethod extends Model
 {

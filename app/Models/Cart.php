@@ -25,6 +25,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Cart whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Cart whereUserId($value)
  * @mixin \Eloquent
+ * @mixin IdeHelperCart
  */
 class Cart extends Model
 {

@@ -32,6 +32,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property-read int|null $media_count
  * @method static \Database\Factories\CategoryFactory factory($count = null, $state = [])
  * @mixin \Eloquent
+ * @mixin IdeHelperCategory
  */
 class Category extends Model implements HasMedia
 {

@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Attribute whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Attribute whereType($value)
  * @mixin \Eloquent
+ * @mixin IdeHelperAttribute
  */
 class Attribute extends Model
 {

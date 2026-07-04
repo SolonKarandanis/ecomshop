@@ -44,7 +44,9 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property-read \App\Models\PaymentMethod $paymentMethod
  * @property-read \App\Models\StripeOrderDetail|null $stripeOrderDetail
  * @property-read mixed $created_at_diff
+ * @method static \Database\Factories\OrderFactory factory($count = null, $state = [])
  * @mixin \Eloquent
+ * @mixin IdeHelperOrder
  */
 class Order extends Model
 {

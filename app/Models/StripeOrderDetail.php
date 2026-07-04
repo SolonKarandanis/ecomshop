@@ -26,6 +26,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|StripeOrderDetail whereSessionId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|StripeOrderDetail whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @mixin IdeHelperStripeOrderDetail
  */
 class StripeOrderDetail extends Model
 {
