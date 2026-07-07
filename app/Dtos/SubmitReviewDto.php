@@ -2,6 +2,8 @@
 
 namespace App\Dtos;
 
+use App\Http\Requests\SubmitReviewRequest;
+
 class SubmitReviewDto
 {
     private int $productId;
@@ -15,6 +17,16 @@ class SubmitReviewDto
         $this->userId = $userId;
         $this->rating = $rating;
         $this->comment = $comment;
+    }
+
+    public static function fromRequest(SubmitReviewRequest $request,int $productId, int $userId): self
+    {
+        return new self(
+            $productId,
+            $userId,
+            $request->input('rating'),
+            $request->input('comment')
+        );
     }
 
     public function getProductId(): int
