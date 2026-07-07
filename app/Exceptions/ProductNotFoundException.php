@@ -8,6 +8,6 @@ class ProductNotFoundException extends \Exception
 {
     public static function productNotFound(int $productId): ProductNotFoundException
     {
-        return new self("Product with ID {$productId} not found.", HttpStatusCodeEnum::NOT_FOUND->value);
+        return new self(__('messages.product_exceptions.not_found', ['id' => $productId]), HttpStatusCodeEnum::NOT_FOUND->value);
     }
 }

@@ -8,6 +8,6 @@ class ReviewException extends \Exception
 {
     public static function notEligible(): ReviewException
     {
-        return new self('You are not eligible to review this product', HttpStatusCodeEnum::BAD_REQUEST->value);
+        return new self(__('messages.submit_review.not_eligible'), HttpStatusCodeEnum::BAD_REQUEST->value);
     }
 }

@@ -41,4 +41,30 @@ return [
         'success'=>'Password changed successfully!',
         'wrong_current'=>'The current password you entered is incorrect.',
     ],
+    'submit_review'=>[
+        'title'=>'Submit Review',
+        'success'=>'Review submitted successfully!',
+        'error'=>'Failed to submit review!',
+        'not_eligible'=>'You are not eligible to review this product.',
+    ],
+    'cart_exceptions'=>[
+        'save_cart'=>'Failed to save cart',
+        'update_items'=>'Failed to update cart items',
+        'delete_items'=>'Failed to delete cart items',
+        'clear_cart'=>'Failed to clear cart',
+        'empty_cart'=>'Cart is empty',
+    ],
+    'order_exceptions'=>[
+        'create_order'=>'Failed to create new order',
+        'checkout'=>'Something went wrong during checkout!',
+        'stripe_processing'=>'Something went wrong during stripe order processing!',
+    ],
+    'payment_exceptions'=>[
+        'create_stripe_session'=>'Failed to create Stripe session',
+        'retrieve_stripe_session'=>'Failed to retrieve Stripe session',
+        'unsupported_payment_method'=>'Unsupported payment method: :method',
+    ],
+    'product_exceptions'=>[
+        'not_found'=>'Product with ID :id not found.',
+    ],
 ];
