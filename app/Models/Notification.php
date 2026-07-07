@@ -36,8 +36,8 @@ use Illuminate\Notifications\DatabaseNotification as BaseNotification;
  * @method static Builder<static>|Notification whereReadAt($value)
  * @method static Builder<static>|Notification whereType($value)
  * @method static Builder<static>|Notification whereUpdatedAt($value)
- * @mixin \Eloquent
  * @mixin IdeHelperNotification
+ * @mixin \Eloquent
  */
 class Notification extends BaseNotification
 {

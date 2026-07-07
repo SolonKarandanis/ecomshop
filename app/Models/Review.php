@@ -23,8 +23,16 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Review whereRating($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Review whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Review whereUserId($value)
- * @mixin \Eloquent
  * @mixin IdeHelperReview
+ * @property \Illuminate\Support\Carbon $created_at
+ * @property \Illuminate\Support\Carbon $updated_at
+ * @property-read \App\Models\Product $product
+ * @property-read \App\Models\User $user
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Review hidden()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Review published()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Review whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Review whereUpdatedAt($value)
+ * @mixin \Eloquent
  */
 class Review extends Model
 {

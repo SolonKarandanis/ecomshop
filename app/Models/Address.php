@@ -38,8 +38,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read \App\Models\Order $order
  * @property-read \App\Models\User $user
  * @property-read string $full_name
- * @mixin \Eloquent
  * @mixin IdeHelperAddress
+ * @mixin \Eloquent
  */
 class Address extends Model
 {

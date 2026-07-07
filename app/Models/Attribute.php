@@ -18,8 +18,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Attribute whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Attribute whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Attribute whereType($value)
- * @mixin \Eloquent
  * @mixin IdeHelperAttribute
+ * @mixin \Eloquent
  */
 class Attribute extends Model
 {

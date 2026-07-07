@@ -24,8 +24,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Cart whereTotalPrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Cart whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Cart whereUserId($value)
- * @mixin \Eloquent
  * @mixin IdeHelperCart
+ * @mixin \Eloquent
  */
 class Cart extends Model
 {

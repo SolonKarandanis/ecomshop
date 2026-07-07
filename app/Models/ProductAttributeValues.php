@@ -30,8 +30,8 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProductAttributeValues whereProductId($value)
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, Media> $media
  * @property-read int|null $media_count
- * @mixin \Eloquent
  * @mixin IdeHelperProductAttributeValues
+ * @mixin \Eloquent
  */
 class ProductAttributeValues extends Pivot implements HasMedia
 {

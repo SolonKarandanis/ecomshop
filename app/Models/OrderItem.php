@@ -32,8 +32,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|OrderItem whereAttributes($value)
  * @property-read \App\Models\Order $order
  * @property-read \App\Models\Product $product
- * @mixin \Eloquent
  * @mixin IdeHelperOrderItem
+ * @mixin \Eloquent
  */
 class OrderItem extends Model
 {

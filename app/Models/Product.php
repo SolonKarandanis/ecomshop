@@ -66,8 +66,8 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property int $reviews_count
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereAverageRating($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereReviewsCount($value)
- * @mixin \Eloquent
  * @mixin IdeHelperProduct
+ * @mixin \Eloquent
  */
 class Product extends Model implements HasMedia
 {

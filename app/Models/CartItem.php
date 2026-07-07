@@ -30,8 +30,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CartItem whereTotalPrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CartItem whereUnitPrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CartItem whereUpdatedAt($value)
- * @mixin \Eloquent
  * @mixin IdeHelperCartItem
+ * @mixin \Eloquent
  */
 class CartItem extends Model
 {

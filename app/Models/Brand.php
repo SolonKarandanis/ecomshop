@@ -33,8 +33,8 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property-read \Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection<int, Media> $media
  * @property-read int|null $media_count
  * @method static \Database\Factories\BrandFactory factory($count = null, $state = [])
- * @mixin \Eloquent
  * @mixin IdeHelperBrand
+ * @mixin \Eloquent
  */
 class Brand extends Model implements HasMedia
 {

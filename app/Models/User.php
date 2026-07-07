@@ -55,8 +55,8 @@ use Spatie\Permission\Traits\HasRoles;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User withoutTeam($teams)
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Address> $addresses
  * @property-read int|null $addresses_count
- * @mixin \Eloquent
  * @mixin IdeHelperUser
+ * @mixin \Eloquent
  */
 class User extends Authenticatable implements FilamentUser
 {
