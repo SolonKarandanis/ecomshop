@@ -12,6 +12,7 @@ use App\Repositories\NotificationRepository;
 use App\Repositories\OrderRepository;
 use App\Repositories\PaymentMethodRepository;
 use App\Repositories\ProductRepository;
+use App\Repositories\ReviewRepository;
 use App\Repositories\RoleRepository;
 use App\Repositories\StripeOrderDetailRepository;
 use App\Repositories\UserRepository;
@@ -19,6 +20,7 @@ use App\Services\CartService;
 use App\Services\NotificationHandlerService;
 use App\Services\NotificationService;
 use App\Services\OrderService;
+use App\Services\ReviewService;
 use App\Services\StripeService;
 use App\Services\UserService;
 use Filament\Support\Assets\Js;
@@ -71,6 +73,14 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton(NotificationService::class, function ($app) {
             return new NotificationService($app->make(NotificationRepository::class));
+        });
+
+        $this->app->singleton(ReviewService::class,function ($app) {
+            return new ReviewService(
+                $app->make(ReviewRepository::class),
+                $app->make(OrderRepository::class),
+                $app->make(ProductRepository::class),
+            );
         });
     }
 

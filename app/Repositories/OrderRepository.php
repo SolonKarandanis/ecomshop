@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Dtos\CreateOrderDTO;
 use App\Dtos\OrderSearchRequestDTO;
+use App\Enums\OrderStatusEnum;
 use App\Models\Order;
 use App\Models\OrderItem;
 use Illuminate\Database\Eloquent\Builder;
@@ -130,5 +131,14 @@ class OrderRepository
     public function getOrders(): Collection|Builder
     {
         return $this->modelQuery()->get();
+    }
+
+    public function hasDeliveredOrderForProduct(int $userId, int $productId): bool
+    {
+        return $this->modelQuery()
+            ->where('user_id', $userId)
+            ->where('order_status', OrderStatusEnum::Delivered->value)
+            ->whereHas('items', fn ($q) => $q->where('product_id', $productId))
+            ->exists();
     }
 }

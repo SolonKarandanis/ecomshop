@@ -125,4 +125,12 @@ class ProductRepository
             ->get()
             ->keyBy('id');
     }
+
+    public function updateRatingStats(int $productId, ?float $averageRating, int $reviewsCount): bool
+    {
+        return $this->modelQuery()->where('id', $productId)->update([
+            'average_rating' => $averageRating,
+            'reviews_count' => $reviewsCount,
+        ]);
+    }
 }
