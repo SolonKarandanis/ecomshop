@@ -214,4 +214,93 @@
             </div>
         </div>
     </section>
+    <section class="max-w-6xl px-4 py-4 mx-auto md:px-6">
+        <div class="border-t dark:border-gray-900 pt-8">
+            <h2 class="text-2xl font-bold dark:text-gray-400 mb-4">{{ __('product-details.reviews') }}</h2>
+            <div class="flex items-center gap-x-3 mb-8">
+                <div class="flex items-center">
+                    @for ($i = 1; $i <= 5; $i++)
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                             class="w-5 mr-1 bi bi-star-fill {{ $i <= round($product->average_rating ?? 0) ? 'text-blue-500 dark:text-blue-400' : 'text-gray-300 dark:text-gray-600' }}"
+                             viewBox="0 0 16 16">
+                            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
+                        </svg>
+                    @endfor
+                </div>
+                <span class="text-sm text-gray-500 dark:text-gray-400">
+                    @if($product->reviews_count > 0)
+                         {{ number_format($product->average_rating, 1) }} {{ __('product-details.out_of_5') }} &middot; {{ $product->reviews_count }} {{ __('product-details.reviews') }}
+                    @else
+                        {{ __('product-details.no_reviews_yet') }}
+                    @endif
+                </span>
+            </div>
+            @if($canReviewProduct)
+                <div class="mb-10 p-6 rounded-lg border border-gray-200 dark:border-gray-700" x-data="{ hoverRating: 0 }">
+                    <h3 class="text-lg font-semibold dark:text-gray-400 mb-4">{{ __('product-details.write_a_review') }}</h3>
+
+                    <div class="mb-4">
+                        <label class="block text-sm mb-2 dark:text-white">{{ __('product-details.rating') }}</label>
+                        <div class="flex items-center gap-x-1">
+                            @for ($i = 1; $i <= 5; $i++)
+                                <button type="button"
+                                        x-on:mouseenter="hoverRating = {{ $i }}"
+                                        x-on:mouseleave="hoverRating = 0"
+                                        x-on:click="$wire.rating = {{ $i }}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor"
+                                         class="w-7 bi bi-star-fill cursor-pointer"
+                                         :class="(hoverRating || $wire.rating) >= {{ $i }} ? 'text-blue-500 dark:text-blue-400' : 'text-gray-300 dark:text-gray-600'"
+                                         viewBox="0 0 16 16">
+                                        <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
+                                    </svg>
+                                </button>
+                            @endfor
+                        </div>
+                        @error('rating')
+                        <p class="text-xs text-red-600 mt-2">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="comment" class="block text-sm mb-2 dark:text-white">{{ __('product-details.comment') }}</label>
+                        <textarea id="comment" wire:model="comment" rows="4"
+                                  class="py-3 px-4 block w-full border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400 @error('comment') border-red-500 @enderror"></textarea>
+                        @error('comment')
+                        <p class="text-xs text-red-600 mt-2">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <x-button variant="primary" wire:click="submitReview" :wire-target="'submitReview'" :loading="true">
+                        {{ __('buttons.submit_review') }}
+                    </x-button>
+                </div>
+            @endif
+            @forelse($reviews as $review)
+                <div class="py-6 border-b dark:border-gray-700">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="font-semibold dark:text-gray-300">{{ $review->user->name }}</span>
+                        <span class="text-xs text-gray-500 dark:text-gray-400">{{ $review->created_at->diffForHumans() }}</span>
+                    </div>
+                    <div class="flex items-center mb-2">
+                        @for ($i = 1; $i <= 5; $i++)
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor"
+                                 class="w-3.5 mr-1 bi bi-star-fill {{ $i <= $review->rating ? 'text-blue-500 dark:text-blue-400' : 'text-gray-300 dark:text-gray-600' }}"
+                                 viewBox="0 0 16 16">
+                                <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
+                            </svg>
+                        @endfor
+                    </div>
+                    @if($review->comment)
+                        <p class="text-sm text-gray-700 dark:text-gray-400">{{ $review->comment }}</p>
+                    @endif
+                </div>
+            @empty
+                <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('product-details.no_reviews_yet') }}</p>
+            @endforelse
+
+            <div class="mt-6">
+                {{ $reviews->links() }}
+            </div>
+        </div>
+    </section>
 </div>
