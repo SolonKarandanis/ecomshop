@@ -46,4 +46,34 @@ class NotificationHandlerService
             $buyer->id,
         ));
     }
+
+    public function orderShipped(Order $order):void{
+        $buyer = $order->user;
+        $buyer->notify(new OrderNotification(
+            NotificationEventTypeEnum::ORDER_SHIPPED,
+            $order->id,
+            "Your order #{$order->id} has been shipped.",
+            $buyer->id,
+        ));
+    }
+
+    public function orderDelivered(Order $order):void{
+        $buyer = $order->user;
+        $buyer->notify(new OrderNotification(
+            NotificationEventTypeEnum::ORDER_DELIVERED,
+            $order->id,
+            "Your order #{$order->id} has been delivered.",
+            $buyer->id,
+        ));
+    }
+
+    public function orderCancelled(Order $order):void{
+        $buyer = $order->user;
+        $buyer->notify(new OrderNotification(
+            NotificationEventTypeEnum::ORDER_CANCELLED,
+            $order->id,
+            "Your order #{$order->id} has been cancelled.",
+            $buyer->id,
+        ));
+    }
 }
