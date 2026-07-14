@@ -12,6 +12,10 @@ _Avoid_: Account, member
 A User with the `buyer` role. The only role that can add to cart and place orders.
 _Avoid_: Customer, shopper, client
 
+**Supplier**:
+A User with the `supplier` role. Owns one or more Products, and is the only role (besides Admin) able to transition the Order Status of an Order containing their Products, from `Paid` onward. Only choosable at registration, and only while the Suppliers feature is enabled — see **Suppliers Feature**.
+_Avoid_: Vendor, seller, merchant
+
 **User Status**:
 A two-state flag on a User — `active` or `inactive`. An inactive User cannot authenticate on the storefront or access the admin panel. Status is admin-controlled only; Users cannot change their own status. New Users default to `active`.
 _Avoid_: User state, account status, enabled/disabled
@@ -29,8 +33,12 @@ A completed purchase placed by a Buyer. Has an Order Status and a Payment Status
 _Avoid_: Purchase, transaction, booking
 
 **Cart**:
-A temporary collection of items a Buyer intends to purchase. Stored in cookies for guests and in the database for authenticated Buyers.
+A temporary collection of items a Buyer intends to purchase. Stored in cookies for guests and in the database for authenticated Buyers. May only contain Products from a single Supplier — mixed-Supplier Carts are rejected at add-to-cart time.
 _Avoid_: Basket, bag
+
+**Suppliers Feature**:
+A system-wide toggle (`SUPPLIERS_ENABLED`) that controls whether the Supplier role can be chosen at registration and whether existing Suppliers can act on Order Status. Checked live on every request — disabling it does not alter any existing User's role or any Product's ownership, it only withdraws the ability to act while off. When disabled, every Product's owning Supplier is instead whichever Admin created or last edited it.
+_Avoid_: Feature flag, supplier mode
 
 **Review**:
 Feedback a Buyer leaves on a Product: a required 1–5 star Rating plus optional written text. Eligible only for a Buyer with a **Verified Purchase** of that Product. Exactly one Review per Buyer per Product, ever. The Buyer may edit their Rating/text at any time; only an Admin can remove a Review (by hiding it — see Review Status), the Buyer cannot delete their own. Auto-published on submission.
@@ -68,6 +76,8 @@ _Avoid_: New notification, unseen notification
 - An **Order** has exactly one **Address** (the shipping address at the time of purchase)
 - An **Address** belongs to one **Order** and one **User**
 - A **Profile** belongs to one **User**
+- Every Product has exactly one owning **Supplier** (or, when the **Suppliers Feature** is off, the Admin who created/edited it)
+- A **Supplier** may transition an Order's Order Status from `Paid` to `Shipped` or `Cancelled`, and from `Shipped` to `Delivered`, only for Orders containing their Products. `Delivered` and `Cancelled` are terminal for every role, including Admin.
 
 ## Example dialogue
 
