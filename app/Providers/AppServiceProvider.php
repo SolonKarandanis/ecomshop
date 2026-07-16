@@ -40,6 +40,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+//      DB::prohibitDestructiveCommands()` stops `migrate:fresh`, `db:wipe` and friends
+//      from ever running in production.
+        DB::prohibitDestructiveCommands(
+            app()->isProduction()
+        );
+
         $this->app->singleton(CartService::class, function ($app) {
             return new CartService($app->make(CartRepository::class), $app->make(ProductRepository::class));
         });
