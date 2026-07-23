@@ -36,6 +36,11 @@ class ReviewService
         return $this->reviewRepository->existsByUserIdAndReviewId($userId, $reviewId);
     }
 
+    public function getReviewForBuyer(int $userId, int $productId): ?Review
+    {
+        return $this->reviewRepository->findByUserAndProduct($userId, $productId);
+    }
+
     /**
      * @throws ReviewException|Throwable
      */
@@ -80,7 +85,7 @@ class ReviewService
         catch (Throwable $exception){
             Log::error($exception);
             DB::rollBack();
-            throw ReviewException::createReview();
+            throw ReviewException::updateReview();
         }
 
     }

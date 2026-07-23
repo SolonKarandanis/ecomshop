@@ -235,9 +235,11 @@
                     @endif
                 </span>
             </div>
-            @if($canReviewProduct)
+            @if($canReviewProduct || $isEditingReview)
                 <div class="mb-10 p-6 rounded-lg border border-gray-200 dark:border-gray-700" x-data="{ hoverRating: 0 }">
-                    <h3 class="text-lg font-semibold dark:text-gray-400 mb-4">{{ __('product-details.write_a_review') }}</h3>
+                    <h3 class="text-lg font-semibold dark:text-gray-400 mb-4">
+                        {{ $isEditingReview ? __('product-details.edit_your_review') : __('product-details.write_a_review') }}
+                    </h3>
 
                     <div class="mb-4">
                         <label class="block text-sm mb-2 dark:text-white">{{ __('product-details.rating') }}</label>
@@ -271,7 +273,7 @@
                     </div>
 
                     <x-button variant="primary" wire:click="submitReview" :wire-target="'submitReview'" :loading="true">
-                        {{ __('buttons.submit_review') }}
+                        {{ $isEditingReview ? __('buttons.update_review') : __('buttons.submit_review') }}
                     </x-button>
                 </div>
             @endif

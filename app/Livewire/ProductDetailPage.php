@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Attributes\PreAuthorize;
 use App\Dtos\SubmitReviewDto;
+use App\Dtos\UpdateReviewDTO;
 use App\Exceptions\ReviewException;
 use App\Http\Requests\SubmitReviewRequest;
 use App\Livewire\Traits\WithCartActions;
@@ -32,6 +33,7 @@ class ProductDetailPage extends Component
     public bool $hasGpuAttribute = false;
     public int $rating = 0;
     public ?string $comment = null;
+    public ?int $reviewId = null;
 
     protected ProductRepository $productRepository;
     protected CartService $cartService;
@@ -53,6 +55,16 @@ class ProductDetailPage extends Component
     public function mount(string $slug): void
     {
         $this->slug = $slug;
+
+        if (auth()->check() && auth()->user()->isBuyer()) {
+            $review = $this->reviewService->getReviewForBuyer(auth()->id(), $this->product->id);
+
+            if ($review) {
+                $this->reviewId = $review->id;
+                $this->rating = $review->rating;
+                $this->comment = $review->comment;
+            }
+        }
     }
 
     #[Computed]
@@ -79,9 +91,10 @@ class ProductDetailPage extends Component
     #[PreAuthorize('buyer-action')]
     public function submitReview(): void
     {
-        $title = __('messages.submit_review.title');
+        $isEditing = $this->reviewId !== null;
+        $title = $isEditing ? __('messages.submit_review.edit_title') : __('messages.submit_review.title');
 
-        if (!$this->isPreAuthorized(__FUNCTION__) || !$this->canReviewProduct) {
+        if (!$this->isPreAuthorized(__FUNCTION__) || !($isEditing || $this->canReviewProduct)) {
             $this->handleError($title, __('messages.submit_review.not_eligible'), ReviewException::notEligible());
             return;
         }
@@ -93,13 +106,18 @@ class ProductDetailPage extends Component
         ]);
         $this->validate($request->rules());
 
-        $dto = SubmitReviewDto::fromRequest($request, $this->product->id, auth()->id());
-
         try {
-            $this->reviewService->submitReview($dto);
+            if ($isEditing) {
+                $dto = UpdateReviewDTO::fromRequest($request, $this->reviewId, auth()->id(), $this->product->id);
+                $this->reviewService->updateReview($dto);
+                $this->handleSuccess(null, $title, __('messages.submit_review.update_success'));
+            } else {
+                $dto = SubmitReviewDto::fromRequest($request, $this->product->id, auth()->id());
+                $this->reviewService->submitReview($dto);
+                $this->reset('rating', 'comment');
+                $this->handleSuccess(null, $title, __('messages.submit_review.success'));
+            }
             unset($this->product);
-            $this->reset('rating', 'comment');
-            $this->handleSuccess(null, $title, __('messages.submit_review.success'));
         } catch (ReviewException $e) {
             $this->handleError($title, __('messages.submit_review.error'), $e);
         }
@@ -116,6 +134,7 @@ class ProductDetailPage extends Component
         $this->hasGpuAttribute        = $product->gpuAttributeValues->count() > 0;
         $reviews = $this->reviews;
         $canReviewProduct = $this->canReviewProduct;
-        return view('livewire.product-detail-page', compact('product', 'reviews', 'canReviewProduct'));
+        $isEditingReview = $this->reviewId !== null;
+        return view('livewire.product-detail-page', compact('product', 'reviews', 'canReviewProduct', 'isEditingReview'));
     }
 }

@@ -87,7 +87,7 @@ it('does not allow a buyer without a verified purchase to submit a review', func
     expect(Review::count())->toBe(0);
 });
 
-it('does not allow a buyer to submit a second review for the same product', function () {
+it('allows a buyer to edit their existing review and updates the average rating', function () {
     $buyer = createBuyerUser();
     $product = Product::factory()->create(['is_active' => true]);
     createDeliveredOrderFor($buyer, $product);
@@ -101,14 +101,49 @@ it('does not allow a buyer to submit a second review for the same product', func
     ]);
 
     livewire(ProductDetailPage::class, ['slug' => $product->slug])
+        ->assertSet('rating', 3)
+        ->assertSet('comment', 'First review.')
         ->set('rating', 5)
-        ->set('comment', 'Second attempt.')
-        ->call('submitReview');
+        ->set('comment', 'Updated my mind, this is great.')
+        ->call('submitReview')
+        ->assertSee('Updated my mind, this is great.');
 
     expect(Review::where('user_id', $buyer->id)->where('product_id', $product->id)->count())->toBe(1);
-    $this->assertDatabaseMissing('reviews', [
+    $this->assertDatabaseHas('reviews', [
         'user_id'    => $buyer->id,
         'product_id' => $product->id,
-        'comment'    => 'Second attempt.',
+        'rating'     => 5,
+        'comment'    => 'Updated my mind, this is great.',
+    ]);
+
+    expect((float) $product->refresh()->average_rating)->toBe(5.0);
+});
+
+it('does not allow a buyer to edit another buyer\'s review', function () {
+    $owner = createBuyerUser();
+    $intruder = createBuyerUser();
+    $product = Product::factory()->create(['is_active' => true]);
+    createDeliveredOrderFor($owner, $product);
+
+    $review = Review::create([
+        'user_id'    => $owner->id,
+        'product_id' => $product->id,
+        'rating'     => 3,
+        'comment'    => 'Owner review.',
+    ]);
+
+    actingAs($intruder);
+
+    livewire(ProductDetailPage::class, ['slug' => $product->slug])
+        ->set('reviewId', $review->id)
+        ->set('rating', 1)
+        ->set('comment', 'Hijacked.')
+        ->call('submitReview');
+
+    $this->assertDatabaseHas('reviews', [
+        'id'      => $review->id,
+        'user_id' => $owner->id,
+        'rating'  => 3,
+        'comment' => 'Owner review.',
     ]);
 });

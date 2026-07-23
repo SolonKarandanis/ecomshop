@@ -46,6 +46,10 @@ return [
         'success'=>'Review submitted successfully!',
         'error'=>'Failed to submit review!',
         'not_eligible'=>'You are not eligible to review this product.',
+        'creation_error'=>'Failed to create review!',
+        'edit_title'=>'Edit Review',
+        'update_success'=>'Review updated successfully!',
+        'update_error'=>'Failed to update review!',
     ],
     'cart_exceptions'=>[
         'save_cart'=>'Failed to save cart',
