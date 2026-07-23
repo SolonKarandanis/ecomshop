@@ -133,4 +133,9 @@ class ProductRepository
             'reviews_count' => $reviewsCount,
         ]);
     }
+
+    public function lockForUpdate(int $productId): Product
+    {
+        return $this->modelQuery()->where('id', $productId)->lockForUpdate()->firstOrFail();
+    }
 }

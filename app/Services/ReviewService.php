@@ -51,6 +51,7 @@ class ReviewService
         }
         try{
             DB::beginTransaction();
+            $this->productRepository->lockForUpdate($dto->getProductId());
             $review = $this->reviewRepository->createReview($dto);
             $stats = $this->reviewRepository->getRatingStatsForProduct($dto->getProductId());
             $this->productRepository->updateRatingStats($dto->getProductId(), $stats->getAverageRating(), $stats->getReviewsCount());
@@ -74,6 +75,7 @@ class ReviewService
         }
         try{
             DB::beginTransaction();
+            $this->productRepository->lockForUpdate($dto->getProductId());
             $review = $this->reviewRepository->getReviewById($dto->getReviewId());
             $this->reviewRepository->updateReview($review,$dto);
             $stats = $this->reviewRepository->getRatingStatsForProduct($dto->getProductId());
