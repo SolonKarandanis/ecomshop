@@ -62,7 +62,7 @@ class ReviewService
     /**
      * @throws ReviewException
      */
-    public function editReview(UpdateReviewDTO $dto): Review
+    public function updateReview(UpdateReviewDTO $dto): Review
     {
         if (!$this->canEdit($dto->getUserId(), $dto->getReviewId())){
             throw ReviewException::notEligible();
