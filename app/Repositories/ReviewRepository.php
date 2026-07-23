@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Dtos\ReviewRatingStatsDto;
 use App\Dtos\SubmitReviewDto;
+use App\Dtos\UpdateReviewDTO;
 use App\Models\Review;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -37,7 +38,7 @@ class ReviewRepository
         ]);
     }
 
-    public function updateReview(Review $review, SubmitReviewDto $dto): bool
+    public function updateReview(Review $review, UpdateReviewDTO $dto): bool
     {
         return $review->update([
             'rating' => $dto->getRating(),
@@ -62,6 +63,14 @@ class ReviewRepository
             $stats->average_rating !== null ? (float) $stats->average_rating : null,
             (int) $stats->reviews_count
         );
+    }
+
+    public function existsByUserIdAndReviewId(int $userId, int $reviewId): bool
+    {
+        return $this->modelQuery()
+            ->where('user_id', $userId)
+            ->where('id', $reviewId)
+            ->exists();
     }
 
 }

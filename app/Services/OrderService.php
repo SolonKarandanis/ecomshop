@@ -74,24 +74,24 @@ class OrderService
      */
     public function checkout(CheckoutDTO $dto):string{
         $paymentMethod=$dto->getPaymentMethod();
-        DB::beginTransaction();
-            try{
-                $cart = $this->cartService->getCart();
-                Log::debug('OrderService checkout cartItems count: ', [$cart->cartItems->count()]);
-                $this->handleEmptyCart($cart->cartItems);
-                $line_items = $this->createLineItems($cart->cartItems);
-                $order_items = $this->createOrderItems($cart->cartItems);
-                $paymentMethods = $this->paymentMethodRepository->findAll()->pluck('id', 'resource_key');
-                $paymentMethodId=$paymentMethods->get($paymentMethod);
-                Log::debug('OrderService creating order');
-                $order = $this->createNewOrder($cart->total_price,$paymentMethodId,$order_items);
-                Log::debug('OrderService created order ',[$order->id]);
-                $redirect_url = $this->paymentHandlerFactory->make($paymentMethod)->process($order, $line_items);
-                Log::debug('OrderService creating address');
-                $this->addressRepository->create($order->id,$dto);
-                Log::debug('OrderService created address');
-                Log::debug('OrderService clearing cart');
-                $this->cartService->clearCart();
+        try{
+            DB::beginTransaction();
+            $cart = $this->cartService->getCart();
+            Log::debug('OrderService checkout cartItems count: ', [$cart->cartItems->count()]);
+            $this->handleEmptyCart($cart->cartItems);
+            $line_items = $this->createLineItems($cart->cartItems);
+            $order_items = $this->createOrderItems($cart->cartItems);
+            $paymentMethods = $this->paymentMethodRepository->findAll()->pluck('id', 'resource_key');
+            $paymentMethodId=$paymentMethods->get($paymentMethod);
+            Log::debug('OrderService creating order');
+            $order = $this->createNewOrder($cart->total_price,$paymentMethodId,$order_items);
+            Log::debug('OrderService created order ',[$order->id]);
+            $redirect_url = $this->paymentHandlerFactory->make($paymentMethod)->process($order, $line_items);
+            Log::debug('OrderService creating address');
+            $this->addressRepository->create($order->id,$dto);
+            Log::debug('OrderService created address');
+            Log::debug('OrderService clearing cart');
+            $this->cartService->clearCart();
             DB::commit();
             $order = $this->getUsersLatestOrder(auth()->user()->id);
             $this->notificationService->orderCreated($order);
@@ -157,11 +157,11 @@ class OrderService
     }
 
     /**
-     * @throws OrderException
+     * @throws OrderException|Throwable
      */
     public function successOrFailStripeOrder(string $sessionId, Order $latestOrder): Order{
-        DB::beginTransaction();
         try{
+            DB::beginTransaction();
             $sessionInfo = $this->stripeService->retrieveSession($sessionId);
             $isPaid = $sessionInfo->payment_status == StripePaymentStatusEnum::PAID->value;
             if ($isPaid) {
