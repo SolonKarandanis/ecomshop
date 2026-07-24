@@ -20,4 +20,9 @@ class ReviewException extends \Exception
     {
         return new self(__('messages.submit_review.update_error'), HttpStatusCodeEnum::INTERNAL_SERVER_ERROR->value);
     }
+
+    public static function updateStatus(): ReviewException
+    {
+        return new self(__('messages.submit_review.update_status_error'), HttpStatusCodeEnum::INTERNAL_SERVER_ERROR->value);
+    }
 }

@@ -12,8 +12,7 @@ use Illuminate\Support\Collection;
 
 class ReviewRepository
 {
-
-    public function modelQuery(): Builder | Review
+    public function modelQuery(): Builder|Review
     {
         return Review::query();
     }
@@ -46,6 +45,13 @@ class ReviewRepository
         ]);
     }
 
+    public function updateStatus(Review $review, string $status): bool
+    {
+        return $review->update([
+            'status' => $status,
+        ]);
+    }
+
     public function getPublishedReviewsForProduct(int $productId): LengthAwarePaginator|Collection
     {
         return $this->modelQuery()->where('product_id', $productId)->published()->paginate(5);
@@ -72,5 +78,4 @@ class ReviewRepository
             ->where('id', $reviewId)
             ->exists();
     }
-
 }
