@@ -52,6 +52,13 @@ class ReviewRepository
         ]);
     }
 
+    public function updateAdminReply(Review $review, ?string $adminReply): bool
+    {
+        return $review->update([
+            'admin_reply' => $adminReply,
+        ]);
+    }
+
     public function getPublishedReviewsForProduct(int $productId): LengthAwarePaginator|Collection
     {
         return $this->modelQuery()->where('product_id', $productId)->published()->paginate(5);

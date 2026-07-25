@@ -92,6 +92,64 @@ it('lets an admin hide a review, removing it from the public list and recalculat
         ->assertDontSee('Great product, works perfectly.');
 });
 
+it('lets an admin add a public reply to a review, visible on ProductDetailPage', function () {
+    $admin = createAdminUser();
+    $buyer = createModerationBuyerUser();
+    $product = Product::factory()->create(['is_active' => true]);
+    createModerationDeliveredOrderFor($buyer, $product);
+
+    actingAs($buyer);
+    livewire(ProductDetailPage::class, ['slug' => $product->slug])
+        ->set('rating', 4)
+        ->set('comment', 'Solid product, does the job.')
+        ->call('submitReview');
+
+    $review = Review::where('user_id', $buyer->id)->where('product_id', $product->id)->firstOrFail();
+
+    actingAs($admin);
+    app(ReviewService::class)->updateAdminReply($review, 'Thanks for the feedback!');
+
+    $this->assertDatabaseHas('reviews', [
+        'id' => $review->id,
+        'admin_reply' => 'Thanks for the feedback!',
+    ]);
+
+    livewire(ProductDetailPage::class, ['slug' => $product->slug])
+        ->assertSee('Thanks for the feedback!');
+});
+
+it('does not let a buyer change the Admin Reply when editing their own review', function () {
+    $admin = createAdminUser();
+    $buyer = createModerationBuyerUser();
+    $product = Product::factory()->create(['is_active' => true]);
+    createModerationDeliveredOrderFor($buyer, $product);
+
+    actingAs($buyer);
+    livewire(ProductDetailPage::class, ['slug' => $product->slug])
+        ->set('rating', 3)
+        ->set('comment', 'It was okay.')
+        ->call('submitReview');
+
+    $review = Review::where('user_id', $buyer->id)->where('product_id', $product->id)->firstOrFail();
+
+    actingAs($admin);
+    app(ReviewService::class)->updateAdminReply($review, 'Appreciate the honest feedback.');
+
+    actingAs($buyer);
+    livewire(ProductDetailPage::class, ['slug' => $product->slug])
+        ->set('rating', 5)
+        ->set('comment', 'Actually it grew on me.')
+        ->call('submitReview');
+
+    $this->assertDatabaseHas('reviews', [
+        'id' => $review->id,
+        'rating' => 5,
+        'admin_reply' => 'Appreciate the honest feedback.',
+    ]);
+
+    get(ReviewResource::getUrl('index'))->assertForbidden();
+});
+
 it('denies a non-admin access to the ReviewResource', function () {
     $buyer = createModerationBuyerUser();
     actingAs($buyer);

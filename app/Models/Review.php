@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $rating
  * @property string|null $comment
  * @property string $status
+ * @property string|null $admin_reply
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Review newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Review newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Review query()
@@ -43,7 +44,8 @@ class Review extends Model
         'product_id',
         'rating',
         'comment',
-        'status'
+        'status',
+        'admin_reply',
     ];
 
     public function user(): BelongsTo

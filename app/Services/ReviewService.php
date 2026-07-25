@@ -118,4 +118,19 @@ class ReviewService
             throw ReviewException::updateStatus();
         }
     }
+
+    /**
+     * @throws ReviewException
+     */
+    public function updateAdminReply(Review $review, ?string $adminReply): Review
+    {
+        try {
+            $this->reviewRepository->updateAdminReply($review, $adminReply);
+
+            return $review->refresh();
+        } catch (Throwable $exception) {
+            Log::error($exception);
+            throw ReviewException::updateAdminReply();
+        }
+    }
 }

@@ -51,6 +51,7 @@ return [
         'update_success'=>'Review updated successfully!',
         'update_error'=>'Failed to update review!',
         'update_status_error'=>'Failed to update review status!',
+        'update_admin_reply_error'=>'Failed to update admin reply!',
     ],
     'cart_exceptions'=>[
         'save_cart'=>'Failed to save cart',

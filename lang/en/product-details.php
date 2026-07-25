@@ -9,4 +9,5 @@ return [
     'rating' => 'Rating',
     'comment' => 'Comment (optional)',
     'out_of_5' => 'out of 5',
+    'admin_reply' => 'Admin Reply',
 ];

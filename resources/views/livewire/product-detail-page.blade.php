@@ -278,6 +278,12 @@
                     @if($review->comment)
                         <p class="text-sm text-gray-700 dark:text-gray-400">{{ $review->comment }}</p>
                     @endif
+                    @if($review->admin_reply)
+                        <div class="mt-3 ml-4 pl-4 border-l-2 border-blue-200 dark:border-blue-800">
+                            <span class="text-xs font-semibold text-blue-600 dark:text-blue-400">{{ __('product-details.admin_reply') }}</span>
+                            <p class="text-sm text-gray-700 dark:text-gray-400">{{ $review->admin_reply }}</p>
+                        </div>
+                    @endif
                 </div>
             @empty
                 <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('product-details.no_reviews_yet') }}</p>

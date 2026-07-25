@@ -6,6 +6,7 @@ use App\Enums\ReviewStatusEnum;
 use App\Models\Review;
 use App\Services\ReviewService;
 use Filament\Actions\Action;
+use Filament\Forms\Components\Textarea;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -29,6 +30,12 @@ class ReviewsTable
                 TextColumn::make('comment')
                     ->limit(50)
                     ->wrap(),
+                TextColumn::make('admin_reply')
+                    ->label('Admin Reply')
+                    ->limit(50)
+                    ->wrap()
+                    ->placeholder('—')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('status')
                     ->badge()
                     ->formatStateUsing(fn (string $state) => ReviewStatusEnum::labels()[$state] ?? $state)
@@ -75,6 +82,19 @@ class ReviewsTable
                     ->requiresConfirmation()
                     ->visible(fn (Review $record) => $record->status === ReviewStatusEnum::PUBLISHED->value)
                     ->action(fn (Review $record) => app(ReviewService::class)->updateReviewStatus($record, ReviewStatusEnum::HIDDEN)),
+                Action::make('reply')
+                    ->label(fn (Review $record) => filled($record->admin_reply) ? 'Edit Reply' : 'Reply')
+                    ->icon('heroicon-o-chat-bubble-left-right')
+                    ->color('gray')
+                    ->schema([
+                        Textarea::make('admin_reply')
+                            ->label('Admin Reply')
+                            ->rows(3)
+                            ->maxLength(2000)
+                            ->nullable(),
+                    ])
+                    ->fillForm(fn (Review $record) => ['admin_reply' => $record->admin_reply])
+                    ->action(fn (Review $record, array $data) => app(ReviewService::class)->updateAdminReply($record, $data['admin_reply'])),
             ]);
     }
 }

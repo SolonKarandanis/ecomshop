@@ -25,4 +25,9 @@ class ReviewException extends \Exception
     {
         return new self(__('messages.submit_review.update_status_error'), HttpStatusCodeEnum::INTERNAL_SERVER_ERROR->value);
     }
+
+    public static function updateAdminReply(): ReviewException
+    {
+        return new self(__('messages.submit_review.update_admin_reply_error'), HttpStatusCodeEnum::INTERNAL_SERVER_ERROR->value);
+    }
 }
