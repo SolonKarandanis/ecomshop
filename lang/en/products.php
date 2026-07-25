@@ -12,5 +12,6 @@ return [
     'sort_by'=>[
         'latest'=>'Sort By latest',
         'price'=>'Sort By price',
+        'rating'=>'Sort By rating',
     ],
 ];

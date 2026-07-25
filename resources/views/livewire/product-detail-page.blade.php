@@ -217,24 +217,7 @@
     <section class="max-w-6xl px-4 py-4 mx-auto md:px-6">
         <div class="border-t dark:border-gray-900 pt-8">
             <h2 class="text-2xl font-bold dark:text-gray-400 mb-4">{{ __('product-details.reviews') }}</h2>
-            <div class="flex items-center gap-x-3 mb-8">
-                <div class="flex items-center">
-                    @for ($i = 1; $i <= 5; $i++)
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
-                             class="w-5 mr-1 bi bi-star-fill {{ $i <= round($product->average_rating ?? 0) ? 'text-blue-500 dark:text-blue-400' : 'text-gray-300 dark:text-gray-600' }}"
-                             viewBox="0 0 16 16">
-                            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
-                        </svg>
-                    @endfor
-                </div>
-                <span class="text-sm text-gray-500 dark:text-gray-400">
-                    @if($product->reviews_count > 0)
-                         {{ number_format($product->average_rating, 1) }} {{ __('product-details.out_of_5') }} &middot; {{ $product->reviews_count }} {{ __('product-details.reviews') }}
-                    @else
-                        {{ __('product-details.no_reviews_yet') }}
-                    @endif
-                </span>
-            </div>
+            <x-reviews :average-rating="$product->average_rating" :reviews-count="$product->reviews_count"/>
             @if($canReviewProduct || $isEditingReview)
                 <div class="mb-10 p-6 rounded-lg border border-gray-200 dark:border-gray-700" x-data="{ hoverRating: 0 }">
                     <h3 class="text-lg font-semibold dark:text-gray-400 mb-4">

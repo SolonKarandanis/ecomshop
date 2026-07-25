@@ -12,6 +12,7 @@ use Illuminate\Support\Collection;
 class ProductRepository
 {
 
+    private array $sortBy = ['latest'=>'created_at','price'=>'price','rating'=>'average_rating'];
     public function modelQuery(): Builder| Product{
         return Product::query();
     }
@@ -70,13 +71,8 @@ class ProductRepository
             $query->where('on_sale', true);
         });
 
-        $productQuery->when($dto->getSort()==='latest',function($query) use ($dto){
-            $query->orderBy('created_at', 'desc');
-        });
-
-        $productQuery->when($dto->getSort()==='price',function($query) use ($dto){
-            $query->orderBy('price', 'desc');
-        });
+        $sortColumn = $this->sortBy[$dto->getSort()] ?? $this->sortBy['latest'];
+        $productQuery->orderBy($sortColumn, 'desc');
 
         return $productQuery->paginate(6);
     }

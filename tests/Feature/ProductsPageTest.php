@@ -72,13 +72,13 @@ it('can sort products by latest', function () {
         ->assertSeeInOrder([$newProduct->name, $oldProduct->name]);
 });
 
-it('can sort products by oldest', function () {
-    $oldProduct = Product::factory()->create(['name' => 'Old Product', 'created_at' => now()->subDay(), 'is_active' => true]);
-    $newProduct = Product::factory()->create(['name' => 'New Product', 'created_at' => now(), 'is_active' => true]);
+it('can sort products by rating', function () {
+    $lowRatedProduct = Product::factory()->create(['name' => 'Low Rated Product', 'average_rating' => 2.0, 'is_active' => true]);
+    $highRatedProduct = Product::factory()->create(['name' => 'High Rated Product', 'average_rating' => 4.5, 'is_active' => true]);
 
     livewire(ProductsPage::class)
-        ->set('sort', 'oldest')
-        ->assertSeeInOrder([$oldProduct->name, $newProduct->name]);
+        ->set('sort', 'rating')
+        ->assertSeeInOrder([$highRatedProduct->name, $lowRatedProduct->name]);
 });
 
 it('can add product to cart for buyer', function () {

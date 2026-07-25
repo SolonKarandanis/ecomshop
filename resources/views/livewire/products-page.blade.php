@@ -71,6 +71,7 @@
                                 <select wire:model.live="sort" class="block w-40 text-base bg-gray-100 cursor-pointer text-gray-700 dark:text-white dark:bg-gray-900">
                                     <option value="latest">{{__('products.sort_by.latest')}}</option>
                                     <option value="price">{{__('products.sort_by.price')}}</option>
+                                    <option value="rating">{{__('products.sort_by.rating')}}</option>
                                 </select>
                             </div>
                         </div>
@@ -93,6 +94,7 @@
                                         <p class="text-lg ">
                                             <span class="text-green-600 dark:text-green-600">{{Number::currency($product->price,'eur')}}</span>
                                         </p>
+                                        <x-reviews :average-rating="$product->average_rating" :reviews-count="$product->reviews_count" compact/>
                                     </div>
                                     <div class="flex justify-center p-4 border-t border-gray-300 dark:border-gray-700">
                                         @if(!auth()->check() || auth()->user()->isBuyer())
