@@ -26,7 +26,7 @@ trait WithCartActions
             return;
         }
 
-        $product = $this->productRepository->getProductById($productId);
+        $product = $this->productService->getProductById($productId);
         $addToCartDto = AddToCartDto::withAttributes(
             $product->id,
             $quantity,

@@ -10,7 +10,6 @@ use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Product;
 use App\Repositories\CartRepository;
-use App\Repositories\ProductRepository;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\DB;
@@ -28,7 +27,7 @@ class CartService
 
     public function __construct(
         private readonly CartRepository $cartRepository,
-        private readonly ProductRepository $productRepository
+        private readonly ProductService $productService
     ){}
 
     public function getCart(): Cart{
@@ -79,7 +78,7 @@ class CartService
             $cartItem->id_from_cookie = $itemData['id'] ?? null;
             $cartItems[] = $cartItem;
         }
-        $products = $this->productRepository->findProductsForCart($productIds);
+        $products = $this->productService->findProductsForCart($productIds);
         foreach ($cartItems as $cartItem) {
             $product = $products->get($cartItem->product_id);
             if($product){
@@ -383,7 +382,7 @@ class CartService
         // Eager load the product relationships for the updated cart items
         $productIds = collect($updatedCartItems)->pluck('product_id')->all();
         if (!empty($productIds)) {
-            $products = $this->productRepository->findProductsByIds($productIds)->keyBy('id');
+            $products = $this->productService->findProductsByIds($productIds)->keyBy('id');
             foreach ($updatedCartItems as $cartItem) {
                 if (isset($products[$cartItem->product_id])) {
                     $cartItem->setRelation('product', $products[$cartItem->product_id]);
@@ -412,7 +411,7 @@ class CartService
     protected function deleteItemsFromDatabase(array $cartItemIds):bool{
         DB::beginTransaction();
         try{
-            $cartId=$this->cartRepository->getCartId(Auth::id());
+            $cartId=$this->productService->getCartId(Auth::id());
             $this->cartRepository->deleteCartItems($cartId,$cartItemIds);
             $this->recalculateCartTotalPrice();
             DB::commit();
@@ -570,7 +569,7 @@ class CartService
      */
     protected function fetchProductsToBeAdded(array $addToCartRequests):Collection{
         $productIds= collect($addToCartRequests)->map(fn($request):int => $request->getProductId())->all();
-        return $this->productRepository->findProductsByIds($productIds);
+        return $this->productService->findProductsByIds($productIds);
     }
 
     /**

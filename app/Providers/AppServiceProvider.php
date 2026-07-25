@@ -52,7 +52,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton(CartService::class, function ($app) {
-            return new CartService($app->make(CartRepository::class), $app->make(ProductRepository::class));
+            return new CartService($app->make(CartRepository::class), $app->make(ProductService::class));
         });
 
         $this->app->singleton(UserService::class, function ($app) {
@@ -90,7 +90,7 @@ class AppServiceProvider extends ServiceProvider
             return new ReviewService(
                 $app->make(ReviewRepository::class),
                 $app->make(OrderRepository::class),
-                $app->make(ProductRepository::class),
+                $app->make(ProductService::class),
             );
         });
     }

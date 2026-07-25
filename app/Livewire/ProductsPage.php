@@ -4,8 +4,8 @@ namespace App\Livewire;
 
 use App\Dtos\ProductSearchFilterDto;
 use App\Livewire\Traits\WithCartActions;
-use App\Repositories\ProductRepository;
 use App\Services\CartService;
+use App\Services\ProductService;
 use App\Services\UiService;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
@@ -40,7 +40,7 @@ class ProductsPage extends Component
     #[Url('sort')]
     public $sort='latest';
 
-    protected ProductRepository $productRepository;
+    protected ProductService $productService;
     protected CartService $cartService;
 
     protected UiService $uiService;
@@ -60,11 +60,11 @@ class ProductsPage extends Component
     }
 
     public function boot(
-        ProductRepository $productRepository,
+        ProductService $productService,
         CartService $cartService,
         UiService $uiService
     ): void{
-        $this->productRepository = $productRepository;
+        $this->productService = $productService;
         $this->cartService = $cartService;
         $this->uiService = $uiService;
     }
@@ -78,7 +78,7 @@ class ProductsPage extends Component
         $productSearchFilterDto->setPriceFrom($this->price_from);
         $productSearchFilterDto->setPriceTo($this->price_to);
         $productSearchFilterDto->setSort($this->sort);
-        $searchResult = $this->productRepository->searchProducts($productSearchFilterDto);
+        $searchResult = $this->productService->searchProducts($productSearchFilterDto);
         return view('livewire.products-page',[
             'products'=>$searchResult,
         ]);

@@ -8,7 +8,6 @@ use App\Enums\ReviewStatusEnum;
 use App\Exceptions\ReviewException;
 use App\Models\Review;
 use App\Repositories\OrderRepository;
-use App\Repositories\ProductRepository;
 use App\Repositories\ReviewRepository;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
@@ -21,7 +20,7 @@ class ReviewService
     public function __construct(
         private readonly ReviewRepository $reviewRepository,
         private readonly OrderRepository $orderRepository,
-        private readonly ProductRepository $productRepository,
+        private readonly ProductService $productService,
     ) {}
 
     public function canReview(int $userId, int $productId): bool
@@ -53,10 +52,10 @@ class ReviewService
         }
         try {
             DB::beginTransaction();
-            $this->productRepository->lockForUpdate($dto->getProductId());
+            $this->productService->lockForUpdate($dto->getProductId());
             $review = $this->reviewRepository->createReview($dto);
             $stats = $this->reviewRepository->getRatingStatsForProduct($dto->getProductId());
-            $this->productRepository->updateRatingStats($dto->getProductId(), $stats->getAverageRating(), $stats->getReviewsCount());
+            $this->productService->updateRatingStats($dto->getProductId(), $stats->getAverageRating(), $stats->getReviewsCount());
             DB::commit();
 
             return $review;
@@ -77,11 +76,11 @@ class ReviewService
         }
         try {
             DB::beginTransaction();
-            $this->productRepository->lockForUpdate($dto->getProductId());
+            $this->productService->lockForUpdate($dto->getProductId());
             $review = $this->reviewRepository->getReviewById($dto->getReviewId());
             $this->reviewRepository->updateReview($review, $dto);
             $stats = $this->reviewRepository->getRatingStatsForProduct($dto->getProductId());
-            $this->productRepository->updateRatingStats($dto->getProductId(), $stats->getAverageRating(), $stats->getReviewsCount());
+            $this->productService->updateRatingStats($dto->getProductId(), $stats->getAverageRating(), $stats->getReviewsCount());
             $review = $this->reviewRepository->getReviewById($dto->getReviewId());
             DB::commit();
 
@@ -106,10 +105,10 @@ class ReviewService
     {
         try {
             DB::beginTransaction();
-            $this->productRepository->lockForUpdate($review->product_id);
+            $this->productService->lockForUpdate($review->product_id);
             $this->reviewRepository->updateStatus($review, $status->value);
             $stats = $this->reviewRepository->getRatingStatsForProduct($review->product_id);
-            $this->productRepository->updateRatingStats($review->product_id, $stats->getAverageRating(), $stats->getReviewsCount());
+            $this->productService->updateRatingStats($review->product_id, $stats->getAverageRating(), $stats->getReviewsCount());
             DB::commit();
 
             return $review->refresh();

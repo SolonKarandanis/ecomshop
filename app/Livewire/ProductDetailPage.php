@@ -10,8 +10,8 @@ use App\Http\Requests\SubmitReviewRequest;
 use App\Livewire\Traits\WithCartActions;
 use App\Livewire\Traits\WithPreAuthorize;
 use App\Models\Product;
-use App\Repositories\ProductRepository;
 use App\Services\CartService;
+use App\Services\ProductService;
 use App\Services\ReviewService;
 use App\Services\UiService;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -35,18 +35,18 @@ class ProductDetailPage extends Component
     public ?string $comment = null;
     public ?int $reviewId = null;
 
-    protected ProductRepository $productRepository;
+    protected ProductService $productService;
     protected CartService $cartService;
     protected UiService $uiService;
     protected ReviewService $reviewService;
 
     public function boot(
-        ProductRepository $productRepository,
+        ProductService $productService,
         CartService $cartService,
         UiService $uiService,
         ReviewService $reviewService
     ): void{
-        $this->productRepository = $productRepository;
+        $this->productService = $productService;
         $this->cartService = $cartService;
         $this->uiService = $uiService;
         $this->reviewService = $reviewService;
@@ -70,7 +70,7 @@ class ProductDetailPage extends Component
     #[Computed]
     public function product(): Product
     {
-        return $this->productRepository->getProductBySlug($this->slug);
+        return $this->productService->getProductBySlug($this->slug);
     }
 
     #[Computed]
