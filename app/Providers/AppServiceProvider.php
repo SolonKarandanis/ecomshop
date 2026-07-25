@@ -20,6 +20,7 @@ use App\Services\CartService;
 use App\Services\NotificationHandlerService;
 use App\Services\NotificationService;
 use App\Services\OrderService;
+use App\Services\ProductService;
 use App\Services\ReviewService;
 use App\Services\StripeService;
 use App\Services\UserService;
@@ -45,6 +46,10 @@ class AppServiceProvider extends ServiceProvider
         DB::prohibitDestructiveCommands(
             app()->isProduction()
         );
+
+        $this->app->singleton(ProductService::class,function ($app){
+            return new ProductService($app->make(ProductRepository::class));
+        });
 
         $this->app->singleton(CartService::class, function ($app) {
             return new CartService($app->make(CartRepository::class), $app->make(ProductRepository::class));
