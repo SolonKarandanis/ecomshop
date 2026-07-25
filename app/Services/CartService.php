@@ -411,7 +411,7 @@ class CartService
     protected function deleteItemsFromDatabase(array $cartItemIds):bool{
         DB::beginTransaction();
         try{
-            $cartId=$this->productService->getCartId(Auth::id());
+            $cartId=$this->cartRepository->getCartId(Auth::id());
             $this->cartRepository->deleteCartItems($cartId,$cartItemIds);
             $this->recalculateCartTotalPrice();
             DB::commit();

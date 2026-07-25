@@ -36,7 +36,7 @@ class ProductService
     }
 
     public function updateRatingStats(int $productId, ?float $averageRating, int $reviewsCount): bool{
-        return $this->updateRatingStats($productId, $averageRating, $reviewsCount);
+        return $this->productRepository->updateRatingStats($productId, $averageRating, $reviewsCount);
     }
 
     public function lockForUpdate(int $productId): Product{
