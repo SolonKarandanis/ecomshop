@@ -42,8 +42,8 @@ class OrderService
         private readonly NotificationHandlerService $notificationService,
     ){}
 
-    public function getOrderById(int $orderId):Order{
-        return $this->orderRepository->getOrderById($orderId);
+    public function getOrderById(int $orderId, int $userId):Order{
+        return $this->orderRepository->getOrderById($orderId,$userId);
     }
 
     public function getUsersLatestOrder(int $userId):Order{

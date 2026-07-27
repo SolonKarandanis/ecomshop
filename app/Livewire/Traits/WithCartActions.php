@@ -4,15 +4,12 @@ namespace App\Livewire\Traits;
 
 use App\Attributes\PreAuthorize;
 use App\Dtos\AddToCartDto;
-use App\Enums\MessageSeverityEnum;
 use App\Exceptions\CartException;
 use App\Exceptions\ProductNotFoundException;
-use Illuminate\Support\Facades\Log;
-use Throwable;
 
 trait WithCartActions
 {
-    use WithPreAuthorize;
+    use WithPreAuthorize, WithMessages;
 
     /**
      * @throws ProductNotFoundException
@@ -42,27 +39,5 @@ trait WithCartActions
         } catch (CartException|ProductNotFoundException $e) {
             $this->handleError($title, $error, $e);
         }
-    }
-
-    protected function handleSuccess(string|null $dispatchEvent,string $msgTitle,string $msgSuccess):void
-    {
-        if($dispatchEvent){
-            $this->dispatch($dispatchEvent);
-        }
-        $this->uiService->showMessage(
-            MessageSeverityEnum::SUCCESS,
-            $msgTitle,
-            $msgSuccess
-        );
-    }
-
-    protected function handleError(string $msgTitle, string $msgFail, Throwable $e): void
-    {
-        Log::error($e->getMessage());
-        $this->uiService->showMessage(
-            MessageSeverityEnum::ERROR,
-            $msgTitle,
-            $msgFail
-        );
     }
 }

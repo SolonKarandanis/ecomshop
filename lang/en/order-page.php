@@ -11,7 +11,10 @@ return [
         'price'=>'Price',
         'quantity'=>'Quantity',
         'total'=>'Total',
+        'review'=>'Review',
     ],
+    'review_this_product'=>'Review this product',
+    'cancel_review'=>'Cancel',
     'shipping'=>[
         'address'=>'Shipping Address',
         'phone'=>'Phone',

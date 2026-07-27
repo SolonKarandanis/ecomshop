@@ -11,7 +11,10 @@ return [
         'price' => 'Τιμή',
         'quantity' => 'Ποσότητα',
         'total' => 'Σύνολο',
+        'review' => 'Αξιολόγηση',
     ],
+    'review_this_product' => 'Αξιολογήστε αυτό το προϊόν',
+    'cancel_review' => 'Άκυρο',
     'shipping' => [
         'address' => 'Διεύθυνση Αποστολής',
         'phone' => 'Τηλέφωνο',

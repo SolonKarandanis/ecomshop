@@ -3,18 +3,18 @@
 namespace App\Livewire;
 
 use App\Dtos\UpdateCartItemsDTO;
-use App\Enums\MessageSeverityEnum;
 use App\Exceptions\CartException;
+use App\Livewire\Traits\WithMessages;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Services\CartService;
 use App\Services\UiService;
-use Illuminate\Support\Facades\Log;
 use Livewire\Component;
-use Throwable;
 
 class CartPage extends Component
 {
+    use WithMessages;
+
     protected CartService $cartService;
     protected UiService $uiService;
     public ?Cart $cart = null;
@@ -111,28 +111,6 @@ class CartPage extends Component
             $this->handleError($title, $error, $e);
         }
         $this->cart = $this->cartService->getCart();
-    }
-
-    protected function handleSuccess(string|null $dispatchEvent,string $msgTitle,string $msgSuccess):void
-    {
-        if($dispatchEvent){
-            $this->dispatch($dispatchEvent);
-        }
-        $this->uiService->showMessage(
-            MessageSeverityEnum::SUCCESS,
-            $msgTitle,
-            $msgSuccess
-        );
-    }
-
-    protected function handleError(string $msgTitle, string $msgFail, Throwable $e): void
-    {
-        Log::error($e->getMessage());
-        $this->uiService->showMessage(
-            MessageSeverityEnum::ERROR,
-            $msgTitle,
-            $msgFail
-        );
     }
 
     public function render()

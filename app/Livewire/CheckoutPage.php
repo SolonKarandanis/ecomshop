@@ -3,7 +3,6 @@
 namespace App\Livewire;
 
 use App\Dtos\CheckoutDTO;
-use App\Enums\MessageSeverityEnum;
 use App\Exceptions\EmptyCartException;
 use App\Exceptions\OrderException;
 use App\Exceptions\PaymentException;
@@ -13,8 +12,8 @@ use App\Services\CartService;
 use App\Services\OrderService;
 use App\Services\UiService;
 use App\Attributes\PreAuthorize;
+use App\Livewire\Traits\WithMessages;
 use App\Livewire\Traits\WithPreAuthorize;
-use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Throwable;
@@ -22,7 +21,7 @@ use Throwable;
 #[Title('Checkout')]
 class CheckoutPage extends Component
 {
-    use WithPreAuthorize;
+    use WithPreAuthorize, WithMessages;
     public string $firstName = '';
     public string $lastName = '';
     public string $phone = '';
@@ -85,16 +84,6 @@ class CheckoutPage extends Component
             $this->handleError($title, $error, $e);
             return redirect()->route('cart');
         }
-    }
-
-    protected function handleError(string $msgTitle, string $msgFail, Throwable $e): void
-    {
-        Log::error($e->getMessage());
-        $this->uiService->showMessage(
-            MessageSeverityEnum::ERROR,
-            $msgTitle,
-            $msgFail
-        );
     }
 
     public function render()

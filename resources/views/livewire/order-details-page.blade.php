@@ -124,6 +124,9 @@
                         <th class="text-left font-semibold">{{__('order-page.columns.price')}}</th>
                         <th class="text-left font-semibold">{{__('order-page.columns.quantity')}}</th>
                         <th class="text-left font-semibold">{{__('order-page.columns.total')}}</th>
+                        @if($order->order_status === OrderStatus::Delivered->value)
+                            <th class="text-left font-semibold">{{__('order-page.columns.review')}}</th>
+                        @endif
                     </tr>
                     </thead>
                     <tbody>
@@ -140,7 +143,72 @@
                                 <span class="text-center w-8">{{$orderItem->quantity}}</span>
                             </td>
                             <td class="py-4">{{Number::currency($orderItem->total_amount ?? 0,'eur')}}</td>
+                            @if($order->order_status === OrderStatus::Delivered->value)
+                                <td class="py-4">
+                                    <x-button
+                                        :variant="$reviewingProductId === $orderItem->product_id ? 'danger-outline' : 'success'"
+                                        wire:click="openReviewForm({{ $orderItem->product_id }})"
+                                        :wire-target="'openReviewForm'"
+                                    >
+                                        {{ $reviewingProductId === $orderItem->product_id
+                                            ? __('order-page.cancel_review')
+                                            : __('order-page.review_this_product') }}
+                                    </x-button>
+                                </td>
+                            @endif
                         </tr>
+                        @if($order->order_status === OrderStatus::Delivered->value)
+                            <tr wire:key="{{$orderItem->id}}-review-form">
+                                <td colspan="5" class="pb-6">
+                                    <div
+                                        x-data="{ hoverRating: 0 }"
+                                        x-show="$wire.reviewingProductId === {{ $orderItem->product_id }}"
+                                        x-collapse.duration.300ms
+                                        class="p-6 rounded-lg border border-gray-200 dark:border-gray-700"
+                                        style="display: none;"
+                                    >
+                                        <h3 class="text-lg font-semibold dark:text-gray-400 mb-4">
+                                            {{ $reviewId !== null ? __('product-details.edit_your_review') : __('product-details.write_a_review') }}
+                                        </h3>
+
+                                        <div class="mb-4">
+                                            <label class="block text-sm mb-2 dark:text-white">{{ __('product-details.rating') }}</label>
+                                            <div class="flex items-center gap-x-1">
+                                                @for ($i = 1; $i <= 5; $i++)
+                                                    <button type="button"
+                                                            x-on:mouseenter="hoverRating = {{ $i }}"
+                                                            x-on:mouseleave="hoverRating = 0"
+                                                            x-on:click="$wire.rating = {{ $i }}">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor"
+                                                             class="w-7 bi bi-star-fill cursor-pointer"
+                                                             :class="(hoverRating || $wire.rating) >= {{ $i }} ? 'text-blue-500 dark:text-blue-400' : 'text-gray-300 dark:text-gray-600'"
+                                                             viewBox="0 0 16 16">
+                                                            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
+                                                        </svg>
+                                                    </button>
+                                                @endfor
+                                            </div>
+                                            @error('rating')
+                                            <p class="text-xs text-red-600 mt-2">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+
+                                        <div class="mb-4">
+                                            <label for="comment-{{ $orderItem->id }}" class="block text-sm mb-2 dark:text-white">{{ __('product-details.comment') }}</label>
+                                            <textarea id="comment-{{ $orderItem->id }}" wire:model="comment" rows="4"
+                                                      class="py-3 px-4 block w-full border border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400 @error('comment') border-red-500 @enderror"></textarea>
+                                            @error('comment')
+                                            <p class="text-xs text-red-600 mt-2">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+
+                                        <x-button variant="primary" wire:click="submitReview" :wire-target="'submitReview'" :loading="true">
+                                            {{ $reviewId !== null ? __('buttons.update_review') : __('buttons.submit_review') }}
+                                        </x-button>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endif
                     @endforeach
                     </tbody>
                 </table>
