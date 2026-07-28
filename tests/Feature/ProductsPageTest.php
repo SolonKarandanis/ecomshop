@@ -143,7 +143,7 @@ it('filters products by description', function () {
 
 it('combines search with category filter', function () {
     $product1 = Product::factory()->create(['name' => 'Blue Widget', 'is_active' => true]);
-    $product2 = Product::factory()->create(['name' => 'Blue Widget', 'is_active' => true]);
+    $product2 = Product::factory()->create(['name' => 'Red Widget', 'is_active' => true]);
 
     livewire(ProductsPage::class)
         ->set('search', 'Widget')
