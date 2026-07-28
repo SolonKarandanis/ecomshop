@@ -48,6 +48,10 @@ class AppServiceProvider extends ServiceProvider
             app()->isProduction()
         );
 
+        $this->app->singleton(ProductSearchEngineFactory::class, fn ($app) =>
+            new ProductSearchEngineFactory(DB::connection()->getDriverName())
+        );
+
         $this->app->singleton(ProductService::class,function ($app){
             return new ProductService(
                 $app->make(ProductRepository::class),
