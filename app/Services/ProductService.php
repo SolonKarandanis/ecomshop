@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Dtos\ProductSearchFilterDto;
-use App\Enums\ProductSearchEngineEnum;
 use App\Models\Product;
 use App\Repositories\ProductRepository;
 use App\Search\ProductSearchEngineFactory;
@@ -28,7 +27,7 @@ class ProductService
 
     public function searchProducts(ProductSearchFilterDto $dto): LengthAwarePaginator|array{
         return $this->searchEngineFactory
-            ->make(ProductSearchEngineEnum::Like)
+            ->make()
             ->search($dto);
     }
 
