@@ -2,17 +2,13 @@
 
 namespace App\Repositories;
 
-use App\Dtos\ProductSearchFilterDto;
 use App\Models\Product;
-use App\Models\ProductAttributeValues;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
 class ProductRepository
 {
 
-    private array $sortBy = ['latest'=>'created_at','price'=>'price','rating'=>'average_rating'];
     public function modelQuery(): Builder| Product{
         return Product::query();
     }
@@ -40,41 +36,6 @@ class ProductRepository
             ->load('media');
 
         return $product;
-    }
-
-    public function searchProducts(ProductSearchFilterDto $dto): LengthAwarePaginator|array
-    {
-        $productQuery = $this->modelQuery()
-            ->with([
-                'productAttributeValues' => function ($query) {
-                    $query->whereHas('attribute', function ($query) {
-                        $query->where('name', 'attribute.color');
-                    })->with(['media', 'attribute']);
-                }
-            ])
-            ->where('is_active', true)
-            ->whereBetween('price', [$dto->getPriceFrom(), $dto->getPriceTo()]);
-
-        $productQuery->when(!empty($dto->getSelectedCategories()),function($query) use ($dto){
-            $query->whereIn('category_id', $dto->getSelectedCategories());
-        });
-
-        $productQuery->when(!empty($dto->getSelectedBrands()),function($query) use ($dto){
-            $query->whereIn('brand_id', $dto->getSelectedBrands());
-        });
-
-        $productQuery->when($dto->isFeatured(),function($query) use ($dto){
-            $query->where('is_featured', true);
-        });
-
-        $productQuery->when($dto->isOnSale(),function($query) use ($dto){
-            $query->where('on_sale', true);
-        });
-
-        $sortColumn = $this->sortBy[$dto->getSort()] ?? $this->sortBy['latest'];
-        $productQuery->orderBy($sortColumn, 'desc');
-
-        return $productQuery->paginate(6);
     }
 
     /**

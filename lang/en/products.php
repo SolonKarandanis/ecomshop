@@ -14,4 +14,8 @@ return [
         'price'=>'Sort By price',
         'rating'=>'Sort By rating',
     ],
+    'search'=>[
+        'title'=>'Search',
+        'placeholder'=>'Search products...',
+    ],
 ];

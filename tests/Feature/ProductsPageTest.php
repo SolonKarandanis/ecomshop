@@ -110,3 +110,44 @@ it('blocks non-buyer users from adding to cart', function () {
         ->call('addToCart', $product->id)
         ->assertNotDispatched('cartUpdated');
 });
+
+it('ignores search terms under 3 characters', function () {
+    $product1 = Product::factory()->create(['name' => 'Blue Widget', 'is_active' => true]);
+    $product2 = Product::factory()->create(['name' => 'Red Gadget', 'is_active' => true]);
+
+    livewire(ProductsPage::class)
+        ->set('search', 'wi')
+        ->assertSee($product1->name)
+        ->assertSee($product2->name);
+});
+
+it('filters products by name', function () {
+    $product1 = Product::factory()->create(['name' => 'Blue Widget', 'is_active' => true]);
+    $product2 = Product::factory()->create(['name' => 'Red Gadget', 'is_active' => true]);
+
+    livewire(ProductsPage::class)
+        ->set('search', 'Widget')
+        ->assertSee($product1->name)
+        ->assertDontSee($product2->name);
+});
+
+it('filters products by description', function () {
+    $product1 = Product::factory()->create(['name' => 'Item One', 'description' => 'a rare vintage camera', 'is_active' => true]);
+    $product2 = Product::factory()->create(['name' => 'Item Two', 'description' => 'a modern laptop', 'is_active' => true]);
+
+    livewire(ProductsPage::class)
+        ->set('search', 'vintage')
+        ->assertSee($product1->name)
+        ->assertDontSee($product2->name);
+});
+
+it('combines search with category filter', function () {
+    $product1 = Product::factory()->create(['name' => 'Blue Widget', 'is_active' => true]);
+    $product2 = Product::factory()->create(['name' => 'Blue Widget', 'is_active' => true]);
+
+    livewire(ProductsPage::class)
+        ->set('search', 'Widget')
+        ->set('selected_categories', [$product1->category->id])
+        ->assertSee($product1->name)
+        ->assertDontSee($product2->name);
+});

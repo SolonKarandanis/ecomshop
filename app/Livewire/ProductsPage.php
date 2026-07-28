@@ -40,6 +40,9 @@ class ProductsPage extends Component
     #[Url('sort')]
     public $sort='latest';
 
+    #[Url('q')]
+    public $search='';
+
     protected ProductService $productService;
     protected CartService $cartService;
 
@@ -78,6 +81,7 @@ class ProductsPage extends Component
         $productSearchFilterDto->setPriceFrom($this->price_from);
         $productSearchFilterDto->setPriceTo($this->price_to);
         $productSearchFilterDto->setSort($this->sort);
+        $productSearchFilterDto->setSearch($this->search);
         $searchResult = $this->productService->searchProducts($productSearchFilterDto);
         return view('livewire.products-page',[
             'products'=>$searchResult,

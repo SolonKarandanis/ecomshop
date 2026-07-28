@@ -3,8 +3,10 @@
 namespace App\Services;
 
 use App\Dtos\ProductSearchFilterDto;
+use App\Enums\ProductSearchEngineEnum;
 use App\Models\Product;
 use App\Repositories\ProductRepository;
+use App\Search\ProductSearchEngineFactory;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
@@ -12,7 +14,8 @@ class ProductService
 {
 
     public function __construct(
-        private readonly ProductRepository $productRepository
+        private readonly ProductRepository $productRepository,
+        private readonly ProductSearchEngineFactory $searchEngineFactory,
     ){}
 
     public function getProductById(int $id): Product{
@@ -24,7 +27,9 @@ class ProductService
     }
 
     public function searchProducts(ProductSearchFilterDto $dto): LengthAwarePaginator|array{
-        return $this->productRepository->searchProducts($dto);
+        return $this->searchEngineFactory
+            ->make(ProductSearchEngineEnum::Like)
+            ->search($dto);
     }
 
     public function findProductsByIds(array $productIds): Collection{

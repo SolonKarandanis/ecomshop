@@ -16,6 +16,8 @@ class ProductSearchFilterDto
 
     private string $sort;
 
+    private string $search='';
+
     public function getSelectedCategories(): array
     {
         return $this->selected_categories;
@@ -84,6 +86,16 @@ class ProductSearchFilterDto
     public function setSort(string $sort): void
     {
         $this->sort = $sort;
+    }
+
+    public function getSearch(): string
+    {
+        return $this->search;
+    }
+
+    public function setSearch(string $search): void
+    {
+        $this->search = $search;
     }
 
 

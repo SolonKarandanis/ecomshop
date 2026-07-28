@@ -16,6 +16,7 @@ use App\Repositories\ReviewRepository;
 use App\Repositories\RoleRepository;
 use App\Repositories\StripeOrderDetailRepository;
 use App\Repositories\UserRepository;
+use App\Search\ProductSearchEngineFactory;
 use App\Services\CartService;
 use App\Services\NotificationHandlerService;
 use App\Services\NotificationService;
@@ -48,7 +49,10 @@ class AppServiceProvider extends ServiceProvider
         );
 
         $this->app->singleton(ProductService::class,function ($app){
-            return new ProductService($app->make(ProductRepository::class));
+            return new ProductService(
+                $app->make(ProductRepository::class),
+                $app->make(ProductSearchEngineFactory::class),
+            );
         });
 
         $this->app->singleton(CartService::class, function ($app) {
