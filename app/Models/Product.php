@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
+use Laravel\Scout\Searchable;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -71,7 +72,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  */
 class Product extends Model implements HasMedia
 {
-    use HasFactory, InteractsWithMedia;
+    use HasFactory, InteractsWithMedia, Searchable;
 
     protected $fillable=[
         'category_id',
@@ -96,6 +97,32 @@ class Product extends Model implements HasMedia
             ->width(480);
         $this->addMediaConversion('large')
             ->width(1200);
+    }
+
+    public function toSearchableArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'description' => $this->description,
+            'category_id' => $this->category_id,
+            'brand_id' => $this->brand_id,
+            'price' => (float) $this->price,
+            'is_featured' => (bool) $this->is_featured,
+            'on_sale' => (bool) $this->on_sale,
+            'created_at' => $this->created_at?->timestamp,
+            'average_rating' => $this->average_rating !== null ? (float) $this->average_rating : null,
+        ];
+    }
+
+    public function shouldBeSearchable(): bool
+    {
+        return (bool) $this->is_active;
+    }
+
+    public function searchableAs(): string
+    {
+        return 'idx_products';
     }
 
     public function category(): BelongsTo

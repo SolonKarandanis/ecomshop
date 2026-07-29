@@ -49,7 +49,10 @@ class AppServiceProvider extends ServiceProvider
         );
 
         $this->app->singleton(ProductSearchEngineFactory::class, fn ($app) =>
-            new ProductSearchEngineFactory(DB::connection()->getDriverName())
+            new ProductSearchEngineFactory(
+                DB::connection()->getDriverName(),
+                (bool) config('search.fts_enabled'),
+            )
         );
 
         $this->app->singleton(ProductService::class,function ($app){
@@ -108,6 +111,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        if (! config('search.fts_enabled')) {
+            config(['scout.driver' => null]);
+        }
+
         Order::observe(OrderObserver::class);
 
         Gate::define('buyer-action', function (?User $user) {
