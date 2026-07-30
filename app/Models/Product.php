@@ -12,6 +12,7 @@ use Laravel\Scout\Searchable;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Stripe\Climate\Supplier;
 
 /**
  * @property int $id
@@ -68,6 +69,8 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereAverageRating($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereReviewsCount($value)
  * @mixin IdeHelperProduct
+ * @property int $supplier_id
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Product whereSupplierId($value)
  * @mixin \Eloquent
  */
 class Product extends Model implements HasMedia
@@ -85,6 +88,7 @@ class Product extends Model implements HasMedia
         'is_featured',
         'in_stock',
         'on_sale',
+        'supplier_id',
     ];
 
     protected $casts=[];
@@ -123,6 +127,11 @@ class Product extends Model implements HasMedia
     public function searchableAs(): string
     {
         return 'idx_products';
+    }
+
+    public function supplier(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 
     public function category(): BelongsTo
