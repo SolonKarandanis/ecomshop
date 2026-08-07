@@ -113,7 +113,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Model::shouldBeStrict(! app()->isProduction());
+//        Model::shouldBeStrict(! app()->isProduction());
         if (! config('search.fts_enabled')) {
             config(['scout.driver' => null]);
         }
