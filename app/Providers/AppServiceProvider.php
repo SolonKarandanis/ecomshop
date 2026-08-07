@@ -43,7 +43,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        Model::shouldBeStrict(! app()->isProduction());
+
 //      DB::prohibitDestructiveCommands()` stops `migrate:fresh`, `db:wipe` and friends
 //      from ever running in production.
         DB::prohibitDestructiveCommands(
@@ -113,6 +113,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Model::shouldBeStrict(! app()->isProduction());
         if (! config('search.fts_enabled')) {
             config(['scout.driver' => null]);
         }
