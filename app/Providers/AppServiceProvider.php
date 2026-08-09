@@ -28,6 +28,7 @@ use App\Services\UserService;
 use Filament\Support\Assets\Js;
 use Filament\Support\Facades\FilamentAsset;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -42,6 +43,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+
 //      DB::prohibitDestructiveCommands()` stops `migrate:fresh`, `db:wipe` and friends
 //      from ever running in production.
         DB::prohibitDestructiveCommands(
@@ -111,6 +113,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+//        Model::shouldBeStrict(! app()->isProduction());
         if (! config('search.fts_enabled')) {
             config(['scout.driver' => null]);
         }
