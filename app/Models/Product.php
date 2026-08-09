@@ -111,6 +111,7 @@ class Product extends Model implements HasMedia
             'description' => $this->description,
             'category_id' => $this->category_id,
             'brand_id' => $this->brand_id,
+            'supplier_id' => $this->supplier_id,
             'price' => (float) $this->price,
             'is_featured' => (bool) $this->is_featured,
             'on_sale' => (bool) $this->on_sale,

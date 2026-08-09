@@ -18,4 +18,13 @@ class EditProduct extends EditRecord
             DeleteAction::make(),
         ];
     }
+
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        if (! config('features.suppliers_enabled')) {
+            $data['supplier_id'] = auth()->id();
+        }
+
+        return $data;
+    }
 }

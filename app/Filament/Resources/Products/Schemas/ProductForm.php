@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Products\Schemas;
 
 use App\Enums\AttributeValueMethodEnum;
 use App\Enums\ProductVariationTypesEnum;
+use App\Enums\RolesEnum;
 use App\Models\Attribute;
 use App\Models\AttributeOptions;
 use App\Models\Product;
@@ -103,6 +104,16 @@ class ProductForm
                             ->prefix('$')
                     ]),
                     Section::make('Associations')->schema([
+                        Select::make('supplier_id')
+                            ->visible(fn () => config('features.suppliers_enabled'))
+                            ->required(fn () => config('features.suppliers_enabled'))
+                            ->searchable()
+                            ->preload()
+                            ->relationship(
+                                'supplier',
+                                'name',
+                                modifyQueryUsing: fn ($query) => $query->role(RolesEnum::ROLE_SUPPLIER->value),
+                            ),
                         Select::make('category_id')
                             ->required()
                             ->searchable()
