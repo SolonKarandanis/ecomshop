@@ -6,6 +6,9 @@ return [
     'name' => 'Όνομα',
     'email' => 'Διεύθυνση email',
     'password' => 'Κωδικός πρόσβασης',
+    'role' => 'Ρόλος',
+    'supplier' => 'Προμηθευτής',
+    'buyer' => 'Αγοραστής',
     'buttons' => [
         'sign_up' => 'Εγγραφή',
     ]

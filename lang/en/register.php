@@ -7,6 +7,9 @@ return [
     'name'=>'Name',
     'email'=>'Email address',
     'password'=>'Password',
+    'role'=>'Role',
+    'supplier'=>'Supplier',
+    'buyer'=>'Buyer',
     'buttons'=>[
         'sign_up'=>'Sign up',
     ]

@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\RolesEnum;
 use App\Livewire\Auth\RegisterPage;
 use App\Models\User;
 use Database\Seeders\RoleSeeder;
@@ -65,4 +66,38 @@ it('registers a new user successfully', function () {
     ]);
 
     expect(auth()->check())->toBeTrue();
+});
+
+it('assigns the Supplier role when registering as Supplier while the Suppliers Feature is enabled', function () {
+    config(['features.suppliers_enabled' => true]);
+
+    livewire(RegisterPage::class)
+        ->set('name', 'Sam Supplier')
+        ->set('email', 'sam@example.com')
+        ->set('password', 'password')
+        ->set('role', RolesEnum::ROLE_SUPPLIER->value)
+        ->call('save')
+        ->assertHasNoErrors()
+        ->assertRedirect('/');
+
+    $user = User::where('email', 'sam@example.com')->firstOrFail();
+    expect($user->hasRole(RolesEnum::ROLE_SUPPLIER->value))->toBeTrue();
+    expect($user->hasRole(RolesEnum::ROLE_BUYER->value))->toBeFalse();
+});
+
+it('registers a Buyer when Supplier is submitted while the Suppliers Feature is disabled', function () {
+    config(['features.suppliers_enabled' => false]);
+
+    livewire(RegisterPage::class)
+        ->set('name', 'Sam Tampered')
+        ->set('email', 'tampered@example.com')
+        ->set('password', 'password')
+        ->set('role', RolesEnum::ROLE_SUPPLIER->value)
+        ->call('save')
+        ->assertHasNoErrors()
+        ->assertRedirect('/');
+
+    $user = User::where('email', 'tampered@example.com')->firstOrFail();
+    expect($user->hasRole(RolesEnum::ROLE_BUYER->value))->toBeTrue();
+    expect($user->hasRole(RolesEnum::ROLE_SUPPLIER->value))->toBeFalse();
 });

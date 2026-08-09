@@ -29,4 +29,8 @@ class RoleRepository
     public function getBuyerRole(): Role{
         return $this->getRoleByName(RolesEnum::ROLE_BUYER->value);
     }
+
+    public function getSupplierRole(): Role{
+        return $this->getRoleByName(RolesEnum::ROLE_SUPPLIER->value);
+    }
 }

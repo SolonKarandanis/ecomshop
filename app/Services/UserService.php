@@ -38,6 +38,13 @@ class UserService
         return $user;
     }
 
+    public function createSupplier(CreateUserDTO $dto):User{
+        $user= $this->createUser($dto);
+        $supplierRole=$this->roleRepository->getSupplierRole();
+        $user->assignRole($supplierRole);
+        return $user;
+    }
+
     public function updateProfile(User $user, UpdateProfileDto $dto): void
     {
         if (User::where('email', $dto->getEmail())->where('id', '!=', $user->id)->exists()) {

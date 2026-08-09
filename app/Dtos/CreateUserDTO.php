@@ -2,6 +2,7 @@
 
 namespace App\Dtos;
 
+use App\Enums\RolesEnum;
 use App\Http\Requests\Auth\RegisterUserRequest;
 
 class CreateUserDTO
@@ -10,11 +11,14 @@ class CreateUserDTO
     private string $email;
     private string $password;
 
+    private string $role;
+
     public static function fromArray(array $data): self{
         $instance = new self();
         $instance->setName($data['name']);
         $instance->setEmail($data['email']);
         $instance->setPassword($data['password']);
+        $instance->setRole($data['role']?? RolesEnum::ROLE_BUYER->value);
         return $instance;
     }
 
@@ -24,6 +28,7 @@ class CreateUserDTO
         $instance->setName($request->input('name'));
         $instance->setEmail($request->input('email'));
         $instance->setPassword($request->input('password'));
+        $instance->setRole($request->filled('role')? $request->input('role') : RolesEnum::ROLE_BUYER->value);
         return $instance;
     }
 
@@ -55,5 +60,15 @@ class CreateUserDTO
     public function setPassword(string $password): void
     {
         $this->password = $password;
+    }
+
+    public function getRole(): string
+    {
+        return $this->role;
+    }
+
+    public function setRole(string $role): void
+    {
+        $this->role = $role;
     }
 }

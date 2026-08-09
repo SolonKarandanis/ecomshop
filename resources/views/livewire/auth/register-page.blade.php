@@ -1,3 +1,5 @@
+@use('App\Enums\RolesEnum')
+
 <div class="w-full max-w-340 py-10 px-4 sm:px-6 lg:px-8 mx-auto">
     <div class="flex h-full items-center">
         <main class="w-full max-w-md mx-auto p-6">
@@ -19,6 +21,18 @@
                     <form wire:submit.prevent="save()">
                         <div class="grid gap-y-4">
                             <x-input name="name" label="{{__('register.name')}}" type="name" wire:model="name" />
+                            @if($areSuppliersEnabled)
+                                <div class="flex flex-col justify-between items-start">
+                                    <label for="role" class="block text-sm mb-2 dark:text-white">{{__('register.role')}}</label>
+                                    <select id="role"
+                                            class="block w-full text-base py-2 px-1 bg-gray-100 cursor-pointer
+                                            text-gray700 dark:text-white dark:bg-gray-900 rounded-lg"
+                                            wire:model="role">
+                                        <option value="{{RolesEnum::ROLE_BUYER->value}}">{{__('register.buyer')}}</option>
+                                        <option value="{{RolesEnum::ROLE_SUPPLIER->value}}">{{__('register.supplier')}}</option>
+                                    </select>
+                                </div>
+                            @endif
                             <x-input name="email" label="{{__('register.email')}}" type="email" wire:model="email" />
                             <x-input name="password" label="{{__('register.password')}}" type="password" wire:model="password" />
                             <!-- End Form Group -->

@@ -3,6 +3,7 @@
 namespace App\Livewire\Auth;
 
 use App\Dtos\CreateUserDTO;
+use App\Enums\RolesEnum;
 use App\Http\Requests\Auth\RegisterUserRequest;
 use App\Services\UserService;
 use Livewire\Attributes\Title;
@@ -14,6 +15,7 @@ class RegisterPage extends Component
     public string $name = '';
     public string $email = '';
     public string $password = '';
+    public string $role = RolesEnum::ROLE_BUYER->value;
 
     protected UserService $userService;
 
@@ -30,15 +32,24 @@ class RegisterPage extends Component
             'name' => $this->name,
             'email' => $this->email,
             'password' => $this->password,
+            'role' => $this->role,
         ]);
         $this->validate($request->rules());
         $dto = CreateUserDTO::fromRequest($request);
-        $user = $this->userService->createBuyer($dto);
+        $user = null;
+        if (config('features.suppliers_enabled') && $this->role === RolesEnum::ROLE_BUYER->value || !config('features.suppliers_enabled')){
+            $user = $this->userService->createBuyer($dto);
+        }
+        else{
+            $user = $this->userService->createSupplier($dto);
+        }
         auth()->login($user);
         return redirect()->intended('/');
     }
     public function render()
     {
-        return view('livewire.auth.register-page');
+        return view('livewire.auth.register-page', [
+            'areSuppliersEnabled' => config('features.suppliers_enabled'),
+        ]);
     }
 }
