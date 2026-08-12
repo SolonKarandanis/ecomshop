@@ -10,6 +10,7 @@ class CartException extends \Exception
     {
         return new self(__('messages.cart_exceptions.save_cart'), HttpStatusCodeEnum::BAD_REQUEST->value);
     }
+
     public static function updateItems(): CartException
     {
         return new self(__('messages.cart_exceptions.update_items'), HttpStatusCodeEnum::BAD_REQUEST->value);
@@ -23,5 +24,10 @@ class CartException extends \Exception
     public static function clearCart(): CartException
     {
         return new self(__('messages.cart_exceptions.clear_cart'), HttpStatusCodeEnum::BAD_REQUEST->value);
+    }
+
+    public static function supplierMismatch(): CartException
+    {
+        return new self(__('messages.cart_exceptions.supplier_mismatch'), HttpStatusCodeEnum::BAD_REQUEST->value);
     }
 }

@@ -9,7 +9,7 @@ use App\Exceptions\ProductNotFoundException;
 
 trait WithCartActions
 {
-    use WithPreAuthorize, WithMessages;
+    use WithMessages, WithPreAuthorize;
 
     /**
      * @throws ProductNotFoundException
@@ -18,8 +18,9 @@ trait WithCartActions
     #[PreAuthorize('buyer-action')]
     public function addToCart(int $productId, int $quantity = 1, array $attributes = []): void
     {
-        if (!$this->isPreAuthorized(__FUNCTION__)) {
+        if (! $this->isPreAuthorized(__FUNCTION__)) {
             $this->uiService->addToCartError();
+
             return;
         }
 
@@ -36,7 +37,9 @@ trait WithCartActions
         try {
             $this->cartService->addItemsToCart([$addToCartDto]);
             $this->handleSuccess('cartUpdated', $title, $success);
-        } catch (CartException|ProductNotFoundException $e) {
+        } catch (CartException $e) {
+            $this->handleError($title, $e->getMessage(), $e);
+        } catch (ProductNotFoundException $e) {
             $this->handleError($title, $error, $e);
         }
     }

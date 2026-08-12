@@ -59,6 +59,7 @@ return [
         'delete_items'=>'Failed to delete cart items',
         'clear_cart'=>'Failed to clear cart',
         'empty_cart'=>'Cart is empty',
+        'supplier_mismatch'=>'Your cart can only contain products from one supplier at a time. Clear your cart to add this product.',
     ],
     'order_exceptions'=>[
         'create_order'=>'Failed to create new order',

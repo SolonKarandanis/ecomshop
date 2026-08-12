@@ -10,53 +10,57 @@ use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Product;
 use App\Repositories\CartRepository;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use Illuminate\Support\Collection;
 use Throwable;
 
 class CartService
 {
     protected const COOKIE_CART_NAME = 'cart';
+
     protected const COOKIE_CART_ITEMS_NAME = 'cartItems';
-    protected const COOKIE_LIFETIME = 60*24*365; // 1 year
+
+    protected const COOKIE_LIFETIME = 60 * 24 * 365; // 1 year
+
     private ?Cart $cachedCart = null;
 
     public function __construct(
         private readonly CartRepository $cartRepository,
         private readonly ProductService $productService
-    ){}
+    ) {}
 
-    public function getCart(): Cart{
-        Log::debug('Cached cart', [!is_null($this->cachedCart)]);
-        if($this->cachedCart){
+    public function getCart(): Cart
+    {
+        Log::debug('Cached cart', [! is_null($this->cachedCart)]);
+        if ($this->cachedCart) {
             return $this->cachedCart;
         }
-        if(Auth::check()){
+        if (Auth::check()) {
             Log::debug('Getting cart from database');
             $cart = $this->getCartFromDatabase();
-        }
-        else{
+        } else {
             Log::debug('Getting cart from cookies');
             $cart = $this->getCartFromCookies();
         }
         $this->cachedCart = $cart;
+
         return $this->cachedCart;
     }
 
     protected function getCartFromCookies(): Cart
     {
-        $cartData = json_decode($this->getFromCookies(self::COOKIE_CART_NAME),true);
+        $cartData = json_decode($this->getFromCookies(self::COOKIE_CART_NAME), true);
         $cart = new Cart($cartData);
 
-        $cookieValue =$this->getFromCookies(self::COOKIE_CART_ITEMS_NAME);
+        $cookieValue = $this->getFromCookies(self::COOKIE_CART_ITEMS_NAME);
         Log::debug('Raw cartItems cookie value from request(): ', [$cookieValue]);
         $cartItemsData = json_decode($cookieValue, true);
         if (json_last_error() !== JSON_ERROR_NONE) {
-            Log::debug('JSON decode error: ' . json_last_error_msg());
+            Log::debug('JSON decode error: '.json_last_error_msg());
             $cartItemsData = [];
         }
 
@@ -81,7 +85,7 @@ class CartService
         $products = $this->productService->findProductsForCart($productIds);
         foreach ($cartItems as $cartItem) {
             $product = $products->get($cartItem->product_id);
-            if($product){
+            if ($product) {
                 $cartItem->setRelation('product', $product);
             }
         }
@@ -91,37 +95,42 @@ class CartService
         return $cart;
     }
 
-    protected function getCartFromDatabase():Cart{
-        $userId=Auth::id();
+    protected function getCartFromDatabase(): Cart
+    {
+        $userId = Auth::id();
+
         return $this->cartRepository->getCart($userId);
     }
 
     /**
-     * @param AddToCartDto[] $addToCartRequests
+     * @param  AddToCartDto[]  $addToCartRequests
+     *
      * @throws CartException
      * @throws ProductNotFoundException
      */
-    public function addItemsToCart(array $addToCartRequests):bool{
-        if(Auth::check()){
+    public function addItemsToCart(array $addToCartRequests): bool
+    {
+        if (Auth::check()) {
             return $this->saveCartToDatabase($addToCartRequests);
-        }
-        else{
+        } else {
             return $this->saveCartToCookies($addToCartRequests);
         }
     }
 
     /**
-     * @param AddToCartDto[] $addToCartRequests
+     * @param  AddToCartDto[]  $addToCartRequests
+     *
      * @throws CartException
      * @throws ProductNotFoundException
      */
     public function saveCartToDatabase(array $addToCartRequests): bool
     {
         DB::beginTransaction();
-        try{
+        try {
             $cartId = $this->cartRepository->getCartId(Auth::id());
             Log::debug('Cart id ', [$cartId]);
             $productsToBeAdded = $this->fetchProductsToBeAdded($addToCartRequests);
+            $this->assertSingleSupplier($this->cartRepository->getDistinctSupplierIds($cartId), $productsToBeAdded);
             $newCartItems = [];
             foreach ($addToCartRequests as $request) {
                 $product = $productsToBeAdded->find($request->getProductId());
@@ -144,39 +153,32 @@ class CartService
                 $request->setPrice($price);
                 if ($existingItem) {
                     $request->setQuantity($existingItem->quantity + $request->getQuantity());
-                    $totalPrice = $request->getQuantity()* $request->getPrice();
-                    $this->cartRepository->updateItemQuantity($existingItem->id, $request->getQuantity(),$request->getPrice(), $totalPrice);
+                    $totalPrice = $request->getQuantity() * $request->getPrice();
+                    $this->cartRepository->updateItemQuantity($existingItem->id, $request->getQuantity(), $request->getPrice(), $totalPrice);
                 } else {
                     $newCartItems[] = $request;
                 }
             }
-            if (!empty($newCartItems)) {
+            if (! empty($newCartItems)) {
                 $this->cartRepository->createCartItems($cartId, $newCartItems);
             }
             $this->recalculateCartTotalPrice();
             DB::commit();
+
             return true;
-        }
-        catch (ProductNotFoundException $e) {
+        } catch (ProductNotFoundException|CartException $e) {
             DB::rollBack();
             throw $e;
-        }
-        catch (Throwable $exception){
+        } catch (Throwable $exception) {
             Log::error($exception);
             DB::rollBack();
             throw CartException::saveCart();
         }
     }
 
-    /**
-     * @param array $newCartItems
-     * @param AddToCartDto $request
-     * @param array $attributes
-     * @return bool
-     */
     public function checkIfItemIsAlreadyInNewItems(array $newCartItems, AddToCartDto $request, array $attributes): bool
     {
-        $alreadyInNewItems =false;
+        $alreadyInNewItems = false;
         foreach ($newCartItems as $newItemDto) {
             if ($newItemDto->getProductId() === $request->getProductId()) {
                 $newItemAttributes = $newItemDto->getAttributes();
@@ -188,46 +190,66 @@ class CartService
                 }
             }
         }
+
         return $alreadyInNewItems;
     }
 
-
     /**
-     * @param AddToCartDto $request
-     * @param Product|null $product
      * @throws ProductNotFoundException
      */
-    protected function handleProductNotFound(AddToCartDto $request,Product|null $product):void{
-        if (!$product) {
+    protected function handleProductNotFound(AddToCartDto $request, ?Product $product): void
+    {
+        if (! $product) {
             throw ProductNotFoundException::productNotFound($request->getProductId());
         }
     }
 
     /**
-     * @param Collection<int, CartItem> $cartItems
-     * @param int $productId
-     * @param array $attributes
-     * @return CartItem|null
+     * @param  Collection<int, Product>  $productsToBeAdded
+     *
+     * @throws CartException
      */
-    protected function findExistingCartItem(Collection $cartItems,int $productId, array $attributes):?CartItem{
+    protected function assertSingleSupplier(array $existingSupplierIds, Collection $productsToBeAdded): void
+    {
+        $newSupplierIds = $productsToBeAdded->pluck('supplier_id')->all();
+
+        $supplierIds = collect([...$existingSupplierIds, ...$newSupplierIds])->filter()->unique();
+
+        if ($supplierIds->count() > 1) {
+            throw CartException::supplierMismatch();
+        }
+    }
+
+    /**
+     * @param  Collection<int, CartItem>  $cartItems
+     */
+    protected function findExistingCartItem(Collection $cartItems, int $productId, array $attributes): ?CartItem
+    {
         return $cartItems->first(function (CartItem $item) use ($productId, $attributes) {
             $itemAttributes = $item->attributes ?? [];
             if (is_string($itemAttributes)) {
                 $itemAttributes = json_decode($itemAttributes, true) ?? [];
             }
             ksort($itemAttributes);
-            return (int)$item->product_id === (int)$productId && $itemAttributes === $attributes;
+
+            return (int) $item->product_id === (int) $productId && $itemAttributes === $attributes;
         });
     }
 
     /**
-     * @param AddToCartDto[] $addToCartRequests
+     * @param  AddToCartDto[]  $addToCartRequests
+     *
      * @throws ProductNotFoundException
+     * @throws CartException
      */
     public function saveCartToCookies(array $addToCartRequests): bool
     {
         $cart = $this->getCart();
         $productsToBeAdded = $this->fetchProductsToBeAdded($addToCartRequests);
+        $existingSupplierIds = $cart->cartItems
+            ->map(fn (CartItem $item) => $item->product?->supplier_id)
+            ->all();
+        $this->assertSingleSupplier($existingSupplierIds, $productsToBeAdded);
         foreach ($addToCartRequests as $request) {
             $product = $productsToBeAdded->find($request->getProductId());
             $this->handleProductNotFound($request, $product);
@@ -264,35 +286,34 @@ class CartService
         }
         $this->putItemsToCookies($cartItemsForCookie);
         $this->recalculateCartTotalPrice();
+
         return true;
     }
 
     /**
-     * @param Cart $cart
-     * @param UpdateCartItemsDTO[] $updateCartItemRequests
-     * @return bool
+     * @param  UpdateCartItemsDTO[]  $updateCartItemRequests
+     *
      * @throws CartException
      */
-    public function updateItemsQuantity(Cart $cart,array $updateCartItemRequests):bool{
-        if(Auth::check()){
-            return $this->updateCartItemsInDatabase($cart,$updateCartItemRequests);
-        }
-        else{
-            return $this->updateCartItemsInCookies($cart,$updateCartItemRequests);
+    public function updateItemsQuantity(Cart $cart, array $updateCartItemRequests): bool
+    {
+        if (Auth::check()) {
+            return $this->updateCartItemsInDatabase($cart, $updateCartItemRequests);
+        } else {
+            return $this->updateCartItemsInCookies($cart, $updateCartItemRequests);
         }
     }
 
     /**
-     * @param Cart $cart
-     * @param UpdateCartItemsDTO[] $updateCartItemRequests
-     * @return bool
+     * @param  UpdateCartItemsDTO[]  $updateCartItemRequests
+     *
      * @throws CartException
      */
-    protected function updateCartItemsInDatabase(Cart $cart,array $updateCartItemRequests): bool
+    protected function updateCartItemsInDatabase(Cart $cart, array $updateCartItemRequests): bool
     {
         Log::debug('Attempting to update cart items in the database.');
         DB::beginTransaction();
-        try{
+        try {
             $cartItems = $cart->cartItems;
             $updates = [];
             $idsToUpdate = [];
@@ -319,14 +340,15 @@ class CartService
             }
             if (empty($updates)) {
                 DB::rollBack();
+
                 return true;
             }
             $this->cartRepository->batchUpdateCartItems($updates, $idsToUpdate);
             $this->recalculateCartTotalPrice($cart);
             DB::commit();
+
             return true;
-        }
-        catch (Throwable $exception){
+        } catch (Throwable $exception) {
             Log::error($exception);
             DB::rollBack();
             throw CartException::updateItems();
@@ -334,17 +356,16 @@ class CartService
     }
 
     /**
-     * @param Cart $cart
-     * @param UpdateCartItemsDTO[] $updateCartItemRequests
-     * @return bool
+     * @param  UpdateCartItemsDTO[]  $updateCartItemRequests
      */
-    protected function updateCartItemsInCookies(Cart $cart,array $updateCartItemRequests):bool{
+    protected function updateCartItemsInCookies(Cart $cart, array $updateCartItemRequests): bool
+    {
         $cartItems = $cart->cartItems;
         $cartItemsForCookie = [];
         foreach ($cartItems as $item) {
             $attributeIds = $item->attributes ?? [];
             ksort($attributeIds);
-            $key = $item->product_id . '_' . json_encode($attributeIds);
+            $key = $item->product_id.'_'.json_encode($attributeIds);
             $cartItemsForCookie[$key] = [
                 'id' => $item->id_from_cookie,
                 'product_id' => $item->product_id,
@@ -358,10 +379,10 @@ class CartService
             $quantity = $request->getQuantity();
             $attributes = $request->getAttributes();
             ksort($attributes);
-            $key = $request->getProductId() . '_' . json_encode($attributes);
+            $key = $request->getProductId().'_'.json_encode($attributes);
 
             if (isset($cartItemsForCookie[$key]) && $cartItemsForCookie[$key]['id'] === $cartItemId) {
-                Log::debug('Updating quantity in cookie for item: ' . $cartItemId . ' to quantity: ' . $quantity);
+                Log::debug('Updating quantity in cookie for item: '.$cartItemId.' to quantity: '.$quantity);
                 $cartItemsForCookie[$key]['quantity'] = $quantity;
             }
         }
@@ -381,7 +402,7 @@ class CartService
         }
         // Eager load the product relationships for the updated cart items
         $productIds = collect($updatedCartItems)->pluck('product_id')->all();
-        if (!empty($productIds)) {
+        if (! empty($productIds)) {
             $products = $this->productService->findProductsByIds($productIds)->keyBy('id');
             foreach ($updatedCartItems as $cartItem) {
                 if (isset($products[$cartItem->product_id])) {
@@ -391,16 +412,18 @@ class CartService
         }
         $cart->setRelation('cartItems', collect($updatedCartItems));
         $this->recalculateCartTotalPrice($cart);
+
         return true;
     }
 
     /**
      * @throws CartException
      */
-    public function removeItemsFromCart(array $cartItemIds):bool{
-        if(Auth::check()){
+    public function removeItemsFromCart(array $cartItemIds): bool
+    {
+        if (Auth::check()) {
             return $this->deleteItemsFromDatabase($cartItemIds);
-        }else{
+        } else {
             return $this->deleteItemsFromCookies($cartItemIds);
         }
     }
@@ -408,23 +431,25 @@ class CartService
     /**
      * @throws CartException
      */
-    protected function deleteItemsFromDatabase(array $cartItemIds):bool{
+    protected function deleteItemsFromDatabase(array $cartItemIds): bool
+    {
         DB::beginTransaction();
-        try{
-            $cartId=$this->cartRepository->getCartId(Auth::id());
-            $this->cartRepository->deleteCartItems($cartId,$cartItemIds);
+        try {
+            $cartId = $this->cartRepository->getCartId(Auth::id());
+            $this->cartRepository->deleteCartItems($cartId, $cartItemIds);
             $this->recalculateCartTotalPrice();
             DB::commit();
+
             return true;
-        }
-        catch (Throwable $exception){
+        } catch (Throwable $exception) {
             Log::error($exception);
             DB::rollBack();
             throw CartException::deleteItems();
         }
     }
 
-    protected function deleteItemsFromCookies(array $cartItemIds):bool{
+    protected function deleteItemsFromCookies(array $cartItemIds): bool
+    {
         $cart = $this->getCart();
 
         $itemsToKeep = $cart->cartItems->reject(function ($item) use ($cartItemIds) {
@@ -434,25 +459,27 @@ class CartService
         $cart->setRelation('cartItems', $itemsToKeep);
 
         $cartItemsForCookie = collect($itemsToKeep)
-            ->flatMap(fn($item) => $this->getCartItemsForCookies($item))
+            ->flatMap(fn ($item) => $this->getCartItemsForCookies($item))
             ->all();
         $cartItemsForCookie = array_merge($cartItemsForCookie, $cartItemsForCookie);
         Log::debug('Remaining cart items after delete: ', [$cartItemsForCookie]);
         $this->putItemsToCookies($cartItemsForCookie);
         $this->recalculateCartTotalPrice($cart);
+
         return true;
     }
 
     /**
      * @throws CartException
      */
-    public function clearCart():bool{
-        $result=false;
-        if(Auth::check()){
-            $result=$this->clearCartFromDatabase();
+    public function clearCart(): bool
+    {
+        $result = false;
+        if (Auth::check()) {
+            $result = $this->clearCartFromDatabase();
             $this->cachedCart = null;
-        }else{
-            $result=$this->clearCartFromCookies();
+        } else {
+            $result = $this->clearCartFromCookies();
             // Cookie::forget is queued and only takes effect when the response is sent,
             // so the cookies are still readable within this request. Seed the cache with
             // an empty cart so any subsequent getCart() call in the same request doesn't
@@ -461,22 +488,24 @@ class CartService
             $empty->setRelation('cartItems', collect());
             $this->cachedCart = $empty;
         }
+
         return $result;
     }
 
     /**
      * @throws CartException
      */
-    protected function clearCartFromDatabase():bool{
+    protected function clearCartFromDatabase(): bool
+    {
         DB::beginTransaction();
-        try{
-            $cartId=$this->cartRepository->getCartId(Auth::id());
+        try {
+            $cartId = $this->cartRepository->getCartId(Auth::id());
             $this->cartRepository->clearCart($cartId);
             $this->recalculateCartTotalPrice();
             DB::commit();
+
             return true;
-        }
-        catch (Throwable $exception){
+        } catch (Throwable $exception) {
             Log::error($exception);
             DB::rollBack();
             throw CartException::clearCart();
@@ -484,25 +513,28 @@ class CartService
 
     }
 
-    protected function clearCartFromCookies():bool{
+    protected function clearCartFromCookies(): bool
+    {
         Cookie::queue(Cookie::forget(self::COOKIE_CART_NAME));
         Cookie::queue(Cookie::forget(self::COOKIE_CART_ITEMS_NAME));
+
         return true;
     }
 
     public function getCartItemsCount(): int
     {
-        if(Auth::check()){
+        if (Auth::check()) {
             return $this->cartRepository->getCartItemsCount(Auth::id());
-        }else{
+        } else {
             return $this->getCart()->cartItems->count();
         }
 
     }
 
-    public function moveCartItemsToDatabase():void{
+    public function moveCartItemsToDatabase(): void
+    {
         $cookieCart = $this->getCartFromCookies();
-        if($cookieCart->cartItems->isEmpty()){
+        if ($cookieCart->cartItems->isEmpty()) {
             return;
         }
         $dbCart = $this->getCartFromDatabase();
@@ -533,10 +565,10 @@ class CartService
                 );
             }
         }
-        if (!empty($itemsToCreate)) {
+        if (! empty($itemsToCreate)) {
             $this->cartRepository->createCartItems($dbCart->id, $itemsToCreate);
         }
-        if (!empty($itemsToUpdate)) {
+        if (! empty($itemsToUpdate)) {
             $this->cartRepository->batchUpdateCartItems($itemsToUpdate, $idsToUpdate);
         }
         $dbCart = $this->getCartFromDatabase();
@@ -544,14 +576,16 @@ class CartService
         $this->recalculateCartTotalPrice($dbCart);
     }
 
-    protected function getFromCookies(string $cookieName): array|string|null{
-            return request()->cookie($cookieName,'[]');
+    protected function getFromCookies(string $cookieName): array|string|null
+    {
+        return request()->cookie($cookieName, '[]');
     }
 
-    protected function getCartItemsForCookies($item):array{
+    protected function getCartItemsForCookies($item): array
+    {
         $attributeIds = $item->attributes ?? [];
         ksort($attributeIds);
-        $key = $item->product_id . '_' . json_encode($attributeIds);
+        $key = $item->product_id.'_'.json_encode($attributeIds);
 
         $itemData = [
             'id' => $item->id_from_cookie ?? (string) Str::uuid(),
@@ -561,22 +595,24 @@ class CartService
             'attribute_ids' => $attributeIds,
         ];
         $cartItemsForCookie[$key] = $itemData;
+
         return $cartItemsForCookie;
     }
 
     /**
-     * @param AddToCartDto[] $addToCartRequests
+     * @param  AddToCartDto[]  $addToCartRequests
      */
-    protected function fetchProductsToBeAdded(array $addToCartRequests):Collection{
-        $productIds= collect($addToCartRequests)->map(fn($request):int => $request->getProductId())->all();
+    protected function fetchProductsToBeAdded(array $addToCartRequests): Collection
+    {
+        $productIds = collect($addToCartRequests)->map(fn ($request): int => $request->getProductId())->all();
+
         return $this->productService->findProductsByIds($productIds);
     }
 
     /**
-     * @param AddToCartDto $request
-     * @param Collection<int, Product> $productsToBeAdded
+     * @param  Collection<int, Product>  $productsToBeAdded
      */
-    protected function setAttributesIfEmptyToRequest(AddToCartDto $request,Collection $productsToBeAdded): void
+    protected function setAttributesIfEmptyToRequest(AddToCartDto $request, Collection $productsToBeAdded): void
     {
         if (empty($request->getAttributes())) {
             $product = $productsToBeAdded->find($request->getProductId());
@@ -604,9 +640,9 @@ class CartService
 
             if ($value) {
                 if ($value->attribute_value_method === 'attribute.value.method.fixed') {
-                    $newPrice += (float)$value->attribute_value;
+                    $newPrice += (float) $value->attribute_value;
                 } elseif ($value->attribute_value_method === 'attribute.value.method.percent') {
-                    $newPrice *= (1 + (float)$value->attribute_value / 100);
+                    $newPrice *= (1 + (float) $value->attribute_value / 100);
                 }
             }
         }
@@ -614,26 +650,25 @@ class CartService
         return $newPrice;
     }
 
-    protected function recalculateCartTotalPrice(?Cart $cart = null):void{
-        if($cart === null){
+    protected function recalculateCartTotalPrice(?Cart $cart = null): void
+    {
+        if ($cart === null) {
             $cart = $this->getCart();
         }
         $cart->recalculateCartTotalPrice();
-        if(Auth::check()){
+        if (Auth::check()) {
             $this->cartRepository->saveCart($cart);
-        }else{
+        } else {
             $cartAttributes = collect($cart->toArray())->only($cart->getFillable())->toArray();
             $this->putCartInCookies($cartAttributes);
         }
-        $this->cachedCart=$cart;
+        $this->cachedCart = $cart;
     }
 
     /**
-     * @param Collection<int, CartItem> $cartItems
-     * @param string $cartItemId
-     * @return CartItem|null
+     * @param  Collection<int, CartItem>  $cartItems
      */
-    protected function findExistingCartItemForUpdate(Collection $cartItems, string $cartItemId): CartItem|null
+    protected function findExistingCartItemForUpdate(Collection $cartItems, string $cartItemId): ?CartItem
     {
         if ($cartItems->isEmpty()) {
             return null;
@@ -641,16 +676,17 @@ class CartService
 
         return $cartItems->first(function (CartItem $cartItem) use ($cartItemId) {
             return (isset($cartItem->id_from_cookie) && $cartItem->id_from_cookie === $cartItemId) ||
-                   (isset($cartItem->id) && (string)$cartItem->id === $cartItemId);
+                   (isset($cartItem->id) && (string) $cartItem->id === $cartItemId);
         });
     }
 
-    protected function putCartInCookies(array $cartAttributes):void{
+    protected function putCartInCookies(array $cartAttributes): void
+    {
         Cookie::queue(self::COOKIE_CART_NAME, json_encode($cartAttributes), self::COOKIE_LIFETIME);
     }
 
-    protected function putItemsToCookies(array $cartItemsForCookie):void{
+    protected function putItemsToCookies(array $cartItemsForCookie): void
+    {
         Cookie::queue(self::COOKIE_CART_ITEMS_NAME, json_encode(array_values($cartItemsForCookie)), self::COOKIE_LIFETIME);
     }
-
 }
