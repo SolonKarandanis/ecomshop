@@ -38,25 +38,9 @@ use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
-    public function register(): void
+
+    private function registerServices():void
     {
-
-//      DB::prohibitDestructiveCommands()` stops `migrate:fresh`, `db:wipe` and friends
-//      from ever running in production.
-        DB::prohibitDestructiveCommands(
-            app()->isProduction()
-        );
-
-        $this->app->singleton(ProductSearchEngineFactory::class, fn ($app) =>
-            new ProductSearchEngineFactory(
-                DB::connection()->getDriverName(),
-                (bool) config('search.fts_enabled'),
-            )
-        );
-
         $this->app->singleton(ProductService::class,function ($app){
             return new ProductService(
                 $app->make(ProductRepository::class),
@@ -107,6 +91,25 @@ class AppServiceProvider extends ServiceProvider
             );
         });
     }
+    /**
+     * Register any application services.
+     */
+    public function register(): void
+    {
+
+//      DB::prohibitDestructiveCommands()` stops `migrate:fresh`, `db:wipe` and friends
+//      from ever running in production.
+        DB::prohibitDestructiveCommands(
+            app()->isProduction()
+        );
+        $this->app->singleton(ProductSearchEngineFactory::class, fn ($app) =>
+            new ProductSearchEngineFactory(
+                DB::connection()->getDriverName(),
+                (bool) config('search.fts_enabled'),
+            )
+        );
+        $this->registerServices();
+    }
 
     /**
      * Bootstrap any application services.
@@ -114,19 +117,47 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
 //        Model::shouldBeStrict(! app()->isProduction());
-        if (! config('search.fts_enabled')) {
-            config(['scout.driver' => null]);
-        }
-
-        Order::observe(OrderObserver::class);
-
-        Gate::define('buyer-action', function (?User $user) {
-            return $user === null || $user->isBuyer();
-        });
+        $this->registerConfig();
+        $this->registerObservers();
+        $this->registerGates();
 
         Schema::defaultStringLength(191);
 
         Paginator::useTailwind();
+
+        if (! $this->app->runningInConsole()) {
+            FilamentAsset::register([
+                // Local asset build using Vite
+                Js::make('sweetalert2', Vite::asset('resources/js/app.js')),
+            ]);
+        }
+    }
+
+    private function registerObservers(): void
+    {
+        Order::observe(OrderObserver::class);
+    }
+
+    private function registerGates(): void
+    {
+        Gate::define('buyer-action', function (?User $user) {
+            return $user === null || $user->isBuyer();
+        });
+
+        Gate::define('supplier-action', function (?User $user) {
+            return $user === null || $user->isSupplier();
+        });
+
+        Gate::define('admin-action', function (?User $user) {
+            return $user === null || $user->isAdmin();
+        });
+    }
+
+    private function registerConfig():void
+    {
+        if (! config('search.fts_enabled')) {
+            config(['scout.driver' => null]);
+        }
 
         if (config('database.default') === 'sqlite' &&
             file_exists(config('database.connections.sqlite.database'))) {
@@ -134,13 +165,6 @@ class AppServiceProvider extends ServiceProvider
             DB::statement('PRAGMA synchronous=NORMAL');
             DB::statement('PRAGMA cache_size=10000');
             DB::statement('PRAGMA temp_store=MEMORY');
-        }
-
-        if (! $this->app->runningInConsole()) {
-            FilamentAsset::register([
-                // Local asset build using Vite
-                Js::make('sweetalert2', Vite::asset('resources/js/app.js')),
-            ]);
         }
     }
 }

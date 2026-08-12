@@ -19,21 +19,29 @@ use Livewire\Component;
 #[Title('Order Details')]
 class OrderDetailsPage extends Component
 {
-    use HasStatusClasses, WithPreAuthorize, WithMessages;
+    use HasStatusClasses, WithMessages, WithPreAuthorize;
+
     public $id;
+
     public ?int $reviewingProductId = null;
+
     public int $rating = 0;
+
     public ?string $comment = null;
+
     public ?int $reviewId = null;
+
     protected OrderService $orderService;
+
     protected UiService $uiService;
+
     protected ReviewService $reviewService;
 
     public function boot(
         OrderService $orderService,
         UiService $uiService,
         ReviewService $reviewService
-    ): void{
+    ): void {
         $this->orderService = $orderService;
         $this->uiService = $uiService;
         $this->reviewService = $reviewService;
@@ -44,9 +52,11 @@ class OrderDetailsPage extends Component
         $this->id = $id;
     }
 
-    public function openReviewForm(int $productId):void{
+    public function openReviewForm(int $productId): void
+    {
         if ($this->reviewingProductId === $productId) {
             $this->reviewingProductId = null;
+
             return;
         }
 
@@ -58,22 +68,25 @@ class OrderDetailsPage extends Component
         $this->comment = $review?->comment;
     }
 
-    public function canReviewProduct(int $productId): bool{
+    public function canReviewProduct(int $productId): bool
+    {
         return auth()->check() && auth()->user()->isBuyer()
             && $this->reviewService->canReview(auth()->id(), $productId);
     }
 
     #[PreAuthorize('buyer-action')]
-    public function submitReview(): void{
+    public function submitReview(): void
+    {
         $isEditing = $this->reviewId !== null;
         $title = $isEditing ? __('messages.submit_review.edit_title') : __('messages.submit_review.title');
 
-        if (!$this->isPreAuthorized(__FUNCTION__) || !($isEditing || $this->canReviewProduct($this->reviewingProductId))) {
+        if (! $this->isPreAuthorized(__FUNCTION__) || ! ($isEditing || $this->canReviewProduct($this->reviewingProductId))) {
             $this->handleError($title, __('messages.submit_review.not_eligible'), ReviewException::notEligible());
+
             return;
         }
 
-        $request = new SubmitReviewRequest();
+        $request = new SubmitReviewRequest;
         $request->merge([
             'rating' => $this->rating,
             'comment' => $this->comment,
@@ -98,7 +111,8 @@ class OrderDetailsPage extends Component
 
     public function render()
     {
-        $order = $this->orderService->getOrderById($this->id,auth()->id());
-        return view('livewire.order-details-page',['order'=>$order]);
+        $order = $this->orderService->getOrderById($this->id, auth()->user());
+
+        return view('livewire.order-details-page', ['order' => $order]);
     }
 }

@@ -15,20 +15,22 @@ use Throwable;
 
 class OrderRepository
 {
-
-    public function modelQuery(): Builder| Order{
+    public function modelQuery(): Builder|Order
+    {
         return Order::query();
     }
 
-    public function itemModelQuery(): Builder| OrderItem{
+    public function itemModelQuery(): Builder|OrderItem
+    {
         return OrderItem::query();
     }
 
     /**
      * @throws Throwable
      */
-    public function createOrder(CreateOrderDTO $createOrderDTO): Order{
-        return DB::transaction(function () use ($createOrderDTO){
+    public function createOrder(CreateOrderDTO $createOrderDTO): Order
+    {
+        return DB::transaction(function () use ($createOrderDTO) {
             $order = $this->modelQuery()->create([
                 'user_id' => $createOrderDTO->getUserId(),
                 'grand_total' => $createOrderDTO->getTotalPrice(),
@@ -47,7 +49,8 @@ class OrderRepository
         });
     }
 
-    public function getOrderById(int $orderId,int $userId): Order{
+    public function getOrderById(int $orderId): Order
+    {
         return $this->modelQuery()
             ->with([
                 'address',
@@ -56,12 +59,12 @@ class OrderRepository
                 'items.product.productAttributeValues.attribute',
                 'items.product.productAttributeValues.media',
             ])
-            ->where('user_id',$userId)
             ->where('id', $orderId)
             ->firstOrFail();
     }
 
-    public function getLatestOrder(int $userId): Order{
+    public function getLatestOrder(int $userId): Order
+    {
         return $this->modelQuery()
             ->with([
                 'address',
@@ -76,7 +79,8 @@ class OrderRepository
             ->first();
     }
 
-    public function getUsersOrders(OrderSearchRequestDTO $dto): LengthAwarePaginator|array{
+    public function getUsersOrders(OrderSearchRequestDTO $dto): LengthAwarePaginator|array
+    {
         $orderQuery = $this->applySearchFilters($dto);
 
         return $orderQuery
@@ -98,27 +102,27 @@ class OrderRepository
     {
         $orderQuery = $this->modelQuery()->where('user_id', $dto->getUserId());
 
-        $orderQuery->when(!empty($dto->getOrderStatus()), function ($query) use ($dto) {
+        $orderQuery->when(! empty($dto->getOrderStatus()), function ($query) use ($dto) {
             $query->where('order_status', $dto->getOrderStatus());
         });
 
-        $orderQuery->when(!empty($dto->getPaymentStatus()), function ($query) use ($dto) {
+        $orderQuery->when(! empty($dto->getPaymentStatus()), function ($query) use ($dto) {
             $query->where('payment_status', $dto->getPaymentStatus());
         });
 
-        $orderQuery->when(!empty($dto->getFromDate()), function ($query) use ($dto) {
+        $orderQuery->when(! empty($dto->getFromDate()), function ($query) use ($dto) {
             $query->whereDate('created_at', '>=', $dto->getFromDate());
         });
 
-        $orderQuery->when(!empty($dto->getToDate()), function ($query) use ($dto) {
+        $orderQuery->when(! empty($dto->getToDate()), function ($query) use ($dto) {
             $query->whereDate('created_at', '<=', $dto->getToDate());
         });
 
-        $orderQuery->when(!empty($dto->getMinPrice()), function ($query) use ($dto) {
+        $orderQuery->when(! empty($dto->getMinPrice()), function ($query) use ($dto) {
             $query->where('grand_total', '>=', $dto->getMinPrice());
         });
 
-        $orderQuery->when(!empty($dto->getMaxPrice()), function ($query) use ($dto) {
+        $orderQuery->when(! empty($dto->getMaxPrice()), function ($query) use ($dto) {
             $query->where('grand_total', '<=', $dto->getMaxPrice());
         });
 

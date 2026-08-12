@@ -8,15 +8,15 @@ use App\Dtos\OrderSearchRequestDTO;
 use App\Enums\OrderPaymentStatusEnum;
 use App\Enums\OrderStatusEnum;
 use App\Enums\StripePaymentStatusEnum;
-use App\Models\CartItem;
-use App\Models\User;
-use App\Payments\PaymentHandlerFactory;
 use App\Exceptions\EmptyCartException;
 use App\Exceptions\OrderException;
 use App\Exceptions\PaymentException;
 use App\Exports\OrdersExport;
+use App\Models\CartItem;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\User;
+use App\Payments\PaymentHandlerFactory;
 use App\Repositories\AddressRepository;
 use App\Repositories\OrderRepository;
 use App\Repositories\PaymentMethodRepository;
@@ -33,24 +33,35 @@ use Throwable;
 class OrderService
 {
     public function __construct(
-        private readonly OrderRepository            $orderRepository,
-        private readonly AddressRepository          $addressRepository,
-        private readonly PaymentMethodRepository    $paymentMethodRepository,
-        private readonly CartService                $cartService,
-        private readonly StripeService              $stripeService,
-        private readonly PaymentHandlerFactory      $paymentHandlerFactory,
+        private readonly OrderRepository $orderRepository,
+        private readonly AddressRepository $addressRepository,
+        private readonly PaymentMethodRepository $paymentMethodRepository,
+        private readonly CartService $cartService,
+        private readonly StripeService $stripeService,
+        private readonly PaymentHandlerFactory $paymentHandlerFactory,
         private readonly NotificationHandlerService $notificationService,
-    ){}
+    ) {}
 
-    public function getOrderById(int $orderId, int $userId):Order{
-        return $this->orderRepository->getOrderById($orderId,$userId);
+    public function getOrderById(int $orderId, User $user): Order
+    {
+        $order = $this->orderRepository->getOrderById($orderId);
+        abort_unless($this->canViewOrder($order, $user), 403);
+
+        return $order;
     }
 
-    public function getUsersLatestOrder(int $userId):Order{
+    public function canViewOrder(Order $order, User $user): bool
+    {
+        return $user->isAdmin() || $order->user_id === $user->id;
+    }
+
+    public function getUsersLatestOrder(int $userId): Order
+    {
         return $this->orderRepository->getLatestOrder($userId);
     }
 
-    public function getUsersOrders(OrderSearchRequestDTO $dto): LengthAwarePaginator|array{
+    public function getUsersOrders(OrderSearchRequestDTO $dto): LengthAwarePaginator|array
+    {
         return $this->orderRepository->getUsersOrders($dto);
     }
 
@@ -72,9 +83,10 @@ class OrderService
      * @throws OrderException
      * @throws EmptyCartException|PaymentException|Throwable
      */
-    public function checkout(CheckoutDTO $dto):string{
-        $paymentMethod=$dto->getPaymentMethod();
-        try{
+    public function checkout(CheckoutDTO $dto): string
+    {
+        $paymentMethod = $dto->getPaymentMethod();
+        try {
             DB::beginTransaction();
             $cart = $this->cartService->getCart();
             Log::debug('OrderService checkout cartItems count: ', [$cart->cartItems->count()]);
@@ -82,26 +94,25 @@ class OrderService
             $line_items = $this->createLineItems($cart->cartItems);
             $order_items = $this->createOrderItems($cart->cartItems);
             $paymentMethods = $this->paymentMethodRepository->findAll()->pluck('id', 'resource_key');
-            $paymentMethodId=$paymentMethods->get($paymentMethod);
+            $paymentMethodId = $paymentMethods->get($paymentMethod);
             Log::debug('OrderService creating order');
-            $order = $this->createNewOrder($cart->total_price,$paymentMethodId,$order_items);
-            Log::debug('OrderService created order ',[$order->id]);
+            $order = $this->createNewOrder($cart->total_price, $paymentMethodId, $order_items);
+            Log::debug('OrderService created order ', [$order->id]);
             $redirect_url = $this->paymentHandlerFactory->make($paymentMethod)->process($order, $line_items);
             Log::debug('OrderService creating address');
-            $this->addressRepository->create($order->id,$dto);
+            $this->addressRepository->create($order->id, $dto);
             Log::debug('OrderService created address');
             Log::debug('OrderService clearing cart');
             $this->cartService->clearCart();
             DB::commit();
             $order = $this->getUsersLatestOrder(auth()->user()->id);
             $this->notificationService->orderCreated($order);
+
             return $redirect_url;
-        }
-        catch (EmptyCartException|PaymentException $exception){
+        } catch (EmptyCartException|PaymentException $exception) {
             DB::rollBack();
             throw $exception;
-        }
-        catch (Throwable $exception){
+        } catch (Throwable $exception) {
             Log::error($exception);
             DB::rollBack();
             throw OrderException::checkout();
@@ -109,24 +120,26 @@ class OrderService
     }
 
     /**
-     * @param Collection<int, CartItem> $cartItems
+     * @param  Collection<int, CartItem>  $cartItems
+     *
      * @throws EmptyCartException
      */
-    protected function handleEmptyCart(Collection $cartItems):void{
+    protected function handleEmptyCart(Collection $cartItems): void
+    {
         if ($cartItems->isEmpty()) {
             throw EmptyCartException::emptyCart();
         }
     }
 
     /**
-     * @param Collection<int, CartItem> $cartItems
-     * @return array
+     * @param  Collection<int, CartItem>  $cartItems
      */
-    protected function createLineItems(Collection $cartItems):array{
-        return $cartItems->map(fn(CartItem $cartItem) => [
+    protected function createLineItems(Collection $cartItems): array
+    {
+        return $cartItems->map(fn (CartItem $cartItem) => [
             'price_data' => [
-                'currency'     => config('app.currency'),
-                'unit_amount'  => $cartItem->unit_price * 100, // stripe wants cents
+                'currency' => config('app.currency'),
+                'unit_amount' => $cartItem->unit_price * 100, // stripe wants cents
                 'product_data' => ['name' => $cartItem->product->name],
             ],
             'quantity' => $cartItem->quantity,
@@ -134,11 +147,11 @@ class OrderService
     }
 
     /**
-     * @param Collection<int, CartItem> $cartItems
-     * @return array
+     * @param  Collection<int, CartItem>  $cartItems
      */
-    protected function createOrderItems(Collection $cartItems):array{
-        return $cartItems->map(fn(CartItem $cartItem) => (new OrderItem($cartItem))->attributesToArray())->values()->all();
+    protected function createOrderItems(Collection $cartItems): array
+    {
+        return $cartItems->map(fn (CartItem $cartItem) => (new OrderItem($cartItem))->attributesToArray())->values()->all();
     }
 
     /**
@@ -150,6 +163,7 @@ class OrderService
             /** @var User $user */
             $user = Auth::user();
             $createOrderDto = new CreateOrderDTO($user->id, $totalPrice, $paymentMethodId, $orderItems, $user->name);
+
             return $this->orderRepository->createOrder($createOrderDto);
         } catch (Throwable $e) {
             throw OrderException::createOrder();
@@ -159,14 +173,15 @@ class OrderService
     /**
      * @throws OrderException|Throwable
      */
-    public function successOrFailStripeOrder(string $sessionId, Order $latestOrder): Order{
-        try{
+    public function successOrFailStripeOrder(string $sessionId, Order $latestOrder): Order
+    {
+        try {
             DB::beginTransaction();
             $sessionInfo = $this->stripeService->retrieveSession($sessionId);
             $isPaid = $sessionInfo->payment_status == StripePaymentStatusEnum::PAID->value;
             if ($isPaid) {
                 $latestOrder->payment_status = OrderPaymentStatusEnum::PAID->value;
-                $latestOrder->order_status   = OrderStatusEnum::Paid->value;
+                $latestOrder->order_status = OrderStatusEnum::Paid->value;
             } else {
                 $latestOrder->payment_status = OrderPaymentStatusEnum::FAILED->value;
             }
@@ -177,13 +192,12 @@ class OrderService
             } else {
                 $this->notificationService->orderPaymentFailed($latestOrder);
             }
+
             return $latestOrder;
-        }
-        catch (Throwable $exception){
+        } catch (Throwable $exception) {
             Log::error($exception);
             DB::rollBack();
             throw OrderException::stripeProcessing();
         }
     }
-
 }
