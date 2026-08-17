@@ -2,7 +2,7 @@
 
 namespace App\Enums;
 
-enum OrderStatusEnum:string
+enum OrderStatusEnum: string
 {
     case Draft = 'order.status.draft';
     case Paid = 'order.status.paid';
@@ -19,5 +19,13 @@ enum OrderStatusEnum:string
             self::Delivered->value => __('order.status.delivered'),
             self::Cancelled->value => __('order.status.cancelled'),
         ];
+    }
+
+    public function isTerminal(): bool
+    {
+        return match ($this) {
+            self::Delivered, self::Cancelled => true,
+            default => false,
+        };
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Orders\Pages;
 
+use App\Enums\OrderStatusEnum;
 use App\Filament\Resources\Orders\OrderResource;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ViewAction;
@@ -17,5 +18,16 @@ class EditOrder extends EditRecord
             ViewAction::make(),
             DeleteAction::make(),
         ];
+    }
+
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        $currentStatus = OrderStatusEnum::from($this->getRecord()->order_status);
+
+        if ($currentStatus->isTerminal()) {
+            $data['order_status'] = $currentStatus->value;
+        }
+
+        return $data;
     }
 }
