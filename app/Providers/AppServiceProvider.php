@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\Order;
+use App\Models\User;
 use App\Observers\OrderObserver;
 use App\Payments\PaymentHandlerFactory;
 use App\Payments\StripePaymentHandler;
@@ -27,7 +28,6 @@ use App\Services\StripeService;
 use App\Services\UserService;
 use Filament\Support\Assets\Js;
 use Filament\Support\Facades\FilamentAsset;
-use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
@@ -38,10 +38,9 @@ use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
-
-    private function registerServices():void
+    private function registerServices(): void
     {
-        $this->app->singleton(ProductService::class,function ($app){
+        $this->app->singleton(ProductService::class, function ($app) {
             return new ProductService(
                 $app->make(ProductRepository::class),
                 $app->make(ProductSearchEngineFactory::class),
@@ -60,7 +59,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton(StripeService::class, function ($app) {
-            return new StripeService();
+            return new StripeService;
         });
 
         $this->app->singleton(StripePaymentHandler::class, function ($app) {
@@ -83,7 +82,7 @@ class AppServiceProvider extends ServiceProvider
             return new NotificationService($app->make(NotificationRepository::class));
         });
 
-        $this->app->singleton(ReviewService::class,function ($app) {
+        $this->app->singleton(ReviewService::class, function ($app) {
             return new ReviewService(
                 $app->make(ReviewRepository::class),
                 $app->make(OrderRepository::class),
@@ -91,22 +90,22 @@ class AppServiceProvider extends ServiceProvider
             );
         });
     }
+
     /**
      * Register any application services.
      */
     public function register(): void
     {
 
-//      DB::prohibitDestructiveCommands()` stops `migrate:fresh`, `db:wipe` and friends
-//      from ever running in production.
+        //      DB::prohibitDestructiveCommands()` stops `migrate:fresh`, `db:wipe` and friends
+        //      from ever running in production.
         DB::prohibitDestructiveCommands(
             app()->isProduction()
         );
-        $this->app->singleton(ProductSearchEngineFactory::class, fn ($app) =>
-            new ProductSearchEngineFactory(
-                DB::connection()->getDriverName(),
-                (bool) config('search.fts_enabled'),
-            )
+        $this->app->singleton(ProductSearchEngineFactory::class, fn ($app) => new ProductSearchEngineFactory(
+            DB::connection()->getDriverName(),
+            (bool) config('search.fts_enabled'),
+        )
         );
         $this->registerServices();
     }
@@ -116,7 +115,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-//        Model::shouldBeStrict(! app()->isProduction());
+        //        Model::shouldBeStrict(! app()->isProduction());
         $this->registerConfig();
         $this->registerObservers();
         $this->registerGates();
@@ -145,7 +144,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Gate::define('supplier-action', function (?User $user) {
-            return $user === null || $user->isSupplier();
+            return config('features.suppliers_enabled') && ($user === null || $user->isSupplier());
         });
 
         Gate::define('admin-action', function (?User $user) {
@@ -153,7 +152,7 @@ class AppServiceProvider extends ServiceProvider
         });
     }
 
-    private function registerConfig():void
+    private function registerConfig(): void
     {
         if (! config('search.fts_enabled')) {
             config(['scout.driver' => null]);

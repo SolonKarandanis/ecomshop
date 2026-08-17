@@ -52,7 +52,45 @@ class OrderService
 
     public function canViewOrder(Order $order, User $user): bool
     {
-        return $user->isAdmin() || $order->user_id === $user->id;
+        return $user->isAdmin()
+            || $order->user_id === $user->id
+            || ($user->isSupplier() && $this->supplierOwnsOrder($order, $user));
+    }
+
+    public function canSupplierActOn(Order $order, User $user): bool
+    {
+        return $user->isSupplier()
+            && $this->supplierOwnsOrder($order, $user)
+            && in_array($order->order_status, [OrderStatusEnum::Paid->value, OrderStatusEnum::Shipped->value], true);
+    }
+
+    /**
+     * @throws OrderException
+     */
+    public function transitionOrderStatusBySupplier(Order $order, User $user, OrderStatusEnum $toStatus): Order
+    {
+        if (! $this->canSupplierActOn($order, $user) || ! $this->isLegalSupplierTransition($order->order_status, $toStatus->value)) {
+            throw OrderException::supplierActionNotAllowed();
+        }
+
+        $order->order_status = $toStatus->value;
+        $this->orderRepository->updateOrder($order);
+
+        return $order;
+    }
+
+    private function supplierOwnsOrder(Order $order, User $user): bool
+    {
+        return $order->items->contains(fn (OrderItem $item) => $item->product->supplier_id === $user->id);
+    }
+
+    private function isLegalSupplierTransition(string $from, string $to): bool
+    {
+        return match ($from) {
+            OrderStatusEnum::Paid->value => in_array($to, [OrderStatusEnum::Shipped->value, OrderStatusEnum::Cancelled->value], true),
+            OrderStatusEnum::Shipped->value => $to === OrderStatusEnum::Delivered->value,
+            default => false,
+        };
     }
 
     public function getUsersLatestOrder(int $userId): Order

@@ -114,6 +114,26 @@
     </div>
     <!-- End Grid -->
 
+    @if($canSupplierActOnOrder)
+        <div class="bg-white rounded-lg shadow-md p-6 mt-4">
+            <h2 class="text-lg font-semibold mb-4">{{__('order-page.supplier_actions.title')}}</h2>
+            <div class="flex gap-3">
+                @if($order->order_status === OrderStatus::Paid->value)
+                    <x-button variant="success" wire:click="markAsShipped" :wire-target="'markAsShipped'" :loading="true">
+                        {{__('order-page.supplier_actions.mark_as_shipped')}}
+                    </x-button>
+                    <x-button variant="danger" wire:click="cancelOrder" :wire-target="'cancelOrder'" :loading="true">
+                        {{__('order-page.supplier_actions.cancel_order')}}
+                    </x-button>
+                @elseif($order->order_status === OrderStatus::Shipped->value)
+                    <x-button variant="success" wire:click="markAsDelivered" :wire-target="'markAsDelivered'" :loading="true">
+                        {{__('order-page.supplier_actions.mark_as_delivered')}}
+                    </x-button>
+                @endif
+            </div>
+        </div>
+    @endif
+
     <div class="flex flex-col md:flex-row gap-4 mt-4">
         <div class="md:w-3/4">
             <div class="bg-white overflow-x-auto rounded-lg shadow-md p-6 mb-4">

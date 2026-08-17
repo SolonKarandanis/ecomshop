@@ -15,6 +15,12 @@ return [
     ],
     'review_this_product' => 'Αξιολογήστε αυτό το προϊόν',
     'cancel_review' => 'Άκυρο',
+    'supplier_actions' => [
+        'title' => 'Ενέργειες Προμηθευτή',
+        'mark_as_shipped' => 'Σήμανση ως Απεσταλμένη',
+        'mark_as_delivered' => 'Σήμανση ως Παραδομένη',
+        'cancel_order' => 'Ακύρωση Παραγγελίας',
+    ],
     'shipping' => [
         'address' => 'Διεύθυνση Αποστολής',
         'phone' => 'Τηλέφωνο',
@@ -25,5 +31,5 @@ return [
         'taxes' => 'Φόροι',
         'shipping' => 'Κόστος Αποστολής',
         'total' => 'Γενικό Σύνολο',
-    ]
+    ],
 ];

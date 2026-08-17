@@ -5,14 +5,18 @@ namespace App\Livewire;
 use App\Attributes\PreAuthorize;
 use App\Dtos\SubmitReviewDto;
 use App\Dtos\UpdateReviewDTO;
+use App\Enums\OrderStatusEnum;
+use App\Exceptions\OrderException;
 use App\Exceptions\ReviewException;
 use App\Http\Requests\SubmitReviewRequest;
 use App\Livewire\Traits\WithMessages;
 use App\Livewire\Traits\WithPreAuthorize;
+use App\Models\Order;
 use App\Services\OrderService;
 use App\Services\ReviewService;
 use App\Services\UiService;
 use App\Traits\HasStatusClasses;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
@@ -50,6 +54,18 @@ class OrderDetailsPage extends Component
     public function mount($id): void
     {
         $this->id = $id;
+    }
+
+    #[Computed]
+    public function order(): Order
+    {
+        return $this->orderService->getOrderById($this->id, auth()->user());
+    }
+
+    #[Computed]
+    public function canSupplierActOnOrder(): bool
+    {
+        return auth()->check() && $this->orderService->canSupplierActOn($this->order, auth()->user());
     }
 
     public function openReviewForm(int $productId): void
@@ -109,10 +125,48 @@ class OrderDetailsPage extends Component
         }
     }
 
+    #[PreAuthorize('supplier-action')]
+    public function markAsShipped(): void
+    {
+        $this->transitionOrderAsSupplier(__FUNCTION__, OrderStatusEnum::Shipped, __('messages.supplier_order_actions.shipped_success'));
+    }
+
+    #[PreAuthorize('supplier-action')]
+    public function markAsDelivered(): void
+    {
+        $this->transitionOrderAsSupplier(__FUNCTION__, OrderStatusEnum::Delivered, __('messages.supplier_order_actions.delivered_success'));
+    }
+
+    #[PreAuthorize('supplier-action')]
+    public function cancelOrder(): void
+    {
+        $this->transitionOrderAsSupplier(__FUNCTION__, OrderStatusEnum::Cancelled, __('messages.supplier_order_actions.cancelled_success'));
+    }
+
+    private function transitionOrderAsSupplier(string $callingMethod, OrderStatusEnum $toStatus, string $successMessage): void
+    {
+        $title = __('messages.supplier_order_actions.title');
+
+        if (! $this->isPreAuthorized($callingMethod) || ! $this->canSupplierActOnOrder) {
+            $this->handleError($title, __('messages.supplier_order_actions.not_eligible'), OrderException::supplierActionNotAllowed());
+
+            return;
+        }
+
+        try {
+            $this->orderService->transitionOrderStatusBySupplier($this->order, auth()->user(), $toStatus);
+            unset($this->order, $this->canSupplierActOnOrder);
+            $this->handleSuccess(null, $title, $successMessage);
+        } catch (OrderException $e) {
+            $this->handleError($title, __('messages.supplier_order_actions.error'), $e);
+        }
+    }
+
     public function render()
     {
-        $order = $this->orderService->getOrderById($this->id, auth()->user());
-
-        return view('livewire.order-details-page', ['order' => $order]);
+        return view('livewire.order-details-page', [
+            'order' => $this->order,
+            'canSupplierActOnOrder' => $this->canSupplierActOnOrder,
+        ]);
     }
 }
